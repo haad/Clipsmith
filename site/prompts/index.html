@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clipsmith Prompt Library</title>
+  <script>
+    // Apply theme before DOM renders to prevent flash of wrong theme
+    (function () {
+      var saved = localStorage.getItem('theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <style>
+    /* ============================================================
+       CSS Custom Properties — Light (default) & Dark themes
+    ============================================================ */
+    :root {
+      --bg-page: #f6f8fa;
+      --bg-card: #ffffff;
+      --bg-header: #ffffff;
+      --bg-input: #ffffff;
+      --bg-tab-active: #0969da;
+      --bg-tab-hover: #eaeef2;
+      --bg-btn-copy: #0969da;
+      --bg-btn-copy-hover: #0860ca;
+      --bg-btn-copy-copied: #1a7f37;
+
+      --text-primary: #1f2328;
+      --text-secondary: #656d76;
+      --text-tab-active: #ffffff;
+      --text-btn-copy: #ffffff;
+
+      --border-color: #d0d7de;
+      --border-focus: #0969da;
+      --shadow-card: 0 1px 3px rgba(31, 35, 40, 0.08), 0 0 0 1px rgba(31, 35, 40, 0.06);
+      --shadow-card-hover: 0 4px 12px rgba(31, 35, 40, 0.12), 0 0 0 1px rgba(31, 35, 40, 0.08);
+
+      --badge-coding-bg: #ddf4ff;
+      --badge-coding-text: #0550ae;
+      --badge-writing-bg: #fff8c5;
+      --badge-writing-text: #6e4b04;
+      --badge-analysis-bg: #dafbe1;
+      --badge-analysis-text: #116329;
+      --badge-creative-bg: #ffeff7;
+      --badge-creative-text: #a0126c;
+
+      --toggle-btn-bg: #eaeef2;
+      --toggle-btn-hover: #d0d7de;
+
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+
+      --radius-card: 10px;
+      --radius-badge: 20px;
+      --radius-btn: 6px;
+      --radius-input: 6px;
+
+      --transition: 0.15s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg-page: #0d1117;
+      --bg-card: #161b22;
+      --bg-header: #161b22;
+      --bg-input: #0d1117;
+      --bg-tab-active: #388bfd;
+      --bg-tab-hover: #1c2128;
+      --bg-btn-copy: #388bfd;
+      --bg-btn-copy-hover: #4d9dff;
+      --bg-btn-copy-copied: #2ea043;
+
+      --text-primary: #e6edf3;
+      --text-secondary: #7d8590;
+      --text-tab-active: #ffffff;
+      --text-btn-copy: #ffffff;
+
+      --border-color: #30363d;
+      --border-focus: #388bfd;
+      --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(48, 54, 61, 0.6);
+      --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(56, 139, 253, 0.3);
+
+      --badge-coding-bg: #0c2d6b;
+      --badge-coding-text: #79c0ff;
+      --badge-writing-bg: #3d2a00;
+      --badge-writing-text: #e3b341;
+      --badge-analysis-bg: #0a2c1e;
+      --badge-analysis-text: #56d364;
+      --badge-creative-bg: #3d0030;
+      --badge-creative-text: #ff7fd8;
+
+      --toggle-btn-bg: #21262d;
+      --toggle-btn-hover: #30363d;
+    }
+
+    /* ============================================================
+       Reset & Base
+    ============================================================ */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: var(--font);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background-color var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       Header
+    ============================================================ */
+    header {
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      padding: 20px 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+
+    .header-inner {
+      max-width: 1600px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .header-title h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.02em;
+    }
+
+    .header-subtitle {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+    }
+
+    /* Nav links */
+    .header-nav {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-nav a {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.15s ease;
+    }
+
+    .header-nav a:hover {
+      color: var(--text-primary);
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+      background-color: var(--toggle-btn-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-btn);
+      cursor: pointer;
+      padding: 7px 11px;
+      font-size: 1rem;
+      line-height: 1;
+      color: var(--text-primary);
+      transition: background-color var(--transition), border-color var(--transition);
+      flex-shrink: 0;
+    }
+
+    .theme-toggle:hover {
+      background-color: var(--toggle-btn-hover);
+    }
+
+    /* ============================================================
+       Main layout
+    ============================================================ */
+    main {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    /* ============================================================
+       Controls bar (tabs + search)
+    ============================================================ */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    @media (min-width: 640px) {
+      .controls {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    /* Category tabs */
+    .category-tabs {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      background: none;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-btn);
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 6px 12px;
+      transition: background-color var(--transition), color var(--transition),
+                  border-color var(--transition);
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background-color: var(--bg-tab-hover);
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      background-color: var(--bg-tab-active);
+      border-color: transparent;
+      color: var(--text-tab-active);
+    }
+
+    /* Search input */
+    .search-wrapper {
+      position: relative;
+      flex-shrink: 0;
+      width: 100%;
+    }
+
+    @media (min-width: 640px) {
+      .search-wrapper {
+        width: 240px;
+      }
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .search-input {
+      background-color: var(--bg-input);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-input);
+      color: var(--text-primary);
+      font-family: var(--font);
+      font-size: 0.875rem;
+      padding: 7px 12px 7px 32px;
+      width: 100%;
+      transition: border-color var(--transition), background-color var(--transition);
+      outline: none;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .search-input:focus {
+      border-color: var(--border-focus);
+      box-shadow: 0 0 0 3px rgba(9, 105, 218, 0.15);
+    }
+
+    [data-theme="dark"] .search-input:focus {
+      box-shadow: 0 0 0 3px rgba(56, 139, 253, 0.2);
+    }
+
+    /* ============================================================
+       Status messages (loading / error / empty)
+    ============================================================ */
+    .status-message {
+      text-align: center;
+      padding: 60px 24px;
+      color: var(--text-secondary);
+      font-size: 0.9375rem;
+    }
+
+    .status-message .status-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+
+    .status-message p {
+      margin-top: 8px;
+      font-size: 0.875rem;
+    }
+
+    /* ============================================================
+       Results count
+    ============================================================ */
+    .results-count {
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      margin-bottom: 16px;
+    }
+
+    /* ============================================================
+       Card grid
+    ============================================================ */
+    .card-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 640px) {
+      .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1024px) {
+      .card-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    /* ============================================================
+       Prompt card
+    ============================================================ */
+    .prompt-card {
+      background-color: var(--bg-card);
+      border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      transition: box-shadow var(--transition), background-color var(--transition);
+    }
+
+    .prompt-card:hover {
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .card-title {
+      font-size: 0.9375rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.4;
+    }
+
+    /* Category badges */
+    .category-badge {
+      border-radius: var(--radius-badge);
+      font-size: 0.6875rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      padding: 3px 9px;
+      text-transform: uppercase;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .category-badge.coding {
+      background-color: var(--badge-coding-bg);
+      color: var(--badge-coding-text);
+    }
+    .category-badge.writing {
+      background-color: var(--badge-writing-bg);
+      color: var(--badge-writing-text);
+    }
+    .category-badge.analysis {
+      background-color: var(--badge-analysis-bg);
+      color: var(--badge-analysis-text);
+    }
+    .category-badge.creative {
+      background-color: var(--badge-creative-bg);
+      color: var(--badge-creative-text);
+    }
+
+    /* Prompt content */
+    .card-content {
+      flex: 1;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      white-space: pre-wrap;
+      font-family: var(--font-mono);
+      line-height: 1.65;
+      margin-bottom: 16px;
+      word-break: break-word;
+      overflow-wrap: break-word;
+    }
+
+    /* Copy button */
+    .copy-btn {
+      align-self: flex-start;
+      background-color: var(--bg-btn-copy);
+      border: none;
+      border-radius: var(--radius-btn);
+      color: var(--text-btn-copy);
+      cursor: pointer;
+      font-family: var(--font);
+      font-size: 0.8125rem;
+      font-weight: 500;
+      padding: 6px 14px;
+      transition: background-color var(--transition), transform 0.1s ease;
+    }
+
+    .copy-btn:hover {
+      background-color: var(--bg-btn-copy-hover);
+    }
+
+    .copy-btn:active {
+      transform: scale(0.97);
+    }
+
+    .copy-btn.copied {
+      background-color: var(--bg-btn-copy-copied);
+    }
+
+    /* ============================================================
+       Footer
+    ============================================================ */
+    footer {
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.8125rem;
+      margin-top: 48px;
+      padding: 20px 24px;
+      text-align: center;
+      transition: border-color var(--transition);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-inner">
+      <div class="header-title">
+        <h1>Clipsmith Prompt Library</h1>
+        <span class="header-subtitle" id="headerSubtitle">Loading prompts...</span>
+      </div>
+      <div class="header-nav">
+        <a href="../">Clipsmith</a>
+        <a href="https://github.com/haad/Clipsmith" target="_blank" rel="noopener">GitHub</a>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+          <span id="themeIcon">&#9790;</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="controls">
+      <div class="category-tabs" id="categoryTabs" role="tablist" aria-label="Filter by category">
+        <!-- Populated dynamically -->
+      </div>
+      <div class="search-wrapper">
+        <span class="search-icon" aria-hidden="true">&#128269;</span>
+        <input
+          type="search"
+          class="search-input"
+          id="searchInput"
+          placeholder="Search prompts..."
+          aria-label="Search prompts by title"
+          autocomplete="off"
+        />
+      </div>
+    </div>
+
+    <div id="resultsCount" class="results-count" aria-live="polite"></div>
+    <div id="content"></div>
+  </main>
+
+  <footer>
+    <span>Clipsmith Prompt Library &mdash; curated prompts for Clipsmith clipboard manager</span>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ----------------------------------------------------------
+         State
+      ---------------------------------------------------------- */
+      var allPrompts = [];
+      var activeCategory = 'all';
+      var searchQuery = '';
+
+      /* ----------------------------------------------------------
+         Theme management
+      ---------------------------------------------------------- */
+      function currentTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      }
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+        updateThemeIcon();
+        localStorage.setItem('theme', theme);
+      }
+
+      function updateThemeIcon() {
+        var icon = document.getElementById('themeIcon');
+        icon.innerHTML = currentTheme() === 'dark' ? '&#9728;' : '&#9790;'; // sun or moon
+      }
+
+      document.getElementById('themeToggle').addEventListener('click', function () {
+        applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+      });
+
+      // Sync icon on load
+      updateThemeIcon();
+
+      /* ----------------------------------------------------------
+         Category data
+      ---------------------------------------------------------- */
+      var CATEGORY_ORDER = ['all', 'coding', 'writing', 'analysis', 'creative'];
+
+      function countByCategory(prompts) {
+        var counts = { all: prompts.length };
+        prompts.forEach(function (p) {
+          counts[p.category] = (counts[p.category] || 0) + 1;
+        });
+        return counts;
+      }
+
+      function renderTabs(prompts) {
+        var counts = countByCategory(prompts);
+        var container = document.getElementById('categoryTabs');
+        container.innerHTML = '';
+
+        CATEGORY_ORDER.forEach(function (cat) {
+          if (cat !== 'all' && !counts[cat]) return;
+          var count = counts[cat] || 0;
+          var label = cat === 'all' ? 'All' : capitalize(cat);
+
+          var btn = document.createElement('button');
+          btn.className = 'tab-btn' + (cat === activeCategory ? ' active' : '');
+          btn.setAttribute('role', 'tab');
+          btn.setAttribute('aria-selected', cat === activeCategory ? 'true' : 'false');
+          btn.setAttribute('data-category', cat);
+          btn.textContent = label + ' (' + count + ')';
+
+          btn.addEventListener('click', function () {
+            activeCategory = cat;
+            renderTabs(prompts); // re-render tabs to update active state
+            renderCards();
+          });
+
+          container.appendChild(btn);
+        });
+      }
+
+      /* ----------------------------------------------------------
+         Filtering
+      ---------------------------------------------------------- */
+      function filteredPrompts() {
+        return allPrompts.filter(function (p) {
+          var matchCat = activeCategory === 'all' || p.category === activeCategory;
+          var matchSearch = !searchQuery || p.title.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1;
+          return matchCat && matchSearch;
+        });
+      }
+
+      /* ----------------------------------------------------------
+         Card rendering
+      ---------------------------------------------------------- */
+      function capitalize(str) {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      }
+
+      function escapeHTML(str) {
+        var d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+      }
+
+      function renderCards() {
+        var prompts = filteredPrompts();
+        var content = document.getElementById('content');
+        var resultsCount = document.getElementById('resultsCount');
+
+        // Update count label
+        if (allPrompts.length > 0) {
+          resultsCount.textContent = prompts.length === allPrompts.length
+            ? 'Showing all ' + prompts.length + ' prompts'
+            : 'Showing ' + prompts.length + ' of ' + allPrompts.length + ' prompts';
+        } else {
+          resultsCount.textContent = '';
+        }
+
+        if (prompts.length === 0) {
+          content.innerHTML = '<div class="status-message"><div class="status-icon">&#128269;</div><strong>No prompts found</strong><p>Try adjusting your search or category filter.</p></div>';
+          return;
+        }
+
+        var grid = document.createElement('div');
+        grid.className = 'card-grid';
+
+        prompts.forEach(function (prompt) {
+          var card = document.createElement('article');
+          card.className = 'prompt-card';
+
+          var header = document.createElement('div');
+          header.className = 'card-header';
+
+          var title = document.createElement('h2');
+          title.className = 'card-title';
+          title.textContent = prompt.title;
+
+          var badge = document.createElement('span');
+          badge.className = 'category-badge ' + prompt.category;
+          badge.textContent = capitalize(prompt.category);
+
+          header.appendChild(title);
+          header.appendChild(badge);
+
+          var contentDiv = document.createElement('div');
+          contentDiv.className = 'card-content';
+          contentDiv.textContent = prompt.content; // textContent preserves literal text incl. {{vars}}
+
+          var copyBtn = document.createElement('button');
+          copyBtn.className = 'copy-btn';
+          copyBtn.textContent = 'Copy';
+          copyBtn.setAttribute('aria-label', 'Copy prompt: ' + prompt.title);
+
+          copyBtn.addEventListener('click', function () {
+            navigator.clipboard.writeText(prompt.content).then(function () {
+              copyBtn.textContent = 'Copied!';
+              copyBtn.classList.add('copied');
+              setTimeout(function () {
+                copyBtn.textContent = 'Copy';
+                copyBtn.classList.remove('copied');
+              }, 2000);
+            }).catch(function () {
+              copyBtn.textContent = 'Error';
+              setTimeout(function () {
+                copyBtn.textContent = 'Copy';
+              }, 2000);
+            });
+          });
+
+          card.appendChild(header);
+          card.appendChild(contentDiv);
+          card.appendChild(copyBtn);
+          grid.appendChild(card);
+        });
+
+        content.innerHTML = '';
+        content.appendChild(grid);
+      }
+
+      /* ----------------------------------------------------------
+         Search handler
+      ---------------------------------------------------------- */
+      document.getElementById('searchInput').addEventListener('input', function (e) {
+        searchQuery = e.target.value;
+        renderCards();
+      });
+
+      /* ----------------------------------------------------------
+         Data loading
+      ---------------------------------------------------------- */
+      function showLoading() {
+        var content = document.getElementById('content');
+        content.innerHTML = '<div class="status-message"><div class="status-icon">&#8987;</div><strong>Loading prompts...</strong></div>';
+      }
+
+      function showError(msg) {
+        var content = document.getElementById('content');
+        content.innerHTML = '<div class="status-message"><div class="status-icon">&#9888;</div><strong>Failed to load prompts</strong><p>' + escapeHTML(msg) + '</p></div>';
+        document.getElementById('headerSubtitle').textContent = 'Could not load prompts.json';
+      }
+
+      showLoading();
+
+      fetch('./prompts.json')
+        .then(function (res) {
+          if (!res.ok) {
+            throw new Error('HTTP ' + res.status + ': ' + res.statusText);
+          }
+          return res.json();
+        })
+        .then(function (data) {
+          allPrompts = data.prompts || [];
+          var total = allPrompts.length;
+
+          // Compute per-category counts for subtitle
+          var categoryCounts = countByCategory(allPrompts);
+          delete categoryCounts.all;
+          var catList = Object.keys(categoryCounts)
+            .sort()
+            .map(function (c) { return categoryCounts[c] + ' ' + c; })
+            .join(', ');
+
+          document.getElementById('headerSubtitle').textContent =
+            total + ' curated prompts for Clipsmith clipboard manager';
+
+          renderTabs(allPrompts);
+          renderCards();
+        })
+        .catch(function (err) {
+          showError(err.message || 'Unknown error');
+        });
+
+    })();
+  </script>
+
+</body>
+</html>

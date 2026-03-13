@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clipsmith — Clipboard Manager for macOS</title>
-  <meta name="description" content="A clean and simple clipboard manager for developers. Keyboard-first, open source, macOS native." />
+  <title>Clipsmith — Clipboard, Snippet &amp; Prompt Manager for macOS</title>
+  <meta name="description" content="Keyboard-first clipboard history, code snippets, and AI prompt library for macOS developers. Open source." />
   <script>
     (function () {
       var saved = localStorage.getItem('theme');
@@ -14,39 +14,25 @@
     })();
   </script>
   <style>
-    /* ============================================================
-       CSS Custom Properties — Light (default) & Dark themes
-       (shared with prompt-library)
-    ============================================================ */
     :root {
       --bg-page: #f6f8fa;
       --bg-card: #ffffff;
       --bg-header: #ffffff;
       --bg-btn-primary: #0969da;
       --bg-btn-primary-hover: #0860ca;
-      --bg-btn-secondary: transparent;
-
       --text-primary: #1f2328;
       --text-secondary: #656d76;
       --text-btn-primary: #ffffff;
-
       --border-color: #d0d7de;
       --border-focus: #0969da;
       --shadow-card: 0 1px 3px rgba(31, 35, 40, 0.08), 0 0 0 1px rgba(31, 35, 40, 0.06);
       --shadow-card-hover: 0 4px 12px rgba(31, 35, 40, 0.12), 0 0 0 1px rgba(31, 35, 40, 0.08);
-
       --toggle-btn-bg: #eaeef2;
       --toggle-btn-hover: #d0d7de;
-
       --accent: #0969da;
-      --accent-subtle: #ddf4ff;
-      --accent-text: #0550ae;
-
       --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
       --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-
       --radius-card: 10px;
-      --radius-badge: 20px;
       --radius-btn: 6px;
       --transition: 0.15s ease;
     }
@@ -57,35 +43,20 @@
       --bg-header: #161b22;
       --bg-btn-primary: #388bfd;
       --bg-btn-primary-hover: #4d9dff;
-
       --text-primary: #e6edf3;
       --text-secondary: #7d8590;
       --text-btn-primary: #ffffff;
-
       --border-color: #30363d;
       --border-focus: #388bfd;
       --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(48, 54, 61, 0.6);
       --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(56, 139, 253, 0.3);
-
       --toggle-btn-bg: #21262d;
       --toggle-btn-hover: #30363d;
-
       --accent: #388bfd;
-      --accent-subtle: #0c2d6b;
-      --accent-text: #79c0ff;
     }
 
-    /* ============================================================
-       Reset & Base
-    ============================================================ */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html {
-      font-size: 16px;
-      -webkit-font-smoothing: antialiased;
-      scroll-behavior: smooth;
-    }
-
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
     body {
       font-family: var(--font);
       background-color: var(--bg-page);
@@ -94,311 +65,126 @@
       transition: background-color var(--transition), color var(--transition);
       min-height: 100vh;
     }
-
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
 
-    /* ============================================================
-       Navigation
-    ============================================================ */
+    /* Nav */
     nav {
       background-color: var(--bg-header);
       border-bottom: 1px solid var(--border-color);
       padding: 14px 24px;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      position: sticky; top: 0; z-index: 100;
       transition: background-color var(--transition), border-color var(--transition);
     }
-
     .nav-inner {
-      max-width: 1080px;
-      margin: 0 auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      max-width: 1080px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
     }
-
     .nav-brand {
-      font-size: 1.125rem;
-      font-weight: 700;
-      color: var(--text-primary);
-      text-decoration: none;
-      letter-spacing: -0.02em;
+      font-size: 1.125rem; font-weight: 700; color: var(--text-primary);
+      text-decoration: none; letter-spacing: -0.02em;
     }
     .nav-brand:hover { text-decoration: none; }
-
-    .nav-links {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      list-style: none;
-    }
-
+    .nav-links { display: flex; align-items: center; gap: 16px; list-style: none; }
     .nav-links a {
-      font-size: 0.875rem;
-      font-weight: 500;
-      color: var(--text-secondary);
+      font-size: 0.875rem; font-weight: 500; color: var(--text-secondary);
       transition: color var(--transition);
     }
     .nav-links a:hover { color: var(--text-primary); text-decoration: none; }
-
     .theme-toggle {
-      background-color: var(--toggle-btn-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-btn);
-      cursor: pointer;
-      padding: 6px 10px;
-      font-size: 1rem;
-      line-height: 1;
-      color: var(--text-primary);
+      background-color: var(--toggle-btn-bg); border: 1px solid var(--border-color);
+      border-radius: var(--radius-btn); cursor: pointer; padding: 6px 10px;
+      font-size: 1rem; line-height: 1; color: var(--text-primary);
       transition: background-color var(--transition), border-color var(--transition);
       flex-shrink: 0;
     }
     .theme-toggle:hover { background-color: var(--toggle-btn-hover); }
 
-    /* ============================================================
-       Section base
-    ============================================================ */
-    .section {
-      max-width: 1080px;
-      margin: 0 auto;
-      padding: 64px 24px;
-    }
+    /* Sections */
+    .section { max-width: 1080px; margin: 0 auto; padding: 64px 24px; }
+    .section-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .section-subtitle { font-size: 1rem; color: var(--text-secondary); margin-bottom: 32px; }
 
-    .section-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 8px;
-    }
-
-    .section-subtitle {
-      font-size: 1rem;
-      color: var(--text-secondary);
-      margin-bottom: 32px;
-    }
-
-    /* ============================================================
-       Hero
-    ============================================================ */
-    .hero {
-      text-align: center;
-      padding: 80px 24px 64px;
-      max-width: 1080px;
-      margin: 0 auto;
-    }
-
-    .hero-icon {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 24px;
-    }
-
-    .hero h1 {
-      font-size: 2.5rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 8px;
-    }
-
-    .hero-tagline {
-      font-size: 1.25rem;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
-    }
-
-    .hero-meta {
-      font-size: 0.875rem;
-      color: var(--text-secondary);
-      margin-bottom: 32px;
-    }
-
-    .hero-meta span::after {
-      content: "\00b7";
-      margin: 0 8px;
-    }
+    /* Hero */
+    .hero { text-align: center; padding: 80px 24px 64px; max-width: 1080px; margin: 0 auto; }
+    .hero-icon { width: 120px; height: 120px; margin-bottom: 24px; border-radius: 22%; }
+    .hero h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px; }
+    .hero-tagline { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 12px; }
+    .hero-meta { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 32px; }
+    .hero-meta span::after { content: "\00b7"; margin: 0 8px; }
     .hero-meta span:last-child::after { content: none; }
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 
-    .hero-ctas {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-
+    /* Buttons */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-family: var(--font);
-      font-size: 0.9375rem;
-      font-weight: 600;
-      padding: 10px 20px;
-      border-radius: var(--radius-btn);
-      border: none;
-      cursor: pointer;
-      transition: background-color var(--transition), transform 0.1s ease;
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font); font-size: 0.9375rem; font-weight: 600;
+      padding: 10px 20px; border-radius: var(--radius-btn); border: none;
+      cursor: pointer; transition: background-color var(--transition), transform 0.1s ease;
       text-decoration: none;
     }
     .btn:hover { text-decoration: none; }
     .btn:active { transform: scale(0.97); }
-
-    .btn-primary {
-      background-color: var(--bg-btn-primary);
-      color: var(--text-btn-primary);
-    }
+    .btn-primary { background-color: var(--bg-btn-primary); color: var(--text-btn-primary); }
     .btn-primary:hover { background-color: var(--bg-btn-primary-hover); }
-
     .btn-secondary {
-      background-color: transparent;
-      color: var(--text-primary);
+      background-color: transparent; color: var(--text-primary);
       border: 1px solid var(--border-color);
     }
     .btn-secondary:hover { background-color: var(--toggle-btn-bg); }
 
-    /* ============================================================
-       Feature grid
-    ============================================================ */
-    .card-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
+    /* Feature grid */
+    .card-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
     @media (min-width: 640px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 1024px) { .card-grid { grid-template-columns: repeat(3, 1fr); } }
-
     .feature-card {
-      background-color: var(--bg-card);
-      border-radius: var(--radius-card);
-      box-shadow: var(--shadow-card);
-      padding: 24px;
+      background-color: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); padding: 24px;
       transition: box-shadow var(--transition), background-color var(--transition);
     }
     .feature-card:hover { box-shadow: var(--shadow-card-hover); }
+    .feature-icon { font-size: 1.5rem; margin-bottom: 12px; display: block; }
+    .feature-title { font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px; }
+    .feature-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55; }
 
-    .feature-icon {
-      font-size: 1.5rem;
-      margin-bottom: 12px;
-      display: block;
-    }
-
-    .feature-title {
-      font-size: 0.9375rem;
-      font-weight: 600;
-      margin-bottom: 6px;
-    }
-
-    .feature-desc {
-      font-size: 0.8125rem;
-      color: var(--text-secondary);
-      line-height: 1.55;
-    }
-
-    /* ============================================================
-       Keyboard shortcuts
-    ============================================================ */
-    .shortcuts-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 24px;
-    }
+    /* Keyboard shortcuts */
+    .shortcuts-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
     @media (min-width: 640px) { .shortcuts-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 1024px) { .shortcuts-grid { grid-template-columns: repeat(3, 1fr); } }
-
     .shortcut-group h3 {
-      font-size: 0.8125rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: var(--text-secondary);
-      margin-bottom: 12px;
+      font-size: 0.8125rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 12px;
     }
-
-    .shortcut-list {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
+    .shortcut-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
     .shortcut-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      font-size: 0.875rem;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; font-size: 0.875rem;
     }
-
-    .shortcut-label {
-      color: var(--text-primary);
-    }
-
+    .shortcut-label { color: var(--text-primary); }
     kbd {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      border-radius: 4px;
-      padding: 2px 7px;
-      box-shadow: 0 1px 0 var(--border-color);
-      white-space: nowrap;
-      color: var(--text-primary);
+      font-family: var(--font-mono); font-size: 0.75rem;
+      background-color: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 4px; padding: 2px 7px; box-shadow: 0 1px 0 var(--border-color);
+      white-space: nowrap; color: var(--text-primary);
       transition: background-color var(--transition), border-color var(--transition);
     }
 
-    /* ============================================================
-       Download section
-    ============================================================ */
-    .download-section {
-      text-align: center;
-      border-top: 1px solid var(--border-color);
-      transition: border-color var(--transition);
-    }
+    /* Download */
+    .download-section { text-align: center; border-top: 1px solid var(--border-color); transition: border-color var(--transition); }
+    .download-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .download-note { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.7; }
 
-    .download-ctas {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-    }
-
-    .download-note {
-      font-size: 0.8125rem;
-      color: var(--text-secondary);
-      line-height: 1.7;
-    }
-
-    /* ============================================================
-       Footer
-    ============================================================ */
+    /* Footer */
     footer {
-      border-top: 1px solid var(--border-color);
-      color: var(--text-secondary);
-      font-size: 0.8125rem;
-      padding: 24px;
-      text-align: center;
+      border-top: 1px solid var(--border-color); color: var(--text-secondary);
+      font-size: 0.8125rem; padding: 24px; text-align: center;
       transition: border-color var(--transition);
     }
-
-    .footer-links {
-      display: flex;
-      gap: 16px;
-      justify-content: center;
-      flex-wrap: wrap;
-      margin-bottom: 8px;
-    }
-
-    .footer-links a {
-      color: var(--text-secondary);
-    }
+    .footer-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+    .footer-links a { color: var(--text-secondary); }
     .footer-links a:hover { color: var(--text-primary); }
 
-    /* ============================================================
-       Responsive
-    ============================================================ */
+    /* Responsive */
     @media (max-width: 639px) {
       .hero h1 { font-size: 2rem; }
       .hero-tagline { font-size: 1.05rem; }
@@ -410,14 +196,11 @@
 </head>
 <body>
 
-  <!-- ============================================================
-       Navigation
-  ============================================================ -->
   <nav>
     <div class="nav-inner">
       <a href="#" class="nav-brand">Clipsmith</a>
       <ul class="nav-links">
-        <li><a href="../../prompt-library/">Prompt Library</a></li>
+        <li><a href="./prompts/">Prompt Library</a></li>
         <li><a href="https://github.com/haad/Clipsmith" target="_blank" rel="noopener">GitHub</a></li>
         <li>
           <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
@@ -428,50 +211,9 @@
     </div>
   </nav>
 
-  <!-- ============================================================
-       Hero
-  ============================================================ -->
   <section class="hero">
-    <svg class="hero-icon" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg" aria-label="Clipsmith app icon">
-      <defs>
-        <linearGradient id="bgGrad" x1="512" y1="922" x2="512" y2="102" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="#1A3A5C"/>
-          <stop offset="0.45" stop-color="#4A90D9"/>
-          <stop offset="1" stop-color="#6BB3FF"/>
-        </linearGradient>
-        <linearGradient id="hlGrad" x1="512" y1="102" x2="512" y2="560" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stop-color="white" stop-opacity="0.2"/>
-          <stop offset="1" stop-color="white" stop-opacity="0"/>
-        </linearGradient>
-        <clipPath id="squircleClip">
-          <rect x="102" y="102" width="820" height="820" rx="185" ry="185"/>
-        </clipPath>
-        <filter id="iconShadow" x="-8%" y="-4%" width="116%" height="120%">
-          <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#000" flood-opacity="0.38"/>
-        </filter>
-        <filter id="elemShadow" x="-10%" y="-5%" width="130%" height="120%">
-          <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000" flood-opacity="0.22"/>
-        </filter>
-      </defs>
-      <rect x="102" y="102" width="820" height="820" rx="185" ry="185" fill="url(#bgGrad)" filter="url(#iconShadow)"/>
-      <rect x="102" y="102" width="820" height="460" fill="url(#hlGrad)" clip-path="url(#squircleClip)"/>
-      <rect x="103" y="103" width="818" height="818" rx="184" ry="184" fill="none" stroke="white" stroke-opacity="0.1" stroke-width="1.5"/>
-      <g filter="url(#elemShadow)">
-        <rect x="310" y="300" width="330" height="440" rx="26" fill="white" fill-opacity="0.60"/>
-        <rect x="425" y="270" width="110" height="56" rx="14" fill="white" fill-opacity="0.60"/>
-        <rect x="450" y="282" width="60" height="26" rx="9" fill="#1A3A5C" fill-opacity="0.40"/>
-        <g>
-          <path d="M 415 362 L 665 362 Q 685 362, 685 382 L 685 732 Q 685 752, 665 752 L 415 752 Q 395 752, 395 732 L 395 382 Q 395 362, 415 362 Z" fill="white" fill-opacity="0.95"/>
-          <rect x="435" y="420" width="210" height="15" rx="7.5" fill="#1A3A5C" fill-opacity="0.25"/>
-          <rect x="435" y="468" width="210" height="15" rx="7.5" fill="#1A3A5C" fill-opacity="0.25"/>
-          <rect x="435" y="516" width="210" height="15" rx="7.5" fill="#1A3A5C" fill-opacity="0.25"/>
-          <rect x="435" y="564" width="155" height="15" rx="7.5" fill="#1A3A5C" fill-opacity="0.25"/>
-        </g>
-      </g>
-    </svg>
-
     <h1>Clipsmith</h1>
-    <p class="hero-tagline">A clean and simple clipboard manager for developers</p>
+    <p class="hero-tagline">Clipboard history, code snippets, and AI prompts — one shortcut away</p>
     <p class="hero-meta">
       <span>Keyboard-first</span>
       <span>Open source</span>
@@ -479,27 +221,25 @@
     </p>
     <div class="hero-ctas">
       <a href="https://github.com/haad/Clipsmith/releases" class="btn btn-primary" target="_blank" rel="noopener">Download from GitHub</a>
+      <a href="https://github.com/haad/Clipsmith" class="btn btn-secondary" target="_blank" rel="noopener">View Source</a>
     </div>
   </section>
 
-  <!-- ============================================================
-       Features
-  ============================================================ -->
   <section class="section">
     <h2 class="section-title">Features</h2>
-    <p class="section-subtitle">Everything you need from a clipboard manager, nothing you don't.</p>
+    <p class="section-subtitle">One tool for everything you type, copy, and reuse.</p>
 
     <div class="card-grid">
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128203;</span>
         <h3 class="feature-title">Clipboard History</h3>
-        <p class="feature-desc">Automatically saves everything you copy. Scroll back through your clipboard history and paste any previous item.</p>
+        <p class="feature-desc">Automatically saves everything you copy. Scroll back through your history and paste any previous item with one keystroke.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#9000;</span>
-        <h3 class="feature-title">Keyboard-First Navigation</h3>
-        <p class="feature-desc">Navigate your clipboard with arrow keys, paste with Return. Designed for developers who keep their hands on the keyboard.</p>
+        <h3 class="feature-title">Keyboard-First</h3>
+        <p class="feature-desc">Navigate with arrow keys, paste with Return, search with /. Designed for developers who keep their hands on the keyboard.</p>
       </article>
 
       <article class="feature-card">
@@ -515,12 +255,6 @@
       </article>
 
       <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#9729;</span>
-        <h3 class="feature-title">GitHub Gist Sharing</h3>
-        <p class="feature-desc">Share any clipping as a GitHub Gist with one keystroke. Perfect for quickly sharing code with teammates.</p>
-      </article>
-
-      <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128172;</span>
         <h3 class="feature-title">Prompt Library</h3>
         <p class="feature-desc">Built-in collection of curated AI prompts organized by category. Browse, search, and paste prompts for ChatGPT, Claude, and more.</p>
@@ -529,7 +263,13 @@
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#9889;</span>
         <h3 class="feature-title">Quick Actions</h3>
-        <p class="feature-desc">Transform clipboard text instantly: uppercase, lowercase, trim whitespace, sort lines, encode URLs, and more.</p>
+        <p class="feature-desc">Transform text instantly: uppercase, lowercase, trim whitespace, sort lines, encode URLs, and more.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#9729;</span>
+        <h3 class="feature-title">GitHub Gist Sharing</h3>
+        <p class="feature-desc">Share any clipping as a GitHub Gist with one keystroke. Perfect for quickly sharing code with teammates.</p>
       </article>
 
       <article class="feature-card">
@@ -546,9 +286,6 @@
     </div>
   </section>
 
-  <!-- ============================================================
-       Keyboard Shortcuts
-  ============================================================ -->
   <section class="section">
     <h2 class="section-title">Keyboard Shortcuts</h2>
     <p class="section-subtitle">Every action is a keystroke away.</p>
@@ -557,94 +294,40 @@
       <div class="shortcut-group">
         <h3>Navigation</h3>
         <ul class="shortcut-list">
-          <li class="shortcut-item">
-            <span class="shortcut-label">Open Clipsmith</span>
-            <kbd>&#8679;&#8984;V</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Previous clipping</span>
-            <kbd>&#8593;</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Next clipping</span>
-            <kbd>&#8595;</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Paste selected</span>
-            <kbd>&#9166;</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Search clippings</span>
-            <kbd>/</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Dismiss</span>
-            <kbd>Esc</kbd>
-          </li>
+          <li class="shortcut-item"><span class="shortcut-label">Open Clipsmith</span><kbd>&#8679;&#8984;V</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Previous clipping</span><kbd>&#8593;</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Next clipping</span><kbd>&#8595;</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Paste selected</span><kbd>&#9166;</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Search clippings</span><kbd>/</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Dismiss</span><kbd>Esc</kbd></li>
         </ul>
       </div>
 
       <div class="shortcut-group">
         <h3>Actions</h3>
         <ul class="shortcut-list">
-          <li class="shortcut-item">
-            <span class="shortcut-label">Delete clipping</span>
-            <kbd>&#8998;</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Star / unstar</span>
-            <kbd>S</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Share as Gist</span>
-            <kbd>G</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Quick actions</span>
-            <kbd>Tab</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Preview</span>
-            <kbd>Space</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Shortcut help</span>
-            <kbd>?</kbd>
-          </li>
+          <li class="shortcut-item"><span class="shortcut-label">Delete clipping</span><kbd>&#8998;</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Star / unstar</span><kbd>S</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Share as Gist</span><kbd>G</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Quick actions</span><kbd>Tab</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Preview</span><kbd>Space</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Shortcut help</span><kbd>?</kbd></li>
         </ul>
       </div>
 
       <div class="shortcut-group">
         <h3>Organization</h3>
         <ul class="shortcut-list">
-          <li class="shortcut-item">
-            <span class="shortcut-label">All clippings</span>
-            <kbd>&#8984;1</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Starred</span>
-            <kbd>&#8984;2</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Snippets</span>
-            <kbd>&#8984;3</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Prompts</span>
-            <kbd>&#8984;4</kbd>
-          </li>
-          <li class="shortcut-item">
-            <span class="shortcut-label">Snippet folders</span>
-            <kbd>&#8984;N</kbd>
-          </li>
+          <li class="shortcut-item"><span class="shortcut-label">All clippings</span><kbd>&#8984;1</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Starred</span><kbd>&#8984;2</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Snippets</span><kbd>&#8984;3</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Prompts</span><kbd>&#8984;4</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">New snippet folder</span><kbd>&#8984;N</kbd></li>
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- ============================================================
-       Download
-  ============================================================ -->
   <section class="section download-section">
     <h2 class="section-title">Get Clipsmith</h2>
     <p class="section-subtitle">Free and open source. Download and start using in seconds.</p>
@@ -660,29 +343,21 @@
     </p>
   </section>
 
-  <!-- ============================================================
-       Footer
-  ============================================================ -->
   <footer>
     <div class="footer-links">
+      <a href="./prompts/">Prompt Library</a>
       <a href="https://github.com/haad/Clipsmith" target="_blank" rel="noopener">GitHub</a>
-      <a href="../../prompt-library/">Prompt Library</a>
       <a href="https://www.paypal.com/donate/?hosted_button_id=BPGMKCULNBCH8" target="_blank" rel="noopener">Donate</a>
     </div>
-    <span>MIT License &mdash; &copy; 2024 Clipsmith contributors</span>
+    <span>MIT License &mdash; &copy; 2025 Clipsmith contributors</span>
   </footer>
 
-  <!-- ============================================================
-       Theme toggle script
-  ============================================================ -->
   <script>
     (function () {
       'use strict';
-
       function currentTheme() {
         return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
       }
-
       function applyTheme(theme) {
         if (theme === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
@@ -692,16 +367,13 @@
         updateThemeIcon();
         localStorage.setItem('theme', theme);
       }
-
       function updateThemeIcon() {
         var icon = document.getElementById('themeIcon');
         icon.innerHTML = currentTheme() === 'dark' ? '&#9728;' : '&#9790;';
       }
-
       document.getElementById('themeToggle').addEventListener('click', function () {
         applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
       });
-
       updateThemeIcon();
     })();
   </script>

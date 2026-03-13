@@ -12,7 +12,7 @@ struct PromptLibrarySettingsSection: View {
     // MARK: - Sync State
 
     @AppStorage(AppSettingsKeys.promptLibraryURL)
-    private var promptLibraryURL: String = "https://raw.githubusercontent.com/haad/flycut-prompts-library/refs/heads/gh-pages/prompts.json"
+    private var promptLibraryURL: String = "https://haad.github.io/Clipsmith/prompts/prompts.json"
 
     @AppStorage(AppSettingsKeys.promptLibraryLastSync)
     private var lastSyncISO: String = ""

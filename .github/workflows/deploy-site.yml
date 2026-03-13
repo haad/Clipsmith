@@ -1,0 +1,38 @@
+name: Deploy Site to GitHub Pages
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "site/prompts/prompts/**"
+      - "site/prompts/catalog.yaml"
+      - "site/prompts/scripts/build.sh"
+      - "site/prompts/schema/**"
+      - "site/prompts/index.html"
+      - "site/index.html"
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-gh-pages
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build prompts.json
+        run: bash site/prompts/scripts/build.sh
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./site
+          force_orphan: true
