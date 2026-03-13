@@ -1,5 +1,5 @@
 //
-// Debug configuration for Flycut
+// Debug configuration for Clipsmith
 // This configuration should be used for development and debugging
 //
 
@@ -23,7 +23,7 @@ ENABLE_TESTABILITY = YES
 GCC_PREPROCESSOR_DEFINITIONS = DEBUG=1 $(inherited)
 
 // Code signing entitlements for debug
-CODE_SIGN_ENTITLEMENTS = FlycutDebug.entitlements
+CODE_SIGN_ENTITLEMENTS = ClipsmithDebug.entitlements
 
 // Product name with debug suffix (optional)
 PRODUCT_NAME = $(TARGET_NAME)

@@ -98,16 +98,16 @@ jobs:
         echo "Using identity: $IDENTITY"
 
     - name: List available schemes
-      run: xcodebuild -list -project Flycut.xcodeproj
+      run: xcodebuild -list -project Clipsmith.xcodeproj
 
     - name: Build and Archive (Signed)
       if: steps.check_secrets.outputs.has_certs == 'true'
       run: |
         xcodebuild \
-          -project Flycut.xcodeproj \
-          -scheme Flycut \
+          -project Clipsmith.xcodeproj \
+          -scheme Clipsmith \
           -configuration Release \
-          -archivePath build/Flycut.xcarchive \
+          -archivePath build/Clipsmith.xcarchive \
           archive \
           CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
           CODE_SIGN_STYLE=Manual
@@ -117,10 +117,10 @@ jobs:
       run: |
         echo "Building without code signing (no certificates provided)"
         xcodebuild \
-          -project Flycut.xcodeproj \
-          -scheme Flycut \
+          -project Clipsmith.xcodeproj \
+          -scheme Clipsmith \
           -configuration Release \
-          -archivePath build/Flycut.xcarchive \
+          -archivePath build/Clipsmith.xcarchive \
           archive \
           CODE_SIGN_IDENTITY="" \
           CODE_SIGNING_REQUIRED=NO \
@@ -163,7 +163,7 @@ jobs:
         # Export the app
         xcodebuild \
           -exportArchive \
-          -archivePath build/Flycut.xcarchive \
+          -archivePath build/Clipsmith.xcarchive \
           -exportPath build/Export \
           -exportOptionsPlist build/ExportOptions.plist
 
@@ -173,9 +173,9 @@ jobs:
         ls -la build/
         echo ""
         echo "Checking archive contents:"
-        ls -la build/Flycut.xcarchive/ || true
-        ls -la build/Flycut.xcarchive/Products/ || true
-        ls -la build/Flycut.xcarchive/Products/Applications/ || true
+        ls -la build/Clipsmith.xcarchive/ || true
+        ls -la build/Clipsmith.xcarchive/Products/ || true
+        ls -la build/Clipsmith.xcarchive/Products/Applications/ || true
         echo ""
         echo "Checking export directory:"
         ls -la build/Export/ || true
@@ -191,10 +191,10 @@ jobs:
         NOTARIZATION_TEAM_ID: ${{ secrets.NOTARIZATION_TEAM_ID }}
       run: |
         # Find the app bundle
-        APP_PATH=$(find build -name "Flycut.app" -type d | head -1)
+        APP_PATH=$(find build -name "Clipsmith.app" -type d | head -1)
 
         if [ -z "$APP_PATH" ]; then
-          echo "Error: Could not find Flycut.app for notarization"
+          echo "Error: Could not find Clipsmith.app for notarization"
           exit 1
         fi
 
@@ -224,10 +224,10 @@ jobs:
         fi
 
         # Find the app bundle
-        APP_PATH=$(find build -name "Flycut.app" -type d | head -1)
+        APP_PATH=$(find build -name "Clipsmith.app" -type d | head -1)
 
         if [ -z "$APP_PATH" ]; then
-          echo "Error: Could not find Flycut.app"
+          echo "Error: Could not find Clipsmith.app"
           echo "Build directory contents:"
           find build -type d
           exit 1
@@ -243,7 +243,7 @@ jobs:
         cp -R "$APP_PATH" build/dmg-staging/
 
         # Verify copy
-        if [ ! -d "build/dmg-staging/Flycut.app" ]; then
+        if [ ! -d "build/dmg-staging/Clipsmith.app" ]; then
           echo "Error: Failed to copy app to staging directory"
           ls -la build/dmg-staging/
           exit 1
@@ -257,7 +257,7 @@ jobs:
         ls -la build/dmg-staging/
 
         # Create the DMG
-        DMG_NAME="Flycut.dmg"
+        DMG_NAME="Clipsmith.dmg"
 
         # Use absolute paths
         WORKSPACE_DIR="$(pwd)"
@@ -278,7 +278,7 @@ jobs:
         # Create DMG with absolute paths
         echo "Running hdiutil..."
         hdiutil create \
-          -volname "Flycut" \
+          -volname "Clipsmith" \
           -srcfolder "$SOURCE_DIR" \
           -ov \
           -format UDZO \
@@ -287,7 +287,7 @@ jobs:
             echo "Trying alternative approach with create-dmg..."
             brew install create-dmg
             create-dmg \
-              --volname "Flycut" \
+              --volname "Clipsmith" \
               --window-pos 200 120 \
               --window-size 800 400 \
               --icon-size 100 \
@@ -351,8 +351,8 @@ jobs:
 
         1. Download the DMG file below
         2. Open the DMG
-        3. Drag Flycut.app to your Applications folder
-        4. Launch Flycut from Applications
+        3. Drag Clipsmith.app to your Applications folder
+        4. Launch Clipsmith from Applications
 
         ## Build Information
 
@@ -369,7 +369,7 @@ jobs:
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
-        files: build/Flycut.dmg
+        files: build/Clipsmith.dmg
         body_path: release_notes.md
         draft: false
         prerelease: false

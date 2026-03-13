@@ -1,5 +1,5 @@
 //
-// Release configuration for Flycut
+// Release configuration for Clipsmith
 // This configuration should be used for production builds
 //
 
@@ -23,7 +23,7 @@ ENABLE_TESTABILITY = NO
 GCC_PREPROCESSOR_DEFINITIONS = $(inherited)
 
 // Code signing entitlements for release (create separate file if needed)
-CODE_SIGN_ENTITLEMENTS = Flycut.entitlements
+CODE_SIGN_ENTITLEMENTS = Clipsmith.entitlements
 
 // Product name
 PRODUCT_NAME = $(TARGET_NAME)
