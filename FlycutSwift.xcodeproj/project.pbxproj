@@ -1,0 +1,798 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AA0001 /* FlycutApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0001 /* FlycutApp.swift */; };
+		AA0002 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0002 /* AppDelegate.swift */; };
+		AA0003 /* FlycutSchemaV1.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0003 /* FlycutSchemaV1.swift */; };
+		AA0004 /* FlycutMigrationPlan.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0004 /* FlycutMigrationPlan.swift */; };
+		AA0005 /* AccessibilityMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0005 /* AccessibilityMonitor.swift */; };
+		AA0006 /* MenuBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0006 /* MenuBarView.swift */; };
+		AA0007 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0007 /* SettingsView.swift */; };
+		AA0008 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AF0008 /* Assets.xcassets */; };
+		AA0010 /* AppSettingsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0012 /* AppSettingsKeys.swift */; };
+		AA0011 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0013 /* AppSettings.swift */; };
+		AA0012 /* KeyboardShortcutNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0014 /* KeyboardShortcutNames.swift */; };
+		AA0013 /* GeneralSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0015 /* GeneralSettingsTab.swift */; };
+		AA0014 /* HotkeySettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0016 /* HotkeySettingsTab.swift */; };
+		AA0015 /* AccessibilitySettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0017 /* AccessibilitySettingsSection.swift */; };
+		AA0016 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = SP0002 /* KeyboardShortcuts */; };
+		AA0017 /* ClipboardStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0018 /* ClipboardStore.swift */; };
+		AA0018 /* TestModelContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0019 /* TestModelContainer.swift */; };
+		AA0019 /* ClipboardStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0020 /* ClipboardStoreTests.swift */; };
+		AA0020 /* ClipboardMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0022 /* ClipboardMonitor.swift */; };
+		AA0021 /* ClipboardMonitorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0023 /* ClipboardMonitorTests.swift */; };
+		AA0022 /* PasteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0024 /* PasteService.swift */; };
+		AA0023 /* AppTracker.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0025 /* AppTracker.swift */; };
+		AA0024 /* PasteServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0026 /* PasteServiceTests.swift */; };
+		AA0025 /* BezelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0027 /* BezelViewModel.swift */; };
+		AA0026 /* BezelViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0028 /* BezelViewModelTests.swift */; };
+		AA0027 /* BezelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0029 /* BezelController.swift */; };
+		AA0028 /* BezelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0030 /* BezelView.swift */; };
+		AA0029 /* BezelControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0031 /* BezelControllerTests.swift */; };
+		AA0030 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0032 /* TokenStore.swift */; };
+		AA0031 /* TokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0033 /* TokenStoreTests.swift */; };
+		AA0032 /* GistService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0034 /* GistService.swift */; };
+		AA0033 /* GistServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0035 /* GistServiceTests.swift */; };
+		AA0034 /* SnippetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0036 /* SnippetStore.swift */; };
+		AA0035 /* SnippetStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0037 /* SnippetStoreTests.swift */; };
+		AA0036 /* HighlightSwift in Frameworks */ = {isa = PBXBuildFile; productRef = SP0003 /* HighlightSwift */; };
+		AA0037 /* SnippetWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0038 /* SnippetWindowView.swift */; };
+		AA0038 /* SnippetListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0039 /* SnippetListView.swift */; };
+		AA0039 /* SnippetEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0040 /* SnippetEditorView.swift */; };
+		AA0040 /* SnippetPasteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0041 /* SnippetPasteTests.swift */; };
+		AA0041 /* GistHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0042 /* GistHistoryView.swift */; };
+		AA0042 /* GistSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0043 /* GistSettingsSection.swift */; };
+		AA0043 /* HighlightedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0044 /* HighlightedTextEditor.swift */; };
+		AA0044 /* FlycutSchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0045 /* FlycutSchemaV2.swift */; };
+		AA0045 /* PromptLibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0046 /* PromptLibraryStore.swift */; };
+		AA0046 /* TemplateSubstitutor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0047 /* TemplateSubstitutor.swift */; };
+		AA0047 /* prompts.json in Resources */ = {isa = PBXBuildFile; fileRef = AF0048 /* prompts.json */; };
+		AA0048 /* SchemaMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0049 /* SchemaMigrationTests.swift */; };
+		AA0049 /* PromptLibraryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0050 /* PromptLibraryStoreTests.swift */; };
+		AA0050 /* TemplateSubstitutorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0051 /* TemplateSubstitutorTests.swift */; };
+		AA0051 /* PromptSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0052 /* PromptSyncService.swift */; };
+		AA0052 /* PromptLibrarySettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0053 /* PromptLibrarySettingsSection.swift */; };
+		AA0053 /* PromptBezelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0054 /* PromptBezelViewModel.swift */; };
+		AA0054 /* PromptBezelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0055 /* PromptBezelView.swift */; };
+		AA0055 /* PromptBezelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0056 /* PromptBezelController.swift */; };
+		AA0056 /* PromptLibraryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0057 /* PromptLibraryView.swift */; };
+		AA0057 /* TextTransformer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0058 /* TextTransformer.swift */; };
+		AA0058 /* TextTransformerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0059 /* TextTransformerTests.swift */; };
+		AA0059 /* ClipboardExportService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0060 /* ClipboardExportService.swift */; };
+		AA0060 /* ClipboardExportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0061 /* ClipboardExportServiceTests.swift */; };
+		AA0061 /* FuzzyMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0062 /* FuzzyMatcher.swift */; };
+		AA0062 /* FuzzyMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0063 /* FuzzyMatcherTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		CI0001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = PP0001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = TT0001;
+			remoteInfo = FlycutSwift;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AF0001 /* FlycutApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlycutApp.swift; sourceTree = "<group>"; };
+		AF0002 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		AF0003 /* FlycutSchemaV1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlycutSchemaV1.swift; sourceTree = "<group>"; };
+		AF0004 /* FlycutMigrationPlan.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlycutMigrationPlan.swift; sourceTree = "<group>"; };
+		AF0005 /* AccessibilityMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilityMonitor.swift; sourceTree = "<group>"; };
+		AF0006 /* MenuBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuBarView.swift; sourceTree = "<group>"; };
+		AF0007 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		AF0008 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		AF0009 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AF0010 /* FlycutSwift.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = FlycutSwift.entitlements; sourceTree = "<group>"; };
+		AF0011 /* FlycutSwift.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FlycutSwift.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF0012 /* AppSettingsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettingsKeys.swift; sourceTree = "<group>"; };
+		AF0013 /* AppSettings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppSettings.swift; sourceTree = "<group>"; };
+		AF0014 /* KeyboardShortcutNames.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyboardShortcutNames.swift; sourceTree = "<group>"; };
+		AF0015 /* GeneralSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeneralSettingsTab.swift; sourceTree = "<group>"; };
+		AF0016 /* HotkeySettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HotkeySettingsTab.swift; sourceTree = "<group>"; };
+		AF0017 /* AccessibilitySettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AccessibilitySettingsSection.swift; sourceTree = "<group>"; };
+		AF0018 /* ClipboardStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardStore.swift; sourceTree = "<group>"; };
+		AF0019 /* TestModelContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestModelContainer.swift; sourceTree = "<group>"; };
+		AF0020 /* ClipboardStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardStoreTests.swift; sourceTree = "<group>"; };
+		AF0021 /* FlycutTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FlycutTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AF0022 /* ClipboardMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardMonitor.swift; sourceTree = "<group>"; };
+		AF0023 /* ClipboardMonitorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardMonitorTests.swift; sourceTree = "<group>"; };
+		AF0024 /* PasteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteService.swift; sourceTree = "<group>"; };
+		AF0025 /* AppTracker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTracker.swift; sourceTree = "<group>"; };
+		AF0026 /* PasteServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasteServiceTests.swift; sourceTree = "<group>"; };
+		AF0027 /* BezelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezelViewModel.swift; sourceTree = "<group>"; };
+		AF0028 /* BezelViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezelViewModelTests.swift; sourceTree = "<group>"; };
+		AF0029 /* BezelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezelController.swift; sourceTree = "<group>"; };
+		AF0030 /* BezelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezelView.swift; sourceTree = "<group>"; };
+		AF0031 /* BezelControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezelControllerTests.swift; sourceTree = "<group>"; };
+		AF0032 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
+		AF0033 /* TokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStoreTests.swift; sourceTree = "<group>"; };
+		AF0034 /* GistService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistService.swift; sourceTree = "<group>"; };
+		AF0035 /* GistServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistServiceTests.swift; sourceTree = "<group>"; };
+		AF0036 /* SnippetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetStore.swift; sourceTree = "<group>"; };
+		AF0037 /* SnippetStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetStoreTests.swift; sourceTree = "<group>"; };
+		AF0038 /* SnippetWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetWindowView.swift; sourceTree = "<group>"; };
+		AF0039 /* SnippetListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetListView.swift; sourceTree = "<group>"; };
+		AF0040 /* SnippetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorView.swift; sourceTree = "<group>"; };
+		AF0041 /* SnippetPasteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPasteTests.swift; sourceTree = "<group>"; };
+		AF0042 /* GistHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistHistoryView.swift; sourceTree = "<group>"; };
+		AF0043 /* GistSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistSettingsSection.swift; sourceTree = "<group>"; };
+		AF0044 /* HighlightedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedTextEditor.swift; sourceTree = "<group>"; };
+		AF0045 /* FlycutSchemaV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FlycutSchemaV2.swift; sourceTree = "<group>"; };
+		AF0046 /* PromptLibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryStore.swift; sourceTree = "<group>"; };
+		AF0047 /* TemplateSubstitutor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSubstitutor.swift; sourceTree = "<group>"; };
+		AF0048 /* prompts.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = prompts.json; sourceTree = "<group>"; };
+		AF0049 /* SchemaMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SchemaMigrationTests.swift; sourceTree = "<group>"; };
+		AF0050 /* PromptLibraryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryStoreTests.swift; sourceTree = "<group>"; };
+		AF0051 /* TemplateSubstitutorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateSubstitutorTests.swift; sourceTree = "<group>"; };
+		AF0052 /* PromptSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSyncService.swift; sourceTree = "<group>"; };
+		AF0053 /* PromptLibrarySettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibrarySettingsSection.swift; sourceTree = "<group>"; };
+		AF0054 /* PromptBezelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBezelViewModel.swift; sourceTree = "<group>"; };
+		AF0055 /* PromptBezelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBezelView.swift; sourceTree = "<group>"; };
+		AF0056 /* PromptBezelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptBezelController.swift; sourceTree = "<group>"; };
+		AF0057 /* PromptLibraryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryView.swift; sourceTree = "<group>"; };
+		AF0058 /* TextTransformer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTransformer.swift; sourceTree = "<group>"; };
+		AF0059 /* TextTransformerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextTransformerTests.swift; sourceTree = "<group>"; };
+		AF0060 /* ClipboardExportService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardExportService.swift; sourceTree = "<group>"; };
+		AF0061 /* ClipboardExportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardExportServiceTests.swift; sourceTree = "<group>"; };
+		AF0062 /* FuzzyMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzyMatcher.swift; sourceTree = "<group>"; };
+		AF0063 /* FuzzyMatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzyMatcherTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BB0001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0016 /* KeyboardShortcuts in Frameworks */,
+				AA0036 /* HighlightSwift in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB0004 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		GG0000 = {
+			isa = PBXGroup;
+			children = (
+				GG0001 /* FlycutSwift */,
+				GG0010 /* FlycutTests */,
+				GG0007 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		GG0001 /* FlycutSwift */ = {
+			isa = PBXGroup;
+			children = (
+				GG0002 /* App */,
+				GG0003 /* Models */,
+				GG0004 /* Services */,
+				GG0008 /* Settings */,
+				GG0005 /* Views */,
+				GG0013 /* Resources */,
+				AF0008 /* Assets.xcassets */,
+				AF0009 /* Info.plist */,
+				AF0010 /* FlycutSwift.entitlements */,
+			);
+			path = FlycutSwift;
+			sourceTree = "<group>";
+		};
+		GG0002 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				AF0001 /* FlycutApp.swift */,
+				AF0002 /* AppDelegate.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		GG0003 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				GG0006 /* Schema */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		GG0004 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				AF0005 /* AccessibilityMonitor.swift */,
+				AF0018 /* ClipboardStore.swift */,
+				AF0022 /* ClipboardMonitor.swift */,
+				AF0024 /* PasteService.swift */,
+				AF0025 /* AppTracker.swift */,
+				AF0032 /* TokenStore.swift */,
+				AF0034 /* GistService.swift */,
+				AF0036 /* SnippetStore.swift */,
+				AF0046 /* PromptLibraryStore.swift */,
+				AF0047 /* TemplateSubstitutor.swift */,
+				AF0052 /* PromptSyncService.swift */,
+				AF0058 /* TextTransformer.swift */,
+				AF0060 /* ClipboardExportService.swift */,
+				AF0062 /* FuzzyMatcher.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		GG0005 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				AF0006 /* MenuBarView.swift */,
+				AF0007 /* SettingsView.swift */,
+				AF0027 /* BezelViewModel.swift */,
+				AF0029 /* BezelController.swift */,
+				AF0030 /* BezelView.swift */,
+				AF0054 /* PromptBezelViewModel.swift */,
+				AF0055 /* PromptBezelView.swift */,
+				AF0056 /* PromptBezelController.swift */,
+				GG0009 /* Settings */,
+				GG0011 /* Snippets */,
+				GG0012 /* Gists */,
+				GG0014 /* Prompts */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		GG0014 /* Prompts */ = {
+			isa = PBXGroup;
+			children = (
+				AF0057 /* PromptLibraryView.swift */,
+			);
+			path = Prompts;
+			sourceTree = "<group>";
+		};
+		GG0006 /* Schema */ = {
+			isa = PBXGroup;
+			children = (
+				AF0003 /* FlycutSchemaV1.swift */,
+				AF0004 /* FlycutMigrationPlan.swift */,
+				AF0045 /* FlycutSchemaV2.swift */,
+			);
+			path = Schema;
+			sourceTree = "<group>";
+		};
+		GG0007 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AF0011 /* FlycutSwift.app */,
+				AF0021 /* FlycutTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		GG0008 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AF0012 /* AppSettingsKeys.swift */,
+				AF0013 /* AppSettings.swift */,
+				AF0014 /* KeyboardShortcutNames.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		GG0009 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				AF0015 /* GeneralSettingsTab.swift */,
+				AF0016 /* HotkeySettingsTab.swift */,
+				AF0017 /* AccessibilitySettingsSection.swift */,
+				AF0043 /* GistSettingsSection.swift */,
+				AF0053 /* PromptLibrarySettingsSection.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		GG0010 /* FlycutTests */ = {
+			isa = PBXGroup;
+			children = (
+				AF0019 /* TestModelContainer.swift */,
+				AF0020 /* ClipboardStoreTests.swift */,
+				AF0023 /* ClipboardMonitorTests.swift */,
+				AF0026 /* PasteServiceTests.swift */,
+				AF0028 /* BezelViewModelTests.swift */,
+				AF0031 /* BezelControllerTests.swift */,
+				AF0033 /* TokenStoreTests.swift */,
+				AF0035 /* GistServiceTests.swift */,
+				AF0037 /* SnippetStoreTests.swift */,
+				AF0041 /* SnippetPasteTests.swift */,
+				AF0049 /* SchemaMigrationTests.swift */,
+				AF0050 /* PromptLibraryStoreTests.swift */,
+				AF0051 /* TemplateSubstitutorTests.swift */,
+				AF0059 /* TextTransformerTests.swift */,
+				AF0061 /* ClipboardExportServiceTests.swift */,
+				AF0063 /* FuzzyMatcherTests.swift */,
+			);
+			path = FlycutTests;
+			sourceTree = "<group>";
+		};
+		GG0011 /* Snippets */ = {
+			isa = PBXGroup;
+			children = (
+				AF0038 /* SnippetWindowView.swift */,
+				AF0039 /* SnippetListView.swift */,
+				AF0040 /* SnippetEditorView.swift */,
+				AF0044 /* HighlightedTextEditor.swift */,
+			);
+			path = Snippets;
+			sourceTree = "<group>";
+		};
+		GG0012 /* Gists */ = {
+			isa = PBXGroup;
+			children = (
+				AF0042 /* GistHistoryView.swift */,
+			);
+			path = Gists;
+			sourceTree = "<group>";
+		};
+		GG0013 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AF0048 /* prompts.json */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		TT0001 /* FlycutSwift */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC0001 /* Build configuration list for PBXNativeTarget "FlycutSwift" */;
+			buildPhases = (
+				BB0002 /* Sources */,
+				BB0001 /* Frameworks */,
+				BB0003 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FlycutSwift;
+			packageProductDependencies = (
+				SP0002 /* KeyboardShortcuts */,
+				SP0003 /* HighlightSwift */,
+			);
+			productName = FlycutSwift;
+			productReference = AF0011 /* FlycutSwift.app */;
+			productType = "com.apple.product-type.application";
+		};
+		TT0002 /* FlycutTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CC0003 /* Build configuration list for PBXNativeTarget "FlycutTests" */;
+			buildPhases = (
+				BB0005 /* Sources */,
+				BB0004 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				TD0001 /* PBXTargetDependency */,
+			);
+			name = FlycutTests;
+			productName = FlycutTests;
+			productReference = AF0021 /* FlycutTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		PP0001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					TT0001 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					TT0002 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = TT0001;
+					};
+				};
+			};
+			buildConfigurationList = CC0002 /* Build configuration list for PBXProject "FlycutSwift" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = GG0000;
+			packageReferences = (
+				SP0001 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
+				SP0004 /* XCRemoteSwiftPackageReference "HighlightSwift" */,
+			);
+			productRefGroup = GG0007 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				TT0001 /* FlycutSwift */,
+				TT0002 /* FlycutTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BB0003 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0008 /* Assets.xcassets in Resources */,
+				AA0047 /* prompts.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BB0002 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0001 /* FlycutApp.swift in Sources */,
+				AA0002 /* AppDelegate.swift in Sources */,
+				AA0003 /* FlycutSchemaV1.swift in Sources */,
+				AA0004 /* FlycutMigrationPlan.swift in Sources */,
+				AA0005 /* AccessibilityMonitor.swift in Sources */,
+				AA0006 /* MenuBarView.swift in Sources */,
+				AA0007 /* SettingsView.swift in Sources */,
+				AA0010 /* AppSettingsKeys.swift in Sources */,
+				AA0011 /* AppSettings.swift in Sources */,
+				AA0012 /* KeyboardShortcutNames.swift in Sources */,
+				AA0013 /* GeneralSettingsTab.swift in Sources */,
+				AA0014 /* HotkeySettingsTab.swift in Sources */,
+				AA0015 /* AccessibilitySettingsSection.swift in Sources */,
+				AA0017 /* ClipboardStore.swift in Sources */,
+				AA0020 /* ClipboardMonitor.swift in Sources */,
+				AA0022 /* PasteService.swift in Sources */,
+				AA0023 /* AppTracker.swift in Sources */,
+				AA0025 /* BezelViewModel.swift in Sources */,
+				AA0027 /* BezelController.swift in Sources */,
+				AA0028 /* BezelView.swift in Sources */,
+				AA0030 /* TokenStore.swift in Sources */,
+				AA0032 /* GistService.swift in Sources */,
+				AA0034 /* SnippetStore.swift in Sources */,
+				AA0037 /* SnippetWindowView.swift in Sources */,
+				AA0038 /* SnippetListView.swift in Sources */,
+				AA0039 /* SnippetEditorView.swift in Sources */,
+				AA0041 /* GistHistoryView.swift in Sources */,
+				AA0042 /* GistSettingsSection.swift in Sources */,
+				AA0043 /* HighlightedTextEditor.swift in Sources */,
+				AA0044 /* FlycutSchemaV2.swift in Sources */,
+				AA0045 /* PromptLibraryStore.swift in Sources */,
+				AA0046 /* TemplateSubstitutor.swift in Sources */,
+				AA0051 /* PromptSyncService.swift in Sources */,
+				AA0052 /* PromptLibrarySettingsSection.swift in Sources */,
+				AA0053 /* PromptBezelViewModel.swift in Sources */,
+				AA0054 /* PromptBezelView.swift in Sources */,
+				AA0055 /* PromptBezelController.swift in Sources */,
+				AA0056 /* PromptLibraryView.swift in Sources */,
+				AA0057 /* TextTransformer.swift in Sources */,
+				AA0059 /* ClipboardExportService.swift in Sources */,
+				AA0061 /* FuzzyMatcher.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BB0005 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA0018 /* TestModelContainer.swift in Sources */,
+				AA0019 /* ClipboardStoreTests.swift in Sources */,
+				AA0021 /* ClipboardMonitorTests.swift in Sources */,
+				AA0024 /* PasteServiceTests.swift in Sources */,
+				AA0026 /* BezelViewModelTests.swift in Sources */,
+				AA0029 /* BezelControllerTests.swift in Sources */,
+				AA0031 /* TokenStoreTests.swift in Sources */,
+				AA0033 /* GistServiceTests.swift in Sources */,
+				AA0035 /* SnippetStoreTests.swift in Sources */,
+				AA0040 /* SnippetPasteTests.swift in Sources */,
+				AA0048 /* SchemaMigrationTests.swift in Sources */,
+				AA0049 /* PromptLibraryStoreTests.swift in Sources */,
+				AA0050 /* TemplateSubstitutorTests.swift in Sources */,
+				AA0058 /* TextTransformerTests.swift in Sources */,
+				AA0060 /* ClipboardExportServiceTests.swift in Sources */,
+				AA0062 /* FuzzyMatcherTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		TD0001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = TT0001 /* FlycutSwift */;
+			targetProxy = CI0001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		XC0001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLE = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		XC0002 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_CYCLE = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				MTL_FAST_MATH = YES;
+				SDKROOT = macosx;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		XC0003 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = FlycutSwift/FlycutSwift.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9478A8FXT3;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = FlycutSwift/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.generalarcade.flycut;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Debug;
+		};
+		XC0004 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
+				CODE_SIGN_ENTITLEMENTS = FlycutSwift/FlycutSwift.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 9478A8FXT3;
+				ENABLE_HARDENED_RUNTIME = YES;
+				INFOPLIST_FILE = FlycutSwift/Info.plist;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MARKETING_VERSION = 3.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.generalarcade.flycut;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 6.0;
+			};
+			name = Release;
+		};
+		XC0005 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9478A8FXT3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.generalarcade.flycut.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FlycutSwift.app/Contents/MacOS/FlycutSwift";
+			};
+			name = Debug;
+		};
+		XC0006 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 9478A8FXT3;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 15.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.generalarcade.flycut.tests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_STRICT_CONCURRENCY = complete;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/FlycutSwift.app/Contents/MacOS/FlycutSwift";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CC0001 /* Build configuration list for PBXNativeTarget "FlycutSwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				XC0003 /* Debug */,
+				XC0004 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC0002 /* Build configuration list for PBXProject "FlycutSwift" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				XC0001 /* Debug */,
+				XC0002 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CC0003 /* Build configuration list for PBXNativeTarget "FlycutTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				XC0005 /* Debug */,
+				XC0006 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		SP0001 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sindresorhus/KeyboardShortcuts";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.4.0;
+			};
+		};
+		SP0004 /* XCRemoteSwiftPackageReference "HighlightSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/appstefan/HighlightSwift";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 1.1.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		SP0002 /* KeyboardShortcuts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = SP0001 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */;
+			productName = KeyboardShortcuts;
+		};
+		SP0003 /* HighlightSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = SP0004 /* XCRemoteSwiftPackageReference "HighlightSwift" */;
+			productName = HighlightSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = PP0001 /* Project object */;
+}

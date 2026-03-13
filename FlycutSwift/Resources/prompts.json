@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "prompts": [
+    {"id": "code-review-swift", "title": "Swift Code Review", "category": "coding", "version": 1, "content": "Review this Swift code for correctness, safety, and style:\n\n{{clipboard}}"},
+    {"id": "explain-code", "title": "Explain Code", "category": "coding", "version": 1, "content": "Explain what this code does, step by step:\n\n{{clipboard}}"},
+    {"id": "fix-bug", "title": "Fix Bug", "category": "coding", "version": 1, "content": "Find and fix the bug in this code:\n\n{{clipboard}}"},
+    {"id": "write-tests", "title": "Write Tests", "category": "coding", "version": 1, "content": "Write comprehensive unit tests for this code:\n\n{{clipboard}}"},
+    {"id": "summarize-text", "title": "Summarize Text", "category": "writing", "version": 1, "content": "Summarize the following text concisely:\n\n{{clipboard}}"},
+    {"id": "rewrite-formal", "title": "Rewrite Formally", "category": "writing", "version": 1, "content": "Rewrite the following text in a formal, professional tone:\n\n{{clipboard}}"},
+    {"id": "fix-grammar", "title": "Fix Grammar", "category": "writing", "version": 1, "content": "Fix the grammar and spelling in this text:\n\n{{clipboard}}"},
+    {"id": "analyze-data", "title": "Analyze Data", "category": "analysis", "version": 1, "content": "Analyze this data and provide key insights:\n\n{{clipboard}}"},
+    {"id": "compare-options", "title": "Compare Options", "category": "analysis", "version": 1, "content": "Compare these options with pros and cons:\n\n{{clipboard}}"},
+    {"id": "brainstorm", "title": "Brainstorm Ideas", "category": "creative", "version": 1, "content": "Brainstorm creative ideas based on this topic:\n\n{{clipboard}}"},
+    {"id": "write-story", "title": "Write Story", "category": "creative", "version": 1, "content": "Write a short story inspired by:\n\n{{clipboard}}"}
+  ]
+}
