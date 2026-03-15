@@ -41,6 +41,12 @@ final class BezelController: NSPanel {
     /// Global event monitor for modifier-key release in hold mode. Removed on hide().
     private var flagsMonitor: Any?
 
+    /// Local event monitor for modifier-key release when the bezel panel is key.
+    /// NSEvent.addGlobalMonitorForEvents does NOT fire for events inside the app's
+    /// own windows, so a local monitor is needed to detect modifier release while
+    /// the bezel has focus.
+    private var localFlagsMonitor: Any?
+
     /// Track whether the bezel was opened via hotkey hold (not sticky mode).
     /// When true, releasing all modifier keys triggers paste-and-hide.
     var isHotkeyHold = false
@@ -122,6 +128,10 @@ final class BezelController: NSPanel {
                 return
             case 48:                            // Tab — show quick action menu
                 showQuickActionMenu()
+                return
+            case 36, 76:                        // Return, Enter (numpad)
+                // Intercept before SwiftUI TextField consumes Return in search mode.
+                keyDown(with: event)
                 return
             case 125, 126, 123, 124,            // Arrow keys
                  121, 116, 119, 115:            // Page Down/Up, End, Home
@@ -487,7 +497,9 @@ final class BezelController: NSPanel {
 
     private func registerFlagsMonitor() {
         removeFlagsMonitor()
-        flagsMonitor = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged) { [weak self] event in
+
+        // Handler shared by both monitors.
+        let handleFlags: (NSEvent) -> Void = { [weak self] event in
             guard let self, self.isHotkeyHold else { return }
             let modifiers: NSEvent.ModifierFlags = [.command, .option, .control, .shift]
             if event.modifierFlags.intersection(modifiers).isEmpty {
@@ -497,10 +509,22 @@ final class BezelController: NSPanel {
                 }
             }
         }
+
+        // Global monitor catches modifier release when another app has focus.
+        flagsMonitor = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged, handler: handleFlags)
+
+        // Local monitor catches modifier release when the bezel panel is key.
+        // addGlobalMonitorForEvents does NOT fire for events inside the app's
+        // own windows, so without this the release is missed.
+        localFlagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { event in
+            handleFlags(event)
+            return event
+        }
     }
 
     private func removeFlagsMonitor() {
         if let m = flagsMonitor { NSEvent.removeMonitor(m); flagsMonitor = nil }
+        if let m = localFlagsMonitor { NSEvent.removeMonitor(m); localFlagsMonitor = nil }
     }
 
     private func registerClickOutsideMonitor() {
