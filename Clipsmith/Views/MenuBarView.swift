@@ -46,12 +46,10 @@ struct MenuBarView: View {
             ForEach(clippings.prefix(displayNum)) { clipping in
                 Button {
                     if menuSelectionPastes {
-                        Task {
-                            await pasteService.paste(
-                                content: clipping.content,
-                                into: appTracker.previousApp
-                            )
-                        }
+                        pasteService.paste(
+                            content: clipping.content,
+                            into: appTracker.previousApp
+                        )
                     } else {
                         // Copy to clipboard without pasting
                         NSPasteboard.general.clearContents()

@@ -277,7 +277,7 @@ final class PromptBezelController: NSPanel {
 
         let substituted = TemplateSubstitutor.substitute(in: prompt.content, variables: variables)
         logger.info("Pasting prompt: \(prompt.title, privacy: .public)")
-        await pasteService?.paste(content: substituted, into: appTracker?.previousApp)
+        pasteService?.paste(content: substituted, into: appTracker?.previousApp)
         hide()
     }
 

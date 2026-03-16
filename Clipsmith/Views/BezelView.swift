@@ -29,8 +29,7 @@ struct BezelView: View {
     /// Focus state for the search TextField — driven by isSearchMode.
     @FocusState private var isSearchFieldFocused: Bool
 
-    /// Cache for app icons keyed by bundle path to avoid repeated NSWorkspace lookups.
-    @State private var iconCache: [String: NSImage] = [:]
+    // Icon cache lives on viewModel to avoid @State mutation during body evaluation.
 
     // MARK: - Body
 
@@ -231,10 +230,11 @@ struct BezelView: View {
     }
 
     /// Returns a cached app icon for the given bundle path, loading it on first access.
+    /// Cache lives on viewModel to avoid mutating @State during body evaluation.
     private func cachedIcon(for bundlePath: String) -> NSImage {
-        if let cached = iconCache[bundlePath] { return cached }
+        if let cached = viewModel.iconCache[bundlePath] { return cached }
         let icon = NSWorkspace.shared.icon(forFile: bundlePath)
-        iconCache[bundlePath] = icon
+        viewModel.iconCache[bundlePath] = icon
         return icon
     }
 

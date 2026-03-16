@@ -51,7 +51,7 @@ struct HighlightedTextEditor: NSViewRepresentable {
 
     // MARK: - Coordinator
 
-    final class Coordinator: NSObject, NSTextViewDelegate {
+    @MainActor final class Coordinator: NSObject, NSTextViewDelegate {
         var parent: HighlightedTextEditor
         var isUpdating = false
         var language: String?

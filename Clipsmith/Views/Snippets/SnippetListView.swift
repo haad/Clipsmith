@@ -256,7 +256,7 @@ struct SnippetListView: View {
                 }
             }
             NSApp.setActivationPolicy(.accessory)
-            await pasteService.paste(content: content, into: previousApp)
+            pasteService.paste(content: content, into: previousApp)
         }
     }
 }

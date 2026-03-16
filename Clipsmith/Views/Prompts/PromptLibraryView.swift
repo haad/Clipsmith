@@ -547,7 +547,7 @@ struct PromptLibraryView: View {
                 }
             }
             NSApp.setActivationPolicy(.accessory)
-            await pasteService.paste(content: substituted, into: previousApp)
+            pasteService.paste(content: substituted, into: previousApp)
         }
     }
 }

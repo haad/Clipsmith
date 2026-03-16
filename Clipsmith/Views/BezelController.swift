@@ -185,8 +185,12 @@ final class BezelController: NSPanel {
     }
 
     /// Hides the bezel, removes the global event monitors, and resets state.
+    ///
+    /// Reset viewModel state BEFORE orderOut so that mutations happen while the
+    /// view is still in a stable state — ordering out can trigger a SwiftUI layout
+    /// pass, and mutating @Observable properties during that pass causes
+    /// "Modifying state during view update" faults.
     func hide() {
-        orderOut(nil)
         removeClickOutsideMonitor()
         removeFlagsMonitor()
         viewModel.selectedIndex = 0
@@ -194,6 +198,7 @@ final class BezelController: NSPanel {
         viewModel.isSearchMode = false
         viewModel.isShowingCheatSheet = false
         isHotkeyHold = false
+        orderOut(nil)
         logger.info("BezelController hidden")
     }
 
@@ -545,6 +550,15 @@ final class BezelController: NSPanel {
         }
     }
 
+    /// Pastes the selected clipping and hides the bezel.
+    ///
+    /// Follows the original Flycut timing pattern:
+    ///   1. Write content to pasteboard immediately
+    ///   2. Hide the bezel immediately (so it's gone before Cmd-V fires)
+    ///   3. Cmd-V is injected ~0.5s later via performSelector:afterDelay:
+    ///
+    /// The bezel MUST be hidden before the synthetic Cmd-V is posted — otherwise
+    /// the panel (canBecomeKey) can intercept the keystroke.
     func pasteAndHide() async {
         guard let content = viewModel.currentClipping else {
             hide()
@@ -552,11 +566,16 @@ final class BezelController: NSPanel {
         }
         // NEVER log clipping content — privacy requirement
         logger.info("Pasting selected clipping")
-        await pasteService?.paste(content: content, into: appTracker?.previousApp)
-        // Bug #23: move pasted clipping to top of history when pasteMovesToTop is enabled
+
+        // 1. Write to pasteboard and schedule delayed Cmd-V (fires in 0.5s).
+        pasteService?.paste(content: content, into: appTracker?.previousApp)
+
+        // 2. Bug #23: move pasted clipping to top of history when pasteMovesToTop is enabled.
         if UserDefaults.standard.bool(forKey: AppSettingsKeys.pasteMovesToTop) {
             try? await clipboardStore?.moveToTop(content: content)
         }
+
+        // 3. Hide the bezel NOW — before the 0.5s Cmd-V delay fires.
         hide()
     }
 

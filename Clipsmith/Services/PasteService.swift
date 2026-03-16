@@ -11,7 +11,7 @@ private let logger = Logger(
 ///
 /// Plain-text-only design: clearContents() + setString(_:forType: .string) ensures no RTF,
 /// HTML, or other rich types are written (CLIP-06). The paste sequence follows the original
-/// Clipsmith AppController.m fakeCommandV + addClipToPasteboard: pattern.
+/// Flycut AppController.m pasteFromStack + fakeCommandV timing pattern.
 ///
 /// @Observable is required so the instance can be injected via SwiftUI's .environment(_:) API.
 @Observable @MainActor
@@ -27,10 +27,19 @@ final class PasteService {
 
     /// Writes content to the pasteboard as plain text and fires Cmd-V into the previous app.
     ///
+    /// Timing follows the original Flycut pattern:
+    ///   1. Write to pasteboard immediately
+    ///   2. Caller hides the bezel at ~0.2s (BezelController.pasteAndHide calls hide())
+    ///   3. Cmd-V is injected at ~0.5s via performSelector afterDelay
+    ///
+    /// The delay between hide and paste is critical — the bezel panel must be fully
+    /// dismissed before the synthetic Cmd-V is posted, otherwise the panel (which is
+    /// canBecomeKey) can intercept the event.
+    ///
     /// - Parameters:
     ///   - content: The string to paste. Rich text formatting is intentionally stripped.
     ///   - previousApp: The app that was frontmost before the hotkey fired.
-    func paste(content: String, into previousApp: NSRunningApplication?) async {
+    func paste(content: String, into previousApp: NSRunningApplication?) {
         // 1. Check accessibility permission first — do NOT call AXIsProcessTrustedWithOptions(prompt:true)
         //    because that steals focus from the app we're about to paste into (Pitfall 3).
         guard AXIsProcessTrusted() else {
@@ -47,31 +56,45 @@ final class PasteService {
         //    ClipboardMonitor skips this cycle and doesn't re-capture our paste content.
         clipboardMonitor?.blockedChangeCount = pasteboard.changeCount
 
-        // 4. Activate the previous app so it receives key focus before we inject Cmd-V.
-        // Use activate(from:options:) — the macOS 14+ replacement for the deprecated
-        // activateWithOptions(.activateIgnoringOtherApps). We pass NSRunningApplication.current
-        // (Clipsmith) as the "from" app so the system knows we are explicitly delegating focus.
+        // 4. Schedule Cmd-V injection after 0.5s delay (matching original Flycut timing).
+        //    Uses performSelector:afterDelay: which schedules on the run loop, exactly
+        //    like the original ObjC implementation. This ensures the bezel has been
+        //    hidden (at ~0.2s) before the keystroke is posted (at 0.5s).
+        let helper = FakeKeyHelper(previousApp: previousApp)
+        helper.scheduleCommandV()
+    }
+}
+
+// MARK: - FakeKeyHelper
+
+/// Bridges to performSelector:afterDelay: for scheduling the synthetic Cmd-V.
+///
+/// Mirrors the original Flycut AppController.m fakeKey:withCommandFlag: implementation
+/// exactly: CGEventSourceStateCombinedSessionState, kCGHIDEventTap, and the 0x000008
+/// secondary command bit.
+@MainActor
+private final class FakeKeyHelper: NSObject {
+
+    private let previousApp: NSRunningApplication?
+
+    init(previousApp: NSRunningApplication?) {
+        self.previousApp = previousApp
+        super.init()
+    }
+
+    func scheduleCommandV() {
+        // Matches original Flycut: [self performSelector:@selector(fakeCommandV) withObject:nil afterDelay:0.5]
+        perform(#selector(fakeCommandV), with: nil, afterDelay: 0.5)
+    }
+
+    @objc private func fakeCommandV() {
+        // Activate the previous app right before injecting the keystroke.
         if let app = previousApp, !app.isTerminated {
             app.activate(from: NSRunningApplication.current, options: [])
         }
 
-        // 5. Wait 500ms for app activation to complete before injecting the key event.
-        //    This matches ObjC Clipsmith timing (0.2s + 0.3s = 500ms total) and ensures reliable
-        //    paste on slower hardware (Bug #28). Do NOT reduce — intermittent failures below 500ms.
-        try? await Task.sleep(for: .milliseconds(500))
-
-        // 6. Fire Cmd-V via CGEventPost.
-        injectCmdV()
-    }
-
-    // MARK: - CGEvent Injection
-
-    /// Injects a Cmd-V key down + up event via CGEvent.post(tap: .cgHIDEventTap).
-    ///
-    /// Source: AppController.m fakeKey:withCommandFlag: — direct Swift translation.
-    /// Uses CGEvent.post(tap:) instance method (CGEventPost was obsoleted in Swift 3).
-    private func injectCmdV() {
-        guard let source = CGEventSource(stateID: .combinedSessionState) else {
+        // Direct translation of Flycut AppController.m fakeKey:withCommandFlag:
+        guard let sourceRef = CGEventSource(stateID: .combinedSessionState) else {
             logger.error("CGEventSource creation failed")
             return
         }
@@ -79,23 +102,19 @@ final class PasteService {
         // V key code = 9 on US keyboard layout (virtual key, not character code).
         let vKeyCode: CGKeyCode = 9
 
-        guard let keyDown = CGEvent(keyboardEventSource: source, virtualKey: vKeyCode, keyDown: true),
-              let keyUp   = CGEvent(keyboardEventSource: source, virtualKey: vKeyCode, keyDown: false)
+        guard let keyDown = CGEvent(keyboardEventSource: sourceRef, virtualKey: vKeyCode, keyDown: true),
+              let keyUp   = CGEvent(keyboardEventSource: sourceRef, virtualKey: vKeyCode, keyDown: false)
         else {
             logger.error("CGEvent creation failed")
             return
         }
 
         // Set Command modifier + secondary command bit (0x000008).
-        // The secondary bit is required by some apps per original Clipsmith source comment.
-        let flags: CGEventFlags = [.maskCommand, CGEventFlags(rawValue: 0x000008)]
-        keyDown.flags = flags
+        // Some apps want the bit set for one of the command keys — per original Flycut source.
+        keyDown.flags = [.maskCommand, CGEventFlags(rawValue: 0x000008)]
 
-        // CGEventTapLocation.hid / .cgHIDEventTap do not exist as Swift named members.
-        // kCGHIDEventTap == 0. Use rawValue initializer which is the correct Swift approach.
-        let hidTap = CGEventTapLocation(rawValue: 0)!
-        keyDown.post(tap: hidTap)
-        keyUp.post(tap: hidTap)
-        logger.debug("Cmd-V injected")
+        keyDown.post(tap: .cghidEventTap)
+        keyUp.post(tap: .cghidEventTap)
+        logger.info("Cmd-V injected")
     }
 }

@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import Observation
 import SwiftData
@@ -63,6 +64,10 @@ final class BezelViewModel {
     /// Whether the keyboard shortcut cheat sheet overlay is visible.
     /// Toggled by pressing `?` when not in search mode.
     var isShowingCheatSheet: Bool = false
+
+    /// Cache for app icons keyed by bundle path. Lives on the view model (not @State)
+    /// so that lookups from the view body do not mutate SwiftUI state mid-render.
+    var iconCache: [String: NSImage] = [:]
 
     // MARK: - Filtered cache
 
