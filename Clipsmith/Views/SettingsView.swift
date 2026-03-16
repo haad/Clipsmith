@@ -27,6 +27,11 @@ struct SettingsView: View {
                 .tabItem {
                     Label("Gist", systemImage: "link")
                 }
+
+            DocsetSettingsSection()
+                .tabItem {
+                    Label("Docsets", systemImage: "book")
+                }
         }
         .frame(minWidth: 420, minHeight: 300)
         .onDisappear {

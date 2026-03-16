@@ -27,6 +27,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var promptSyncService: PromptSyncService!
     var promptBezelController: PromptBezelController!
 
+    // Phase 8 — Documentation Lookup
+    var docsetSearchService: DocsetSearchService!
+    var docsetManagerService: DocsetManagerService!
+    var docBezelController: DocBezelController!
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // CRITICAL: Both LSUIElement=YES and setActivationPolicy(.accessory) are
         // required. LSUIElement suppresses the dock icon at cold launch, but
@@ -141,6 +146,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         promptBezelController.pasteService = pasteService
         promptBezelController.appTracker = appTracker
 
+        // 7. Initialize Documentation Lookup components (Phase 8).
+        docsetSearchService = DocsetSearchService()
+        docsetManagerService = DocsetManagerService()
+        docsetManagerService.loadMetadata()
+
+        docBezelController = DocBezelController()
+        docBezelController.appTracker = appTracker
+        docBezelController.docsetSearchService = docsetSearchService
+        docBezelController.docsetManagerService = docsetManagerService
+
         // 6. Register global hotkeys (KeyboardShortcuts library, Pattern 5).
         KeyboardShortcuts.onKeyDown(for: .activateBezel) { [weak self] in
             Task { @MainActor in
@@ -237,6 +252,22 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     // First press — show bezel and set hold mode based on stickyBezel.
                     self.promptBezelController.isHotkeyHold = !stickyBezel
                     self.promptBezelController.show()
+                }
+            }
+        }
+
+        // Register global hotkey for documentation lookup (Phase 8).
+        KeyboardShortcuts.onKeyDown(for: .activateDocLookup) { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                let stickyBezel = UserDefaults.standard.bool(forKey: AppSettingsKeys.stickyBezel)
+                if self.docBezelController.isVisible {
+                    // Already showing — navigate down (hotkey repress while holding).
+                    self.docBezelController.viewModel.navigateDown()
+                } else {
+                    // First press — show bezel and set hold mode based on stickyBezel.
+                    self.docBezelController.isHotkeyHold = !stickyBezel
+                    self.docBezelController.show()
                 }
             }
         }
@@ -479,6 +510,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         bezelController?.hide()
         promptBezelController?.hide()
+        docBezelController?.hide()
         clipboardMonitor.stop()
         appTracker.stop()
         accessibilityMonitor.stop()

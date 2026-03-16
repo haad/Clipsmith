@@ -26,8 +26,12 @@ struct HotkeySettingsTab: View {
                     "Prompt Library",
                     name: .activatePrompts
                 )
+                KeyboardShortcuts.Recorder(
+                    "Doc Lookup",
+                    name: .activateDocLookup
+                )
             } footer: {
-                Text("Assign hotkeys for clipboard, search, snippets, and prompt library.")
+                Text("Assign hotkeys for clipboard, search, snippets, prompt library, and documentation lookup.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
