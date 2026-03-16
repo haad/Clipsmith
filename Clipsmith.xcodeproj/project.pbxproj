@@ -68,6 +68,13 @@
 		AA0060 /* ClipboardExportServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0061 /* ClipboardExportServiceTests.swift */; };
 		AA0061 /* FuzzyMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0062 /* FuzzyMatcher.swift */; };
 		AA0062 /* FuzzyMatcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0063 /* FuzzyMatcherTests.swift */; };
+		AA0063 /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = SP0005 /* GRDB */; };
+		AA0064 /* GRDB in Frameworks (Tests) */ = {isa = PBXBuildFile; productRef = SP0006 /* GRDB (Tests) */; };
+		AA0065 /* DocsetSearchService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0064 /* DocsetSearchService.swift */; };
+		AA0066 /* DocsetManagerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0065 /* DocsetManagerService.swift */; };
+		AA0067 /* SelectedTextService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0066 /* SelectedTextService.swift */; };
+		AA0068 /* DocsetSearchServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0067 /* DocsetSearchServiceTests.swift */; };
+		AA0069 /* DocsetManagerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0068 /* DocsetManagerServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -144,6 +151,13 @@
 		AF0061 /* ClipboardExportServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipboardExportServiceTests.swift; sourceTree = "<group>"; };
 		AF0062 /* FuzzyMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzyMatcher.swift; sourceTree = "<group>"; };
 		AF0063 /* FuzzyMatcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuzzyMatcherTests.swift; sourceTree = "<group>"; };
+		AF0064 /* DocsetSearchService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetSearchService.swift; sourceTree = "<group>"; };
+		AF0065 /* DocsetManagerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetManagerService.swift; sourceTree = "<group>"; };
+		AF0066 /* SelectedTextService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectedTextService.swift; sourceTree = "<group>"; };
+		AF0067 /* DocsetSearchServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetSearchServiceTests.swift; sourceTree = "<group>"; };
+		AF0068 /* DocsetManagerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetManagerServiceTests.swift; sourceTree = "<group>"; };
+		AF0069 /* docSet.dsidx */ = {isa = PBXFileReference; lastKnownFileType = file; path = docSet.dsidx; sourceTree = "<group>"; };
+		AF0070 /* Info.plist (TestDocset) */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -153,6 +167,7 @@
 			files = (
 				AA0016 /* KeyboardShortcuts in Frameworks */,
 				AA0036 /* HighlightSwift in Frameworks */,
+				AA0063 /* GRDB in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +175,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA0064 /* GRDB in Frameworks (Tests) */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -225,6 +241,9 @@
 				AF0058 /* TextTransformer.swift */,
 				AF0060 /* ClipboardExportService.swift */,
 				AF0062 /* FuzzyMatcher.swift */,
+				AF0064 /* DocsetSearchService.swift */,
+				AF0065 /* DocsetManagerService.swift */,
+				AF0066 /* SelectedTextService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -316,8 +335,44 @@
 				AF0059 /* TextTransformerTests.swift */,
 				AF0061 /* ClipboardExportServiceTests.swift */,
 				AF0063 /* FuzzyMatcherTests.swift */,
+				AF0067 /* DocsetSearchServiceTests.swift */,
+				AF0068 /* DocsetManagerServiceTests.swift */,
+				GG0015 /* Fixtures */,
 			);
 			path = ClipsmithTests;
+			sourceTree = "<group>";
+		};
+		GG0015 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				GG0016 /* TestDocset.docset */,
+			);
+			path = Fixtures;
+			sourceTree = "<group>";
+		};
+		GG0016 /* TestDocset.docset */ = {
+			isa = PBXGroup;
+			children = (
+				GG0017 /* Contents */,
+			);
+			path = "TestDocset.docset";
+			sourceTree = "<group>";
+		};
+		GG0017 /* Contents */ = {
+			isa = PBXGroup;
+			children = (
+				GG0018 /* Resources */,
+				AF0070 /* Info.plist (TestDocset) */,
+			);
+			path = Contents;
+			sourceTree = "<group>";
+		};
+		GG0018 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				AF0069 /* docSet.dsidx */,
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 		GG0011 /* Snippets */ = {
@@ -366,6 +421,7 @@
 			packageProductDependencies = (
 				SP0002 /* KeyboardShortcuts */,
 				SP0003 /* HighlightSwift */,
+				SP0005 /* GRDB */,
 			);
 			productName = Clipsmith;
 			productReference = AF0011 /* Clipsmith.app */;
@@ -384,6 +440,9 @@
 				TD0001 /* PBXTargetDependency */,
 			);
 			name = ClipsmithTests;
+			packageProductDependencies = (
+				SP0006 /* GRDB (Tests) */,
+			);
 			productName = ClipsmithTests;
 			productReference = AF0021 /* ClipsmithTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
@@ -419,6 +478,7 @@
 			packageReferences = (
 				SP0001 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				SP0004 /* XCRemoteSwiftPackageReference "HighlightSwift" */,
+				SP0007 /* XCRemoteSwiftPackageReference "GRDB.swift" */,
 			);
 			productRefGroup = GG0007 /* Products */;
 			projectDirPath = "";
@@ -488,6 +548,9 @@
 				AA0057 /* TextTransformer.swift in Sources */,
 				AA0059 /* ClipboardExportService.swift in Sources */,
 				AA0061 /* FuzzyMatcher.swift in Sources */,
+				AA0065 /* DocsetSearchService.swift in Sources */,
+				AA0066 /* DocsetManagerService.swift in Sources */,
+				AA0067 /* SelectedTextService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -511,6 +574,8 @@
 				AA0058 /* TextTransformerTests.swift in Sources */,
 				AA0060 /* ClipboardExportServiceTests.swift in Sources */,
 				AA0062 /* FuzzyMatcherTests.swift in Sources */,
+				AA0068 /* DocsetSearchServiceTests.swift in Sources */,
+				AA0069 /* DocsetManagerServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -779,6 +844,14 @@
 				minimumVersion = 1.1.0;
 			};
 		};
+		SP0007 /* XCRemoteSwiftPackageReference "GRDB.swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/groue/GRDB.swift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -791,6 +864,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = SP0004 /* XCRemoteSwiftPackageReference "HighlightSwift" */;
 			productName = HighlightSwift;
+		};
+		SP0005 /* GRDB */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = SP0007 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
+		};
+		SP0006 /* GRDB (Tests) */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = SP0007 /* XCRemoteSwiftPackageReference "GRDB.swift" */;
+			productName = GRDB;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
