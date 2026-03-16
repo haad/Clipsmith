@@ -23,6 +23,10 @@ final class PasteService {
     /// pasteboard, preventing ClipboardMonitor from re-capturing its own paste output (Pitfall 1).
     var clipboardMonitor: ClipboardMonitor?
 
+    /// The currently pending FakeKeyHelper, if any. Held so `cancelPendingPaste()` can
+    /// cancel the scheduled Cmd-V (e.g. when the user presses Escape after modifier release).
+    private var pendingHelper: FakeKeyHelper?
+
     // MARK: - Paste
 
     /// Writes content to the pasteboard as plain text and fires Cmd-V into the previous app.
@@ -61,7 +65,18 @@ final class PasteService {
         //    like the original ObjC implementation. This ensures the bezel has been
         //    hidden (at ~0.2s) before the keystroke is posted (at 0.5s).
         let helper = FakeKeyHelper(previousApp: previousApp)
+        pendingHelper = helper
         helper.scheduleCommandV()
+    }
+
+    /// Cancels any pending Cmd-V injection that hasn't fired yet.
+    /// Called when the bezel is dismissed without paste intent (e.g. Escape key).
+    func cancelPendingPaste() {
+        if let helper = pendingHelper {
+            helper.cancelScheduledCommandV()
+            pendingHelper = nil
+            logger.info("Cancelled pending Cmd-V injection")
+        }
     }
 }
 
@@ -73,7 +88,7 @@ final class PasteService {
 /// exactly: CGEventSourceStateCombinedSessionState, kCGHIDEventTap, and the 0x000008
 /// secondary command bit.
 @MainActor
-private final class FakeKeyHelper: NSObject {
+final class FakeKeyHelper: NSObject {
 
     private let previousApp: NSRunningApplication?
 
@@ -85,6 +100,10 @@ private final class FakeKeyHelper: NSObject {
     func scheduleCommandV() {
         // Matches original Flycut: [self performSelector:@selector(fakeCommandV) withObject:nil afterDelay:0.5]
         perform(#selector(fakeCommandV), with: nil, afterDelay: 0.5)
+    }
+
+    func cancelScheduledCommandV() {
+        NSObject.cancelPreviousPerformRequests(withTarget: self, selector: #selector(fakeCommandV), object: nil)
     }
 
     @objc private func fakeCommandV() {

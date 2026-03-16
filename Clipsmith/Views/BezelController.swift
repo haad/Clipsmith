@@ -191,6 +191,7 @@ final class BezelController: NSPanel {
     /// pass, and mutating @Observable properties during that pass causes
     /// "Modifying state during view update" faults.
     func hide() {
+        pasteService?.cancelPendingPaste()
         removeClickOutsideMonitor()
         removeFlagsMonitor()
         viewModel.selectedIndex = 0
@@ -560,6 +561,9 @@ final class BezelController: NSPanel {
     /// The bezel MUST be hidden before the synthetic Cmd-V is posted — otherwise
     /// the panel (canBecomeKey) can intercept the keystroke.
     func pasteAndHide() async {
+        // If the bezel was already dismissed (e.g. user pressed Escape after modifier
+        // release but before this Task ran), skip the paste entirely.
+        guard isVisible else { return }
         guard let content = viewModel.currentClipping else {
             hide()
             return
