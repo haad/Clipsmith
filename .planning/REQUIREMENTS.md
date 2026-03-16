@@ -73,9 +73,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Documentation Lookup
 
-- [ ] **DOCS-01**: User can trigger a quick documentation search for selected/highlighted text via hotkey
-- [ ] **DOCS-02**: Lightweight popup shows documentation results from offline docsets
-- [ ] **DOCS-03**: User can download and manage docsets for their preferred languages/frameworks
+- [x] **DOCS-01**: User can trigger a quick documentation search for selected/highlighted text via hotkey
+- [x] **DOCS-02**: Lightweight popup shows documentation results from offline docsets
+- [x] **DOCS-03**: User can download and manage docsets for their preferred languages/frameworks
 
 ## v2 Requirements
 
@@ -159,9 +159,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | GIST-03 | Phase 4 | Complete |
 | GIST-04 | Phase 4 | Complete |
 | GIST-05 | Phase 4 | Complete |
-| DOCS-01 | Phase 4 | Pending |
-| DOCS-02 | Phase 4 | Pending |
-| DOCS-03 | Phase 4 | Pending |
+| DOCS-01 | Phase 4 | Complete |
+| DOCS-02 | Phase 4 | Complete |
+| DOCS-03 | Phase 4 | Complete |
 
 **Coverage:**
 - v1 requirements: 43 total

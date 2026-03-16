@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 07-intelligent-search-ai-07-01-PLAN.md
-last_updated: "2026-03-12T21:21:11.392Z"
+stopped_at: Completed 08-documentation-lookup-08-01-PLAN.md
+last_updated: "2026-03-16T21:00:53.726Z"
 last_activity: 2026-03-05 — Plan 01-01 complete
 progress:
   total_phases: 10
   completed_phases: 8
-  total_plans: 26
-  completed_plans: 26
+  total_plans: 29
+  completed_plans: 27
   percent: 100
 ---
 
@@ -76,6 +76,7 @@ Progress: [██████████] 100%
 | Phase 06-quick-actions-performance P03 | 1 min | 2 tasks | 3 files |
 | Phase 06-quick-actions-performance P02 | 6 min | 2 tasks | 4 files |
 | Phase 07-intelligent-search-ai P01 | 4 | 2 tasks | 6 files |
+| Phase 08-documentation-lookup P01 | 8 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -162,6 +163,9 @@ Recent decisions affecting current work:
 - [Phase 07-intelligent-search-ai]: FuzzyMatcher uses consecutive-bonus scoring: bonus increments by 1.0 per consecutive hit, decays by 0.5 on miss, normalized by n*(n+1)/2 ideal score
 - [Phase 07-intelligent-search-ai]: PromptBezelViewModel scores title and content separately, uses max(titleScore, contentScore) as ranking key
 - [Phase 07-intelligent-search-ai]: SRCH-02 (source app filtering), SRCH-03 (date filtering), AINT-01 (on-device AI) deferred/descoped per user decision in CONTEXT.md
+- [Phase 08-01]: GRDB.swift 7.10.0 added as SPM dependency; struct DocEntry with Codable + FetchableRecord + Sendable for Swift 6
+- [Phase 08-01]: DocsetManagerService stores metadata as Codable JSON not SwiftData — avoids migration complexity
+- [Phase 08-01]: Test fixture path uses #filePath not #file — #filePath gives absolute compile-time path; #file returns relative path causing SQLite error 14
 
 ### Pending Todos
 
@@ -179,6 +183,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-12T21:18:04.953Z
-Stopped at: Completed 07-intelligent-search-ai-07-01-PLAN.md
+Last session: 2026-03-16T21:00:53.723Z
+Stopped at: Completed 08-documentation-lookup-08-01-PLAN.md
 Resume file: None
