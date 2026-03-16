@@ -75,6 +75,11 @@
 		AA0067 /* SelectedTextService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0066 /* SelectedTextService.swift */; };
 		AA0068 /* DocsetSearchServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0067 /* DocsetSearchServiceTests.swift */; };
 		AA0069 /* DocsetManagerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0068 /* DocsetManagerServiceTests.swift */; };
+		AA0070 /* DocBezelViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0071 /* DocBezelViewModel.swift */; };
+		AA0071 /* DocBezelViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0072 /* DocBezelViewModelTests.swift */; };
+		AA0072 /* DocBezelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0073 /* DocBezelController.swift */; };
+		AA0073 /* DocBezelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0074 /* DocBezelView.swift */; };
+		AA0074 /* DocsetSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0075 /* DocsetSettingsSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -158,6 +163,11 @@
 		AF0068 /* DocsetManagerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetManagerServiceTests.swift; sourceTree = "<group>"; };
 		AF0069 /* docSet.dsidx */ = {isa = PBXFileReference; lastKnownFileType = file; path = docSet.dsidx; sourceTree = "<group>"; };
 		AF0070 /* Info.plist (TestDocset) */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "Info.plist"; sourceTree = "<group>"; };
+		AF0071 /* DocBezelViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocBezelViewModel.swift; sourceTree = "<group>"; };
+		AF0072 /* DocBezelViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocBezelViewModelTests.swift; sourceTree = "<group>"; };
+		AF0073 /* DocBezelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocBezelController.swift; sourceTree = "<group>"; };
+		AF0074 /* DocBezelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocBezelView.swift; sourceTree = "<group>"; };
+		AF0075 /* DocsetSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetSettingsSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -259,6 +269,9 @@
 				AF0054 /* PromptBezelViewModel.swift */,
 				AF0055 /* PromptBezelView.swift */,
 				AF0056 /* PromptBezelController.swift */,
+				AF0071 /* DocBezelViewModel.swift */,
+				AF0073 /* DocBezelController.swift */,
+				AF0074 /* DocBezelView.swift */,
 				GG0009 /* Settings */,
 				GG0011 /* Snippets */,
 				GG0012 /* Gists */,
@@ -312,6 +325,7 @@
 				AF0017 /* AccessibilitySettingsSection.swift */,
 				AF0043 /* GistSettingsSection.swift */,
 				AF0053 /* PromptLibrarySettingsSection.swift */,
+				AF0075 /* DocsetSettingsSection.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -337,6 +351,7 @@
 				AF0063 /* FuzzyMatcherTests.swift */,
 				AF0067 /* DocsetSearchServiceTests.swift */,
 				AF0068 /* DocsetManagerServiceTests.swift */,
+				AF0072 /* DocBezelViewModelTests.swift */,
 				GG0015 /* Fixtures */,
 			);
 			path = ClipsmithTests;
@@ -551,6 +566,10 @@
 				AA0065 /* DocsetSearchService.swift in Sources */,
 				AA0066 /* DocsetManagerService.swift in Sources */,
 				AA0067 /* SelectedTextService.swift in Sources */,
+				AA0070 /* DocBezelViewModel.swift in Sources */,
+				AA0072 /* DocBezelController.swift in Sources */,
+				AA0073 /* DocBezelView.swift in Sources */,
+				AA0074 /* DocsetSettingsSection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -576,6 +595,7 @@
 				AA0062 /* FuzzyMatcherTests.swift in Sources */,
 				AA0068 /* DocsetSearchServiceTests.swift in Sources */,
 				AA0069 /* DocsetManagerServiceTests.swift in Sources */,
+				AA0071 /* DocBezelViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
