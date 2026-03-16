@@ -38,4 +38,7 @@ enum AppSettingsKeys {
     static let promptLibraryURL = "promptLibraryURL"
     static let promptLibraryLastSync = "promptLibraryLastSync"
     static let promptLibraryVariables = "promptLibraryVariables"
+
+    // Phase 8 additions (Documentation Lookup)
+    static let docLookupEnabled = "docLookupEnabled"
 }
