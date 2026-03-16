@@ -116,7 +116,7 @@ struct SnippetEditorView: View {
             await saveSnippet()
         }
         // Observe share-as-gist notification from SnippetWindowView top bar button
-        .onReceive(NotificationCenter.default.publisher(for: .flycutShareSnippetAsGist)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .clipsmithShareSnippetAsGist)) { _ in
             Task {
                 await shareAsGist()
             }
@@ -202,7 +202,7 @@ struct SnippetEditorView: View {
         let response = alert.runModal()
         if response == .alertFirstButtonReturn {
             NSApp.activate()
-            NotificationCenter.default.post(name: .flycutOpenGistSettings, object: nil)
+            NotificationCenter.default.post(name: .clipsmithOpenGistSettings, object: nil)
         }
     }
 

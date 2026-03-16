@@ -5,7 +5,7 @@ import Security
 final class TokenStoreTests: XCTestCase {
 
     // Use a test-specific service string to avoid polluting production keychain
-    private let testService = "com.generalarcade.flycut.github-pat.test"
+    private let testService = "com.github.haad.clipsmith.github-pat.test"
     private let testAccount = "github-personal-access-token-test"
 
     private var tokenStore: TokenStore!

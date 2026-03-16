@@ -41,7 +41,7 @@ struct SnippetWindowView: View {
 
                 if selectedTab == 0 {
                     Button("Share as Gist") {
-                        NotificationCenter.default.post(name: .flycutShareSnippetAsGist, object: nil)
+                        NotificationCenter.default.post(name: .clipsmithShareSnippetAsGist, object: nil)
                     }
                     .keyboardShortcut("g", modifiers: [.command, .shift])
                     .help("Share selected snippet as GitHub Gist (⇧⌘G)")
@@ -74,7 +74,7 @@ struct SnippetWindowView: View {
             .frame(width: 0, height: 0)
             .opacity(0)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .flycutOpenPrompts)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenPrompts)) { _ in
             selectedTab = 1
         }
         .onDisappear {

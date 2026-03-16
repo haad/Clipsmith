@@ -6,7 +6,7 @@ import UserNotifications
 import UniformTypeIdentifiers
 
 private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.generalarcade.flycut",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.github.haad.clipsmith",
     category: "AppDelegate"
 )
 
@@ -163,17 +163,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(openSearchFromMenu),
-            name: .flycutOpenSearch,
+            name: .clipsmithOpenSearch,
             object: nil
         )
 
         // Wire "Share as Gist" from menu bar clipping context menu.
-        // MenuBarView posts .flycutShareAsGist with userInfo["content"]; AppDelegate
+        // MenuBarView posts .clipsmithShareAsGist with userInfo["content"]; AppDelegate
         // handles it here so that GistService (owned by AppDelegate) can be called.
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleShareAsGist(_:)),
-            name: .flycutShareAsGist,
+            name: .clipsmithShareAsGist,
             object: nil
         )
 
@@ -183,13 +183,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleExportHistory),
-            name: .flycutExportHistory,
+            name: .clipsmithExportHistory,
             object: nil
         )
         NotificationCenter.default.addObserver(
             self,
             selector: #selector(handleImportHistory),
-            name: .flycutImportHistory,
+            name: .clipsmithImportHistory,
             object: nil
         )
 
@@ -215,13 +215,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Register global hotkey for the snippet window (Plan 04-03).
-        // MenuBarView observes .flycutOpenSnippets and calls openSnippetWindow()
+        // MenuBarView observes .clipsmithOpenSnippets and calls openSnippetWindow()
         // because AppDelegate cannot use @Environment(\.openWindow).
         KeyboardShortcuts.onKeyDown(for: .activateSnippets) {
             Task { @MainActor in
                 // Activation policy switch and icon refresh are handled by
                 // MenuBarView.openSnippetWindow() via the notification below.
-                NotificationCenter.default.post(name: .flycutOpenSnippets, object: nil)
+                NotificationCenter.default.post(name: .clipsmithOpenSnippets, object: nil)
             }
         }
 
@@ -292,7 +292,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             // Show NSSavePanel for the user to choose a file location
             let panel = NSSavePanel()
             panel.allowedContentTypes = [.json]
-            panel.nameFieldStringValue = "flycut-history.json"
+            panel.nameFieldStringValue = "clipsmith-history.json"
             panel.canCreateDirectories = true
             panel.title = "Export Clipboard History"
 
@@ -423,7 +423,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if response == .alertFirstButtonReturn {
             NSApp.activate()
             // Open Settings — post the settings notification (AppDelegate has no openSettings env)
-            NotificationCenter.default.post(name: .flycutOpenGistSettings, object: nil)
+            NotificationCenter.default.post(name: .clipsmithOpenGistSettings, object: nil)
         }
     }
 

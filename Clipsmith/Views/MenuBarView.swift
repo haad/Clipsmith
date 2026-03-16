@@ -2,17 +2,17 @@ import SwiftUI
 import SwiftData
 
 extension Notification.Name {
-    static let flycutOpenSearch = Notification.Name("flycutOpenSearch")
-    static let flycutOpenSnippets = Notification.Name("flycutOpenSnippets")
+    static let clipsmithOpenSearch = Notification.Name("clipsmithOpenSearch")
+    static let clipsmithOpenSnippets = Notification.Name("clipsmithOpenSnippets")
     /// Posted to open the snippet window on the Prompts tab (tab index 1).
-    static let flycutOpenPrompts = Notification.Name("flycutOpenPrompts")
-    static let flycutShareAsGist = Notification.Name("flycutShareAsGist")
-    static let flycutOpenGistSettings = Notification.Name("flycutOpenGistSettings")
-    static let flycutShareSnippetAsGist = Notification.Name("flycutShareSnippetAsGist")
+    static let clipsmithOpenPrompts = Notification.Name("clipsmithOpenPrompts")
+    static let clipsmithShareAsGist = Notification.Name("clipsmithShareAsGist")
+    static let clipsmithOpenGistSettings = Notification.Name("clipsmithOpenGistSettings")
+    static let clipsmithShareSnippetAsGist = Notification.Name("clipsmithShareSnippetAsGist")
     /// Posted to trigger clipboard history export via NSSavePanel.
-    static let flycutExportHistory = Notification.Name("flycutExportHistory")
+    static let clipsmithExportHistory = Notification.Name("clipsmithExportHistory")
     /// Posted to trigger clipboard history import via NSOpenPanel.
-    static let flycutImportHistory = Notification.Name("flycutImportHistory")
+    static let clipsmithImportHistory = Notification.Name("clipsmithImportHistory")
 }
 
 struct MenuBarView: View {
@@ -66,7 +66,7 @@ struct MenuBarView: View {
                     }
                     Button("Share as Gist...") {
                         NotificationCenter.default.post(
-                            name: .flycutShareAsGist,
+                            name: .clipsmithShareAsGist,
                             object: nil,
                             userInfo: ["content": clipping.content]
                         )
@@ -86,7 +86,7 @@ struct MenuBarView: View {
         }
 
         Button("Search Clippings...") {
-            NotificationCenter.default.post(name: .flycutOpenSearch, object: nil)
+            NotificationCenter.default.post(name: .clipsmithOpenSearch, object: nil)
         }
 
         if clippings.count > 1 {
@@ -119,11 +119,11 @@ struct MenuBarView: View {
         }
 
         Button("Export History...") {
-            NotificationCenter.default.post(name: .flycutExportHistory, object: nil)
+            NotificationCenter.default.post(name: .clipsmithExportHistory, object: nil)
         }
 
         Button("Import History...") {
-            NotificationCenter.default.post(name: .flycutImportHistory, object: nil)
+            NotificationCenter.default.post(name: .clipsmithImportHistory, object: nil)
         }
 
         Divider()
@@ -152,10 +152,10 @@ struct MenuBarView: View {
         .onAppear {
             fetchClippings()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .flycutOpenSnippets)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenSnippets)) { _ in
             openSnippetWindow()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .flycutOpenGistSettings)) { _ in
+        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenGistSettings)) { _ in
             NSApp.activate()
             openSettings()
         }
@@ -196,7 +196,7 @@ struct MenuBarView: View {
     /// Opens the snippet window and navigates to the Prompts tab (tab index 1).
     ///
     /// Opens the window first (with the same activation policy dance as openSnippetWindow),
-    /// then posts .flycutOpenPrompts after a brief delay so SnippetWindowView can switch
+    /// then posts .clipsmithOpenPrompts after a brief delay so SnippetWindowView can switch
     /// to the Prompts tab once the window has appeared.
     private func openSnippetWindowOnPromptsTab() {
         Task { @MainActor in
@@ -205,7 +205,7 @@ struct MenuBarView: View {
             openWindow(id: "snippets")
             // Brief delay ensures SnippetWindowView has appeared before tab switch fires.
             try? await Task.sleep(for: .milliseconds(150))
-            NotificationCenter.default.post(name: .flycutOpenPrompts, object: nil)
+            NotificationCenter.default.post(name: .clipsmithOpenPrompts, object: nil)
         }
     }
 }

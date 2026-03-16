@@ -4,7 +4,7 @@ import SwiftData
 import OSLog
 
 private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.generalarcade.flycut",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.github.haad.clipsmith",
     category: "BezelController"
 )
 
@@ -473,17 +473,17 @@ final class BezelController: NSPanel {
         logger.info("Copied as RTF to pasteboard")
     }
 
-    /// Posts .flycutShareAsGist notification reusing the existing AppDelegate handler.
+    /// Posts .clipsmithShareAsGist notification reusing the existing AppDelegate handler.
     /// Zero new Gist code needed — AppDelegate already handles this notification from MenuBarView.
     @objc private func actionShareAsGist() {
         guard let content = viewModel.currentClipping else { return }
         NotificationCenter.default.post(
-            name: .flycutShareAsGist,
+            name: .clipsmithShareAsGist,
             object: nil,
             userInfo: ["content": content]
         )
         hide()
-        logger.info("Posted flycutShareAsGist notification")
+        logger.info("Posted clipsmithShareAsGist notification")
     }
 
     // MARK: - Private helpers

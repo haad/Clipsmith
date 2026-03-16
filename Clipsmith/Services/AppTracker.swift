@@ -34,8 +34,8 @@ final class AppTracker {
                 guard let activatedApp = capturedApp else { return }
                 // Only update previousApp when the activated app is NOT Clipsmith itself.
                 // This ensures we always have a reference to the user's actual target app.
-                let flycutBundleID = Bundle.main.bundleIdentifier
-                if activatedApp.bundleIdentifier != flycutBundleID {
+                let ownBundleID = Bundle.main.bundleIdentifier
+                if activatedApp.bundleIdentifier != ownBundleID {
                     self.previousApp = activatedApp
                 }
             }

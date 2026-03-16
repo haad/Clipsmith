@@ -11,7 +11,7 @@ struct TokenStore: Sendable {
     let account: String
 
     init(
-        service: String = "com.generalarcade.flycut.github-pat",
+        service: String = "com.github.haad.clipsmith.github-pat",
         account: String = "github-personal-access-token"
     ) {
         self.service = service

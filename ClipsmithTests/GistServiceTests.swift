@@ -32,7 +32,7 @@ final class MockURLProtocol: URLProtocol {
 // MARK: - Helpers
 
 private func makeTestTokenStore(token: String?) -> TokenStore {
-    let service = "com.generalarcade.flycut.github-pat.gist-service-test"
+    let service = "com.github.haad.clipsmith.github-pat.gist-service-test"
     let account = "github-personal-access-token-gist-service-test"
     let store = TokenStore(service: service, account: account)
     store.deleteToken()

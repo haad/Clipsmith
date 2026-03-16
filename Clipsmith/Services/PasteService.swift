@@ -3,7 +3,7 @@ import CoreGraphics
 import OSLog
 
 private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.generalarcade.flycut",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.github.haad.clipsmith",
     category: "PasteService"
 )
 

@@ -3,7 +3,7 @@ import ServiceManagement
 import OSLog
 
 private let logger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.generalarcade.flycut",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.github.haad.clipsmith",
     category: "GeneralSettingsTab"
 )
 
@@ -86,10 +86,10 @@ struct GeneralSettingsTab: View {
                 Toggle("Remove duplicate clippings", isOn: $removeDuplicates)
                 HStack {
                     Button("Export History...") {
-                        NotificationCenter.default.post(name: .flycutExportHistory, object: nil)
+                        NotificationCenter.default.post(name: .clipsmithExportHistory, object: nil)
                     }
                     Button("Import History...") {
-                        NotificationCenter.default.post(name: .flycutImportHistory, object: nil)
+                        NotificationCenter.default.post(name: .clipsmithImportHistory, object: nil)
                     }
                 }
             }
