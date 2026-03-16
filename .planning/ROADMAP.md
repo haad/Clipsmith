@@ -170,7 +170,7 @@ Plans:
 **Requirements**: DOCS-01, DOCS-02, DOCS-03
 **Success Criteria** (what must be TRUE):
   1. User can trigger a documentation search for selected text via hotkey and see results in a lightweight popup with downloaded docsets
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 - [ ] 08-01-PLAN.md — GRDB.swift SPM + DocsetSearchService + DocsetManagerService + SelectedTextService + tests (DOCS-01, DOCS-02, DOCS-03)
@@ -200,5 +200,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | 5. Prompt Library | 5/5 | Complete   | 2026-03-11 |
 | 6. Quick Actions & Performance | 3/3 | Complete   | 2026-03-12 |
 | 7. Intelligent Search & AI | 1/1 | Complete   | 2026-03-12 |
-| 8. Documentation Lookup | 1/3 | In Progress|  |
+| 8. Documentation Lookup | 2/3 | In Progress|  |
 | 9. Favorites | 0/TBD | Not started | - |

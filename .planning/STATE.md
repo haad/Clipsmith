@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-documentation-lookup-08-01-PLAN.md
-last_updated: "2026-03-16T21:00:53.726Z"
+stopped_at: Completed 08-documentation-lookup-08-02-PLAN.md
+last_updated: "2026-03-16T21:08:19.298Z"
 last_activity: 2026-03-05 — Plan 01-01 complete
 progress:
   total_phases: 10
   completed_phases: 8
   total_plans: 29
-  completed_plans: 27
+  completed_plans: 28
   percent: 100
 ---
 
@@ -77,6 +77,7 @@ Progress: [██████████] 100%
 | Phase 06-quick-actions-performance P02 | 6 min | 2 tasks | 4 files |
 | Phase 07-intelligent-search-ai P01 | 4 | 2 tasks | 6 files |
 | Phase 08-documentation-lookup P01 | 8 | 2 tasks | 10 files |
+| Phase 08-documentation-lookup P02 | 4 min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -166,6 +167,9 @@ Recent decisions affecting current work:
 - [Phase 08-01]: GRDB.swift 7.10.0 added as SPM dependency; struct DocEntry with Codable + FetchableRecord + Sendable for Swift 6
 - [Phase 08-01]: DocsetManagerService stores metadata as Codable JSON not SwiftData — avoids migration complexity
 - [Phase 08-01]: Test fixture path uses #filePath not #file — #filePath gives absolute compile-time path; #file returns relative path causing SQLite error 14
+- [Phase 08-02]: DocBezelController uses single designated init() — no SwiftData container needed, simpler than PromptBezelController
+- [Phase 08-02]: WKWebView link interception: linkActivated non-file URLs open in NSWorkspace, cancel in-panel navigation — prevents doc pages navigating away
+- [Phase 08-02]: DocsetSettingsSection uses local @State DocsetManagerService — settings manages own lifecycle, not injected from AppDelegate
 
 ### Pending Todos
 
@@ -183,6 +187,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T21:00:53.723Z
-Stopped at: Completed 08-documentation-lookup-08-01-PLAN.md
+Last session: 2026-03-16T21:08:19.295Z
+Stopped at: Completed 08-documentation-lookup-08-02-PLAN.md
 Resume file: None
