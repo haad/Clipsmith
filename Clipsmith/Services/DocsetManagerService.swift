@@ -7,116 +7,128 @@ private let logger = Logger(
     category: "DocsetManagerService"
 )
 
-/// Metadata for a single docset (downloaded or available for download).
+/// Metadata for a single DevDocs documentation set.
 struct DocsetInfo: Codable, Identifiable, Sendable {
-    var id: String           // e.g. "Swift", "Python_3"
-    var displayName: String  // e.g. "Swift", "Python 3"
-    var localPath: URL?      // nil if not yet downloaded
-    var version: String?
+    var id: String           // DevDocs slug, e.g. "javascript", "python~3.12"
+    var displayName: String  // e.g. "JavaScript", "Python 3.12"
+    var release: String?     // Version string from DevDocs
+    var dbSize: Int          // Size of db.json in bytes
     var isEnabled: Bool
+    var isDownloaded: Bool
 
-    /// Whether this docset has been downloaded and is available for search.
-    var isDownloaded: Bool { localPath != nil }
+    /// Path to the downloaded index.json, or nil if not downloaded.
+    var indexPath: URL? {
+        guard isDownloaded else { return nil }
+        return Self.docDirectory(for: id).appendingPathComponent("index.json")
+    }
+
+    /// Path to the downloaded db.json, or nil if not downloaded.
+    var dbPath: URL? {
+        guard isDownloaded else { return nil }
+        return Self.docDirectory(for: id).appendingPathComponent("db.json")
+    }
+
+    /// Directory where this doc's files are stored.
+    static func docDirectory(for slug: String) -> URL {
+        let appSupport = FileManager.default
+            .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
+        return appSupport.appendingPathComponent("Clipsmith/DevDocs/\(slug)", isDirectory: true)
+    }
+
+    /// Human-readable size string.
+    var sizeLabel: String {
+        let mb = Double(dbSize) / 1_048_576.0
+        if mb >= 1.0 { return String(format: "%.1f MB", mb) }
+        let kb = Double(dbSize) / 1024.0
+        return String(format: "%.0f KB", kb)
+    }
 }
 
-/// Known CDN mirror hostnames for Kapeli docset downloads.
-enum DocsetCDNMirror: String, CaseIterable {
-    case sanfrancisco = "sanfrancisco"
-    case london = "london"
-    case newyork = "newyork"
-    case tokyo = "tokyo"
-    case frankfurt = "frankfurt"
-
-    var baseURL: String { "https://\(rawValue).kapeli.com/feeds" }
-}
-
-/// Manages docset downloads, extraction, and metadata persistence.
+/// Manages DevDocs documentation downloads and metadata.
 ///
-/// Stores metadata as JSON in Application Support/Clipsmith/docsets.json.
-/// No SwiftData models — simple Codable persistence avoids migration complexity.
+/// Downloads `index.json` (search entries) and `db.json` (HTML content) per doc
+/// from devdocs.io. Stores metadata as JSON in Application Support/Clipsmith/.
 @Observable @MainActor
 final class DocsetManagerService {
 
-    /// All known docsets (downloaded + available).
+    /// All known docs (downloaded + available from catalog).
     var docsets: [DocsetInfo] = []
 
-    /// Currently downloading docset ID, if any.
+    /// Currently downloading doc slug, if any.
     var downloadingDocsetID: String?
 
-    /// Download progress (0.0 to 1.0) for the current download.
+    /// Download progress (0.0 to 1.0).
     var downloadProgress: Double = 0.0
 
     /// Last error message, if any.
     var lastError: String?
 
+    /// Whether the catalog is being fetched.
+    var isFetchingCatalog: Bool = false
+
     // MARK: - File paths
 
-    /// Directory where extracted docsets live.
-    private var docsetsDirectory: URL {
-        let appSupport = FileManager.default
-            .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return appSupport.appendingPathComponent("Clipsmith/Docsets", isDirectory: true)
-    }
-
-    /// Path to the metadata JSON file.
     private var metadataPath: URL {
         let appSupport = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
-        return appSupport.appendingPathComponent("Clipsmith/docsets.json")
+        return appSupport.appendingPathComponent("Clipsmith/devdocs-meta.json")
     }
 
-    // MARK: - Bundled manifest
+    // MARK: - Catalog
 
-    /// Curated list of popular docsets available for download.
-    static let availableDocsets: [DocsetInfo] = [
-        DocsetInfo(id: "Swift", displayName: "Swift", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Python_3", displayName: "Python 3", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "JavaScript", displayName: "JavaScript", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "TypeScript", displayName: "TypeScript", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "React", displayName: "React", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Go", displayName: "Go", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Rust", displayName: "Rust", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Ruby", displayName: "Ruby", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "PHP", displayName: "PHP", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "CSS", displayName: "CSS", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "HTML", displayName: "HTML", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Java_SE17", displayName: "Java SE 17", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "C", displayName: "C", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "C++", displayName: "C++", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "NodeJS", displayName: "Node.js", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Django", displayName: "Django", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Laravel", displayName: "Laravel", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Vue", displayName: "Vue.js", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Angular", displayName: "Angular", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Bash", displayName: "Bash", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "PostgreSQL", displayName: "PostgreSQL", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "MySQL", displayName: "MySQL", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Docker", displayName: "Docker", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Kubernetes", displayName: "Kubernetes", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Git", displayName: "Git", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Ruby_on_Rails_7", displayName: "Ruby on Rails 7", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Dart", displayName: "Dart", localPath: nil, version: nil, isEnabled: true),
-        DocsetInfo(id: "Kotlin", displayName: "Kotlin", localPath: nil, version: nil, isEnabled: true),
-    ]
+    /// Fetch the full DevDocs catalog from devdocs.io/docs.json.
+    func fetchCatalog() async {
+        isFetchingCatalog = true
+        defer { isFetchingCatalog = false }
+
+        do {
+            let url = URL(string: "https://devdocs.io/docs.json")!
+            let (data, response) = try await URLSession.shared.data(from: url)
+            guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
+                throw DocsetError.downloadFailed("Failed to fetch DevDocs catalog")
+            }
+            let catalog = try JSONDecoder().decode([DevDocsCatalogEntry].self, from: data)
+
+            // Merge catalog with saved state
+            var byID: [String: DocsetInfo] = [:]
+            for entry in catalog {
+                byID[entry.slug] = DocsetInfo(
+                    id: entry.slug,
+                    displayName: entry.name + (entry.version.isEmpty ? "" : " \(entry.version)"),
+                    release: entry.release,
+                    dbSize: entry.db_size,
+                    isEnabled: true,
+                    isDownloaded: false
+                )
+            }
+            // Overlay saved state (preserves isDownloaded, isEnabled)
+            for saved in docsets where byID[saved.id] != nil {
+                byID[saved.id]?.isEnabled = saved.isEnabled
+                byID[saved.id]?.isDownloaded = saved.isDownloaded
+            }
+
+            docsets = Array(byID.values).sorted { $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending }
+            saveMetadata()
+            logger.info("DevDocs catalog loaded: \(catalog.count) docs available")
+        } catch {
+            logger.error("Failed to fetch DevDocs catalog: \(error.localizedDescription, privacy: .public)")
+            lastError = error.localizedDescription
+        }
+    }
 
     // MARK: - Persistence
 
-    /// Load metadata from disk, merging with the bundled manifest.
+    /// Load saved metadata from disk.
     func loadMetadata() {
-        var saved: [DocsetInfo] = []
-        if FileManager.default.fileExists(atPath: metadataPath.path) {
-            if let data = try? Data(contentsOf: metadataPath),
-               let decoded = try? JSONDecoder().decode([DocsetInfo].self, from: data) {
-                saved = decoded
-            }
+        guard FileManager.default.fileExists(atPath: metadataPath.path) else {
+            // First launch — trigger catalog fetch
+            Task { await fetchCatalog() }
+            return
         }
-
-        // Merge: saved state takes precedence for known IDs; add new manifest entries
-        var byID: [String: DocsetInfo] = [:]
-        for d in Self.availableDocsets { byID[d.id] = d }
-        for d in saved { byID[d.id] = d }   // saved overwrites manifest defaults
-
-        docsets = Array(byID.values).sorted { $0.displayName < $1.displayName }
+        if let data = try? Data(contentsOf: metadataPath),
+           let decoded = try? JSONDecoder().decode([DocsetInfo].self, from: data) {
+            docsets = decoded.sorted { $0.displayName.localizedCaseInsensitiveCompare($1.displayName) == .orderedAscending }
+        }
     }
 
     /// Save current metadata to disk.
@@ -127,90 +139,70 @@ final class DocsetManagerService {
             let data = try JSONEncoder().encode(docsets)
             try data.write(to: metadataPath, options: .atomic)
         } catch {
-            logger.error("Failed to save docset metadata: \(error.localizedDescription, privacy: .public)")
+            logger.error("Failed to save metadata: \(error.localizedDescription, privacy: .public)")
             lastError = error.localizedDescription
         }
     }
 
-    // MARK: - Download + Extract
+    // MARK: - Download
 
-    /// Download and extract a docset from Kapeli CDN.
+    /// Download a doc's index.json and db.json from DevDocs.
     func downloadDocset(_ docset: DocsetInfo) async {
         downloadingDocsetID = docset.id
         downloadProgress = 0.0
         lastError = nil
 
         do {
-            // Ensure destination directory exists
-            try FileManager.default.createDirectory(at: docsetsDirectory, withIntermediateDirectories: true)
+            let docDir = DocsetInfo.docDirectory(for: docset.id)
+            try FileManager.default.createDirectory(at: docDir, withIntermediateDirectories: true)
 
-            // Try each CDN mirror in order
-            var downloadedURL: URL?
-            for mirror in DocsetCDNMirror.allCases {
-                let tgzURL = URL(string: "\(mirror.baseURL)/\(docset.id).tgz")!
-                do {
-                    let (localURL, _) = try await URLSession.shared.download(from: tgzURL)
-                    downloadedURL = localURL
-                    break
-                } catch {
-                    logger.warning("Mirror \(mirror.rawValue, privacy: .public) failed for \(docset.id, privacy: .public): \(error.localizedDescription, privacy: .public)")
-                    continue
-                }
+            // 1. Download index.json
+            let indexURL = URL(string: "https://devdocs.io/docs/\(docset.id)/index.json")!
+            let (indexData, indexResp) = try await URLSession.shared.data(from: indexURL)
+            guard let http = indexResp as? HTTPURLResponse, http.statusCode == 200 else {
+                throw DocsetError.downloadFailed("index.json returned non-200 for \(docset.id)")
             }
+            try indexData.write(to: docDir.appendingPathComponent("index.json"), options: .atomic)
+            downloadProgress = 0.3
 
-            guard let localURL = downloadedURL else {
-                throw DocsetError.downloadFailed("All CDN mirrors failed for \(docset.id)")
+            // 2. Download db.json (can be large — use download task for disk-based transfer)
+            let dbURL = URL(string: "https://documents.devdocs.io/\(docset.id)/db.json")!
+            let (dbTempURL, dbResp) = try await URLSession.shared.download(from: dbURL)
+            guard let dbHTTP = dbResp as? HTTPURLResponse, dbHTTP.statusCode == 200 else {
+                throw DocsetError.downloadFailed("db.json returned non-200 for \(docset.id)")
             }
-            defer { try? FileManager.default.removeItem(at: localURL) }
-
-            // Extract with /usr/bin/tar
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/bin/tar")
-            process.arguments = ["-xzf", localURL.path, "-C", docsetsDirectory.path]
-            try process.run()
-            process.waitUntilExit()
-
-            guard process.terminationStatus == 0 else {
-                throw DocsetError.extractionFailed("tar exited with status \(process.terminationStatus)")
+            let destDB = docDir.appendingPathComponent("db.json")
+            if FileManager.default.fileExists(atPath: destDB.path) {
+                try FileManager.default.removeItem(at: destDB)
             }
+            try FileManager.default.moveItem(at: dbTempURL, to: destDB)
+            downloadProgress = 1.0
 
-            // Find the extracted .docset bundle
-            let extractedPath = docsetsDirectory.appendingPathComponent("\(docset.id).docset")
-            guard FileManager.default.fileExists(atPath: extractedPath.path) else {
-                // Some docsets extract with different names — scan for any .docset
-                let contents = try FileManager.default.contentsOfDirectory(at: docsetsDirectory, includingPropertiesForKeys: nil)
-                if let found = contents.first(where: { $0.pathExtension == "docset" && $0.lastPathComponent.contains(docset.id) }) {
-                    updateDocsetPath(id: docset.id, path: found)
-                } else {
-                    throw DocsetError.extractionFailed("No .docset bundle found after extraction")
-                }
-                downloadingDocsetID = nil
-                return
+            // Mark as downloaded
+            if let idx = docsets.firstIndex(where: { $0.id == docset.id }) {
+                docsets[idx].isDownloaded = true
             }
-
-            updateDocsetPath(id: docset.id, path: extractedPath)
-            logger.info("Downloaded and extracted docset: \(docset.id, privacy: .public)")
+            saveMetadata()
+            logger.info("Downloaded DevDocs: \(docset.id, privacy: .public)")
         } catch {
             lastError = error.localizedDescription
-            logger.error("Docset download failed: \(error.localizedDescription, privacy: .public)")
+            logger.error("Download failed for \(docset.id, privacy: .public): \(error.localizedDescription, privacy: .public)")
         }
 
         downloadingDocsetID = nil
     }
 
-    /// Delete a downloaded docset from disk and clear its local path.
+    /// Delete a downloaded doc from disk.
     func deleteDocset(_ docset: DocsetInfo) {
-        if let localPath = docset.localPath {
-            try? FileManager.default.removeItem(at: localPath)
-        }
+        let docDir = DocsetInfo.docDirectory(for: docset.id)
+        try? FileManager.default.removeItem(at: docDir)
         if let idx = docsets.firstIndex(where: { $0.id == docset.id }) {
-            docsets[idx].localPath = nil
-            docsets[idx].version = nil
+            docsets[idx].isDownloaded = false
         }
         saveMetadata()
     }
 
-    /// Toggle enabled state for a docset.
+    /// Toggle enabled state for a doc.
     func toggleEnabled(_ docset: DocsetInfo) {
         if let idx = docsets.firstIndex(where: { $0.id == docset.id }) {
             docsets[idx].isEnabled.toggle()
@@ -218,30 +210,51 @@ final class DocsetManagerService {
         }
     }
 
-    /// Returns only downloaded and enabled docsets.
+    /// Returns only downloaded and enabled docs.
     var enabledDocsets: [DocsetInfo] {
         docsets.filter { $0.isDownloaded && $0.isEnabled }
     }
+}
 
-    // MARK: - Private
+// MARK: - DevDocs catalog JSON structure
 
-    private func updateDocsetPath(id: String, path: URL) {
-        if let idx = docsets.firstIndex(where: { $0.id == id }) {
-            docsets[idx].localPath = path
-        }
-        saveMetadata()
+private struct DevDocsCatalogEntry: Codable {
+    let name: String
+    let slug: String
+    let version: String
+    let release: String
+    let db_size: Int
+    // Extra fields from docs.json that we don't need but must accept
+    let type: String?
+    let mtime: Int?
+    let attribution: String?
+    let alias: String?
+
+    private enum CodingKeys: String, CodingKey {
+        case name, slug, version, release, db_size, type, mtime, attribution, alias
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        name = try c.decode(String.self, forKey: .name)
+        slug = try c.decode(String.self, forKey: .slug)
+        version = try c.decodeIfPresent(String.self, forKey: .version) ?? ""
+        release = try c.decodeIfPresent(String.self, forKey: .release) ?? ""
+        db_size = try c.decodeIfPresent(Int.self, forKey: .db_size) ?? 0
+        type = try c.decodeIfPresent(String.self, forKey: .type)
+        mtime = try c.decodeIfPresent(Int.self, forKey: .mtime)
+        attribution = try c.decodeIfPresent(String.self, forKey: .attribution)
+        alias = try c.decodeIfPresent(String.self, forKey: .alias)
     }
 }
 
-/// Errors specific to docset operations.
+/// Errors specific to doc operations.
 enum DocsetError: LocalizedError {
     case downloadFailed(String)
-    case extractionFailed(String)
 
     var errorDescription: String? {
         switch self {
         case .downloadFailed(let msg): return "Download failed: \(msg)"
-        case .extractionFailed(let msg): return "Extraction failed: \(msg)"
         }
     }
 }

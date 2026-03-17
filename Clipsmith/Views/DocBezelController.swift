@@ -23,8 +23,8 @@ final class DocBezelController: NSPanel {
     // designated init
     init() {
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 520, height: 420),
-            styleMask: [.nonactivatingPanel, .borderless, .fullSizeContentView],
+            contentRect: NSRect(x: 0, y: 0, width: 720, height: 520),
+            styleMask: [.titled, .fullSizeContentView, .resizable],
             backing: .buffered,
             defer: false
         )
@@ -34,12 +34,18 @@ final class DocBezelController: NSPanel {
         isOpaque = false
         backgroundColor = .clear
         hasShadow = true
-        isMovableByWindowBackground = false
+        titlebarAppearsTransparent = true
+        titleVisibility = .hidden
+        isMovableByWindowBackground = true
         isReleasedWhenClosed = false
+        minSize = NSSize(width: 400, height: 300)
 
         let bezelView = DocBezelView(viewModel: viewModel)
         let hostingView = NSHostingView(rootView: bezelView)
         contentView = hostingView
+
+        // Remember window size/position across launches
+        setFrameAutosaveName("DocBezelFrame")
 
         logger.debug("DocBezelController initialised")
     }
@@ -51,7 +57,8 @@ final class DocBezelController: NSPanel {
     }
 
     override var canBecomeKey: Bool { true }
-    override var canBecomeMain: Bool { false }
+    override var canBecomeMain: Bool { true }
+    override var acceptsMouseMovedEvents: Bool { get { true } set {} }
 
     // MARK: - Event interception (mirrors PromptBezelController)
 
@@ -64,7 +71,9 @@ final class DocBezelController: NSPanel {
                  121, 116, 119, 115:                         // Page/Home/End
                 keyDown(with: event); return
             default:
-                if let chars = event.charactersIgnoringModifiers?.lowercased(),
+                // Only intercept j/k for navigation when a text field is NOT focused
+                if !isTextFieldFirstResponder,
+                   let chars = event.charactersIgnoringModifiers?.lowercased(),
                    event.modifierFlags.intersection([.command, .option, .control]).isEmpty {
                     if chars == "j" || chars == "k" {
                         keyDown(with: event); return
@@ -75,12 +84,21 @@ final class DocBezelController: NSPanel {
         super.sendEvent(event)
     }
 
+    /// Whether the current first responder is a text input field.
+    private var isTextFieldFirstResponder: Bool {
+        guard let responder = firstResponder else { return false }
+        return responder is NSTextView || responder is NSTextField
+    }
+
     override func cancelOperation(_ sender: Any?) { hide() }
 
     // MARK: - show / hide
 
     /// Shows the doc bezel. Reads selected text from the frontmost app and pre-fills search.
     func show() {
+        // Reload metadata to pick up docs downloaded in Settings
+        docsetManagerService?.loadMetadata()
+
         viewModel.searchService = docsetSearchService
         viewModel.managerService = docsetManagerService
         viewModel.selectedIndex = 0
@@ -115,7 +133,8 @@ final class DocBezelController: NSPanel {
             // Enter — open current result's HTML in the WKWebView preview
             // (no paste action for doc lookup; user reads the doc)
             // If user holds Cmd+Enter, open in external browser
-            if event.modifierFlags.contains(.command), let url = viewModel.currentResult?.htmlURL {
+            if event.modifierFlags.contains(.command), let result = viewModel.currentResult {
+                let url = URL(string: "https://devdocs.io/\(result.docsetID)/\(result.entry.path)")!
                 NSWorkspace.shared.open(url)
                 hide()
             }
@@ -146,7 +165,10 @@ final class DocBezelController: NSPanel {
     private func configureAndPresent() {
         viewModel.wraparoundBezel = UserDefaults.standard.bool(forKey: AppSettingsKeys.wraparoundBezel)
         alphaValue = 1.0
-        centerOnScreen()
+        // Only center if no saved frame (first launch or reset)
+        if !setFrameUsingName(frameAutosaveName) {
+            centerOnScreen()
+        }
         makeKeyAndOrderFront(nil)
         registerClickOutsideMonitor()
     }

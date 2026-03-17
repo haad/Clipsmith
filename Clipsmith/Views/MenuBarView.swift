@@ -10,6 +10,7 @@ extension Notification.Name {
     static let clipsmithOpenGistSettings = Notification.Name("clipsmithOpenGistSettings")
     static let clipsmithShareSnippetAsGist = Notification.Name("clipsmithShareSnippetAsGist")
     /// Posted to trigger clipboard history export via NSSavePanel.
+    static let clipsmithOpenDocLookup = Notification.Name("clipsmithOpenDocLookup")
     static let clipsmithExportHistory = Notification.Name("clipsmithExportHistory")
     /// Posted to trigger clipboard history import via NSOpenPanel.
     static let clipsmithImportHistory = Notification.Name("clipsmithImportHistory")
@@ -32,6 +33,7 @@ struct MenuBarView: View {
     @AppStorage(AppSettingsKeys.displayNum) private var displayNum: Int = 10
     @AppStorage(AppSettingsKeys.displayLen) private var displayLen: Int = 40
     @AppStorage(AppSettingsKeys.menuSelectionPastes) private var menuSelectionPastes: Bool = true
+    @AppStorage(AppSettingsKeys.docLookupEnabled) private var docLookupEnabled: Bool = false
 
     private var modelContext: ModelContext {
         ClipsmithApp.sharedModelContainer.mainContext
@@ -89,17 +91,13 @@ struct MenuBarView: View {
             NotificationCenter.default.post(name: .clipsmithOpenSearch, object: nil)
         }
 
-        if clippings.count > 1 {
-            Button("Merge All Clippings") {
-                let merged = clippings.map(\.content).joined(separator: "\n")
-                let mergedClipping = ClipsmithSchemaV1.Clipping(
-                    content: merged,
-                    sourceAppName: "Merged"
-                )
-                modelContext.insert(mergedClipping)
-                try? modelContext.save()
+        if docLookupEnabled {
+            Button("Documentation Lookup...") {
+                NotificationCenter.default.post(name: .clipsmithOpenDocLookup, object: nil)
             }
         }
+
+        Divider()
 
         if !clippings.isEmpty {
             Button("Clear All") {

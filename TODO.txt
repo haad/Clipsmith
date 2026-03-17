@@ -1,0 +1,14 @@
+## Documentation Lookup - Future Enhancements
+
+- [ ] Add Dash docset support as second source alongside DevDocs
+      - Kapeli official docsets (162) via Zeal redirect: https://go.zealdocs.org/d/com.kapeli/{name}/latest
+      - User-contributed docsets (603) from https://github.com/Kapeli/Dash-User-Contributions
+      - Catalog API: https://api.zealdocs.org/v1/docsets
+      - Search via SQLite searchIndex (use Foundation sqlite3 C API, no GRDB)
+      - Render local HTML files via loadFileURL
+      - Add DocSource enum (devdocs vs dashDocset) to DocsetInfo
+      - This would bring total available docs to ~1500+
+
+- [ ] Add LangChain documentation
+      - Not available in DevDocs, Kapeli official, or Dash User Contributions
+      - Options: custom scraper, or "custom URL" feature for user-provided docset feeds

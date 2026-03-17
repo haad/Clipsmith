@@ -80,8 +80,7 @@ final class DocBezelViewModelTests: XCTestCase {
             DocSearchResult(
                 docsetID: "test",
                 docsetName: "Test",
-                entry: DocEntry(id: Int64(i), name: "Entry \(i)", type: "Class", path: "entry\(i).html"),
-                htmlURL: nil
+                entry: DocEntry(slug: "test", name: "Entry \(i)", type: "Class", path: "entry\(i)")
             )
         }
     }

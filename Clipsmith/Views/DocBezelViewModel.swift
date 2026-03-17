@@ -7,14 +7,12 @@ private let logger = Logger(
     category: "DocBezelViewModel"
 )
 
-/// Result item combining a docset source with a search entry.
+/// Result item combining a doc source with a search entry.
 struct DocSearchResult: Identifiable, Sendable {
-    var id: String { "\(docsetID)-\(entry.id)" }
+    var id: String { "\(docsetID)/\(entry.path)" }
     let docsetID: String
     let docsetName: String
     let entry: DocEntry
-    /// Full path to the HTML file for WKWebView loading.
-    let htmlURL: URL?
 }
 
 @Observable @MainActor
@@ -37,17 +35,23 @@ final class DocBezelViewModel {
             searchTask = Task {
                 try? await Task.sleep(for: .milliseconds(150))  // debounce
                 guard !Task.isCancelled else { return }
-                await performSearch(query: query)
+                performSearch(query: query)
             }
         }
     }
 
-    var selectedIndex: Int = 0
+    var selectedIndex: Int = 0 {
+        didSet { loadHTMLForCurrentResult() }
+    }
     var filteredResults: [DocSearchResult] = []
     var isSearching: Bool = false
     var wraparoundBezel: Bool = false
 
+    /// HTML content for the currently selected result (loaded from db.json).
+    var currentHTML: String?
+
     private var searchTask: Task<Void, Never>?
+    private var htmlLoadTask: Task<Void, Never>?
 
     // MARK: - Computed
 
@@ -65,21 +69,17 @@ final class DocBezelViewModel {
 
     // MARK: - Search
 
-    func performSearch(query: String) async {
+    func performSearch(query: String) {
         guard let searchService, let managerService else { return }
         isSearching = true
         do {
             let docsets = managerService.enabledDocsets
-            let results = try await searchService.searchAll(query: query, docsets: docsets)
+            let results = try searchService.searchAll(query: query, docsets: docsets)
             filteredResults = results.map { pair in
-                let htmlURL = pair.docset.localPath?
-                    .appendingPathComponent("Contents/Resources/Documents")
-                    .appendingPathComponent(pair.entry.path)
-                return DocSearchResult(
+                DocSearchResult(
                     docsetID: pair.docset.id,
                     docsetName: pair.docset.displayName,
-                    entry: pair.entry,
-                    htmlURL: htmlURL
+                    entry: pair.entry
                 )
             }
         } catch {
@@ -87,6 +87,40 @@ final class DocBezelViewModel {
             filteredResults = []
         }
         isSearching = false
+        loadHTMLForCurrentResult()
+    }
+
+    // MARK: - HTML content loading
+
+    /// Load HTML for the currently selected result from db.json on disk.
+    private func loadHTMLForCurrentResult() {
+        htmlLoadTask?.cancel()
+        guard let result = currentResult else {
+            currentHTML = nil
+            return
+        }
+        let slug = result.docsetID
+        let path = result.entry.path
+        let resultID = result.id
+
+        htmlLoadTask = Task {
+            let html = await Task.detached {
+                Self.loadHTMLContent(slug: slug, path: path)
+            }.value
+            // Only update if still showing the same result
+            if self.currentResult?.id == resultID {
+                self.currentHTML = html
+            }
+        }
+    }
+
+    /// Read a single entry's HTML from db.json on disk.
+    /// db.json is a JSON object mapping path → HTML string.
+    private nonisolated static func loadHTMLContent(slug: String, path: String) -> String? {
+        let dbURL = DocsetInfo.docDirectory(for: slug).appendingPathComponent("db.json")
+        guard let data = try? Data(contentsOf: dbURL) else { return nil }
+        guard let dict = try? JSONSerialization.jsonObject(with: data) as? [String: String] else { return nil }
+        return dict[path]
     }
 
     // MARK: - Navigation (mirrors PromptBezelViewModel exactly)

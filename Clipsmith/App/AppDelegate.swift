@@ -208,6 +208,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
+        // Wire "Documentation Lookup..." menu bar button.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(openDocLookupFromMenu),
+            name: .clipsmithOpenDocLookup,
+            object: nil
+        )
+
         // Request notification authorization for Gist creation alerts.
         // Delivers silently if the user denies (no sound by default).
         UNUserNotificationCenter.current().delegate = self
@@ -257,15 +265,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // Register global hotkey for documentation lookup (Phase 8).
+        // Always registered, but checks feature flag at invocation time
+        // so toggling the setting works without app restart.
         KeyboardShortcuts.onKeyDown(for: .activateDocLookup) { [weak self] in
             Task { @MainActor in
                 guard let self else { return }
+                guard UserDefaults.standard.bool(forKey: AppSettingsKeys.docLookupEnabled) else { return }
                 let stickyBezel = UserDefaults.standard.bool(forKey: AppSettingsKeys.stickyBezel)
                 if self.docBezelController.isVisible {
-                    // Already showing — navigate down (hotkey repress while holding).
                     self.docBezelController.viewModel.navigateDown()
                 } else {
-                    // First press — show bezel and set hold mode based on stickyBezel.
                     self.docBezelController.isHotkeyHold = !stickyBezel
                     self.docBezelController.show()
                 }
@@ -277,6 +286,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openSearchFromMenu() {
         bezelController?.showWithSearch()
+    }
+
+    // MARK: - Documentation Lookup (from menu bar)
+
+    @objc private func openDocLookupFromMenu() {
+        docBezelController?.show()
     }
 
     // MARK: - Share as Gist (from menu bar clipping context menu)

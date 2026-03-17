@@ -39,6 +39,9 @@ struct GeneralSettingsTab: View {
     @AppStorage(AppSettingsKeys.saveToLocation) private var saveToLocation: String = "~/Desktop"
     @AppStorage(AppSettingsKeys.clipboardPollingInterval) private var clipboardPollingInterval: Double = 1.0
 
+    // Phase 8: feature flag
+    @AppStorage(AppSettingsKeys.docLookupEnabled) private var docLookupEnabled: Bool = false
+
     var body: some View {
         Form {
             // MARK: - History
@@ -146,6 +149,13 @@ struct GeneralSettingsTab: View {
                     TextField("Path", text: $saveToLocation)
                         .textFieldStyle(.roundedBorder)
                 }
+            }
+
+            // MARK: - Features
+
+            Section("Features") {
+                Toggle("Documentation Lookup (experimental)", isOn: $docLookupEnabled)
+                    .help("Enable the documentation browser. Requires app restart for hotkey to take effect.")
             }
 
             // MARK: - Launch

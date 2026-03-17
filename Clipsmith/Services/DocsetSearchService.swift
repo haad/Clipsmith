@@ -1,88 +1,110 @@
 import Foundation
-import GRDB
 
-/// A single entry from a docset's searchIndex SQLite table.
-struct DocEntry: Codable, FetchableRecord, Sendable, Identifiable {
-    let id: Int64
-    let name: String
-    let type: String   // "Class", "Method", "Function", "Property", etc.
-    let path: String   // Relative path from Documents/ directory
+/// A single entry from a DevDocs documentation index.
+struct DocEntry: Codable, Sendable, Identifiable {
+    var id: String { "\(slug)/\(path)" }
+    let slug: String    // Parent doc slug, e.g. "javascript"
+    let name: String    // Entry name, e.g. "Array.map"
+    let type: String    // Category, e.g. "Array", "Operators"
+    let path: String    // Relative path into db.json, e.g. "global_objects/array/map"
 }
 
-/// Queries docset SQLite indexes using GRDB.
+/// Searches DevDocs documentation indexes in memory.
 ///
-/// Caches one DatabaseQueue per docset path to avoid file descriptor leaks
-/// (Pitfall 3 from RESEARCH.md). Thread-safe — GRDB DatabaseQueue serializes access.
+/// Each downloaded doc has an `index.json` with entries. This service loads
+/// those indexes and performs substring search with prefix-first ranking.
 final class DocsetSearchService: Sendable {
-    /// Cache of open database queues, keyed by docset path string.
-    private let cache = DatabaseQueueCache()
 
-    /// Search a single docset for entries matching the query.
-    /// Uses SQL LIKE with prefix match for fast results, limited to 50.
-    func search(query: String, in docsetPath: URL) async throws -> [DocEntry] {
-        let dbPath = docsetPath
-            .appendingPathComponent("Contents/Resources/docSet.dsidx").path
-        let dbQueue = try cache.queue(for: dbPath)
-        return try await dbQueue.read { db in
-            try DocEntry.fetchAll(db, sql: """
-                SELECT id, name, type, path
-                FROM searchIndex
-                WHERE name LIKE ?
-                ORDER BY
-                    CASE WHEN name LIKE ? THEN 0 ELSE 1 END,
-                    length(name),
-                    name
-                LIMIT 50
-                """, arguments: ["%\(query)%", "\(query)%"])
+    private let cache = IndexCache()
+
+    /// Load entries from a doc's index.json file on disk.
+    func loadIndex(slug: String, from indexPath: URL) throws -> [DocEntry] {
+        if let cached = cache.get(slug) { return cached }
+        let data = try Data(contentsOf: indexPath)
+        let raw = try JSONDecoder().decode(DevDocsIndex.self, from: data)
+        let entries = raw.entries.map { entry in
+            DocEntry(slug: slug, name: entry.name, type: entry.type, path: entry.path)
         }
+        cache.set(slug, entries: entries)
+        return entries
     }
 
-    /// Search across multiple docsets, returning results tagged with docset name.
-    func searchAll(query: String, docsets: [DocsetInfo]) async throws -> [(docset: DocsetInfo, entry: DocEntry)] {
-        var results: [(DocsetInfo, DocEntry)] = []
-        for docset in docsets where docset.isEnabled {
-            guard let localPath = docset.localPath else { continue }
-            let entries = try await search(query: query, in: localPath)
-            results.append(contentsOf: entries.map { (docset, $0) })
-        }
-        // Sort: prefix matches first, then by name length, then alphabetical
-        return results.sorted { lhs, rhs in
-            let lName = lhs.1.name.lowercased()
-            let rName = rhs.1.name.lowercased()
-            let q = query.lowercased()
+    /// Search a single doc's entries by name.
+    func search(query: String, in entries: [DocEntry]) -> [DocEntry] {
+        let q = query.lowercased()
+        let matched = entries.filter { $0.name.lowercased().contains(q) }
+        return Array(matched.sorted { lhs, rhs in
+            let lName = lhs.name.lowercased()
+            let rName = rhs.name.lowercased()
             let lPrefix = lName.hasPrefix(q)
             let rPrefix = rName.hasPrefix(q)
             if lPrefix != rPrefix { return lPrefix }
             if lName.count != rName.count { return lName.count < rName.count }
             return lName < rName
-        }
+        }.prefix(50))
     }
 
-    /// Remove cached DatabaseQueue for a docset (call when docset is deleted or reinstalled).
-    func invalidateCache(for docsetPath: URL) {
-        let dbPath = docsetPath
-            .appendingPathComponent("Contents/Resources/docSet.dsidx").path
-        cache.remove(for: dbPath)
+    /// Search across multiple downloaded docs.
+    func searchAll(query: String, docsets: [DocsetInfo]) throws -> [(docset: DocsetInfo, entry: DocEntry)] {
+        var results: [(DocsetInfo, DocEntry)] = []
+        for docset in docsets where docset.isEnabled && docset.isDownloaded {
+            guard let indexPath = docset.indexPath else { continue }
+            let entries = try loadIndex(slug: docset.id, from: indexPath)
+            let matched = search(query: query, in: entries)
+            results.append(contentsOf: matched.map { (docset, $0) })
+        }
+        let q = query.lowercased()
+        return Array(results.sorted { lhs, rhs in
+            let lName = lhs.1.name.lowercased()
+            let rName = rhs.1.name.lowercased()
+            let lPrefix = lName.hasPrefix(q)
+            let rPrefix = rName.hasPrefix(q)
+            if lPrefix != rPrefix { return lPrefix }
+            if lName.count != rName.count { return lName.count < rName.count }
+            return lName < rName
+        }.prefix(100))
+    }
+
+    /// Clear cached index for a doc (call when doc is deleted).
+    func invalidateCache(for slug: String) {
+        cache.remove(slug)
     }
 }
 
-/// Thread-safe cache for DatabaseQueue instances.
-private final class DatabaseQueueCache: @unchecked Sendable {
-    private var queues: [String: DatabaseQueue] = [:]
+// MARK: - DevDocs JSON format
+
+/// The structure of a DevDocs index.json file.
+private struct DevDocsIndex: Codable {
+    let entries: [RawEntry]
+
+    struct RawEntry: Codable {
+        let name: String
+        let path: String
+        let type: String
+    }
+}
+
+// MARK: - Thread-safe cache
+
+private final class IndexCache: @unchecked Sendable {
+    private var entries: [String: [DocEntry]] = [:]
     private let lock = NSLock()
 
-    func queue(for path: String) throws -> DatabaseQueue {
+    func get(_ slug: String) -> [DocEntry]? {
         lock.lock()
         defer { lock.unlock() }
-        if let existing = queues[path] { return existing }
-        let q = try DatabaseQueue(path: path)
-        queues[path] = q
-        return q
+        return entries[slug]
     }
 
-    func remove(for path: String) {
+    func set(_ slug: String, entries: [DocEntry]) {
         lock.lock()
         defer { lock.unlock() }
-        queues.removeValue(forKey: path)
+        self.entries[slug] = entries
+    }
+
+    func remove(_ slug: String) {
+        lock.lock()
+        defer { lock.unlock() }
+        entries.removeValue(forKey: slug)
     }
 }

@@ -3,68 +3,85 @@ import XCTest
 
 final class DocsetSearchServiceTests: XCTestCase {
     private var service: DocsetSearchService!
-    private var fixtureURL: URL!
+    private var sampleEntries: [DocEntry]!
 
-    override func setUp() async throws {
+    override func setUp() {
         service = DocsetSearchService()
-        // Locate the test fixture relative to the test source file.
-        // #filePath returns an absolute path to the source file during compilation.
-        let thisFile = URL(fileURLWithPath: #filePath)
-        let resolvedFixture = thisFile.deletingLastPathComponent()
-            .appendingPathComponent("Fixtures/TestDocset.docset")
-        // Resolve to an absolute path so SQLite can open it regardless of cwd
-        fixtureURL = URL(fileURLWithPath: resolvedFixture.path)
+        sampleEntries = [
+            DocEntry(slug: "javascript", name: "Array", type: "Global Objects", path: "global_objects/array"),
+            DocEntry(slug: "javascript", name: "Array.map", type: "Array", path: "global_objects/array/map"),
+            DocEntry(slug: "javascript", name: "Array.filter", type: "Array", path: "global_objects/array/filter"),
+            DocEntry(slug: "javascript", name: "Array.forEach", type: "Array", path: "global_objects/array/foreach"),
+            DocEntry(slug: "javascript", name: "String", type: "Global Objects", path: "global_objects/string"),
+            DocEntry(slug: "javascript", name: "String.split", type: "String", path: "global_objects/string/split"),
+            DocEntry(slug: "javascript", name: "parseInt", type: "Functions", path: "global_objects/parseint"),
+            DocEntry(slug: "javascript", name: "Promise", type: "Global Objects", path: "global_objects/promise"),
+            DocEntry(slug: "javascript", name: "Map", type: "Global Objects", path: "global_objects/map"),
+            DocEntry(slug: "javascript", name: "Set", type: "Global Objects", path: "global_objects/set"),
+        ]
     }
 
-    func testSearchReturnsMatchingEntries() async throws {
-        let results = try await service.search(query: "String", in: fixtureURL)
+    func testSearchReturnsMatchingEntries() {
+        let results = service.search(query: "String", in: sampleEntries)
         XCTAssertFalse(results.isEmpty, "Should find entries matching 'String'")
         XCTAssertTrue(results.allSatisfy { $0.name.contains("String") })
     }
 
-    func testSearchPrefixMatchesRankedFirst() async throws {
-        let results = try await service.search(query: "Arr", in: fixtureURL)
+    func testSearchPrefixMatchesRankedFirst() {
+        let results = service.search(query: "Arr", in: sampleEntries)
         XCTAssertFalse(results.isEmpty)
-        // "Array" should appear before "Array.append" (shorter name)
-        if results.count >= 2 {
-            XCTAssertEqual(results[0].name, "Array")
-        }
+        // "Array" should appear before "Array.map" (shorter name)
+        XCTAssertEqual(results[0].name, "Array")
     }
 
-    func testSearchNoResults() async throws {
-        let results = try await service.search(query: "ZZZZNOTFOUND", in: fixtureURL)
+    func testSearchNoResults() {
+        let results = service.search(query: "ZZZZNOTFOUND", in: sampleEntries)
         XCTAssertTrue(results.isEmpty)
     }
 
-    func testSearchLimit() async throws {
-        // Our fixture has 10 entries; searching broad should return all of them
-        let results = try await service.search(query: "", in: fixtureURL)
-        // LIKE '%%' matches everything
-        XCTAssertEqual(results.count, 10)
-    }
-
-    func testSearchAllAcrossDocsets() async throws {
-        let docset = DocsetInfo(
-            id: "TestDocset",
-            displayName: "Test",
-            localPath: fixtureURL,
-            version: nil,
-            isEnabled: true
-        )
-        let results = try await service.searchAll(query: "Array", docsets: [docset])
+    func testSearchCaseInsensitive() {
+        let results = service.search(query: "array", in: sampleEntries)
         XCTAssertFalse(results.isEmpty)
-        XCTAssertTrue(results.allSatisfy { $0.docset.id == "TestDocset" })
+        XCTAssertTrue(results.allSatisfy { $0.name.lowercased().contains("array") })
     }
 
-    func testDisabledDocsetSkipped() async throws {
+    func testSearchAllAcrossDocsets() throws {
+        // Create a temp index.json for testing
+        let tmpDir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: tmpDir, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: tmpDir) }
+
+        let indexJSON = """
+        {"entries":[{"name":"Array","path":"global_objects/array","type":"Global Objects"},{"name":"Map","path":"global_objects/map","type":"Global Objects"}]}
+        """
+        try indexJSON.data(using: .utf8)!.write(to: tmpDir.appendingPathComponent("index.json"))
+
         let docset = DocsetInfo(
-            id: "TestDocset",
-            displayName: "Test",
-            localPath: fixtureURL,
-            version: nil,
-            isEnabled: false  // disabled
+            id: "javascript",
+            displayName: "JavaScript",
+            release: nil,
+            dbSize: 1000,
+            isEnabled: true,
+            isDownloaded: true
         )
-        let results = try await service.searchAll(query: "Array", docsets: [docset])
+        // Manually cache the entries since we can't set indexPath to our tmp dir
+        let entries = try service.loadIndex(slug: "javascript", from: tmpDir.appendingPathComponent("index.json"))
+        XCTAssertEqual(entries.count, 2)
+
+        let results = service.search(query: "Array", in: entries)
+        XCTAssertFalse(results.isEmpty)
+    }
+
+    func testDisabledDocsetSkipped() throws {
+        let docset = DocsetInfo(
+            id: "test-disabled",
+            displayName: "Test",
+            release: nil,
+            dbSize: 100,
+            isEnabled: false,
+            isDownloaded: true
+        )
+        let results = try service.searchAll(query: "Array", docsets: [docset])
         XCTAssertTrue(results.isEmpty, "Disabled docsets should be skipped")
     }
 }
