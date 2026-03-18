@@ -268,14 +268,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Always registered, but checks feature flag at invocation time
         // so toggling the setting works without app restart.
         KeyboardShortcuts.onKeyDown(for: .activateDocLookup) { [weak self] in
+            logger.info("Doc lookup hotkey pressed")
             Task { @MainActor in
-                guard let self else { return }
-                guard UserDefaults.standard.bool(forKey: AppSettingsKeys.docLookupEnabled) else { return }
-                let stickyBezel = UserDefaults.standard.bool(forKey: AppSettingsKeys.stickyBezel)
+                guard let self else {
+                    logger.warning("Doc lookup: self is nil")
+                    return
+                }
+                guard UserDefaults.standard.bool(forKey: AppSettingsKeys.docLookupEnabled) else {
+                    logger.info("Doc lookup: feature flag disabled, ignoring")
+                    return
+                }
                 if self.docBezelController.isVisible {
                     self.docBezelController.viewModel.navigateDown()
                 } else {
-                    self.docBezelController.isHotkeyHold = !stickyBezel
+                    // Doc browser always uses sticky mode — no hold-to-browse
+                    self.docBezelController.isHotkeyHold = false
                     self.docBezelController.show()
                 }
             }

@@ -120,7 +120,10 @@ final class DocBezelController: NSPanel {
         viewModel.selectedIndex = 0
         viewModel.searchText = ""
         viewModel.filteredResults = []
+        viewModel.currentHTML = nil
         isHotkeyHold = false
+        // Return to accessory mode so app doesn't stay in Dock
+        NSApp.setActivationPolicy(.accessory)
         logger.info("DocBezelController hidden")
     }
 
@@ -169,6 +172,8 @@ final class DocBezelController: NSPanel {
         if !setFrameUsingName(frameAutosaveName) {
             centerOnScreen()
         }
+        // Activate the app so the panel can come to front
+        NSApp.activate()
         makeKeyAndOrderFront(nil)
         registerClickOutsideMonitor()
     }

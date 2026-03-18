@@ -18,12 +18,41 @@ struct DocBezelView: View {
             .background(.ultraThinMaterial)
 
             // Search bar
-            HStack {
+            HStack(spacing: 6) {
                 Image(systemName: "doc.text.magnifyingglass")
                     .foregroundStyle(.secondary)
-                TextField("Search documentation...", text: $viewModel.searchText)
+
+                // Doc filter pill
+                if let filter = viewModel.activeDocFilter, !viewModel.activeDocFilterNames.isEmpty {
+                    HStack(spacing: 3) {
+                        Text(viewModel.activeDocFilterNames.first ?? filter)
+                            .font(.caption)
+                            .fontWeight(.medium)
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                            .onTapGesture {
+                                // Remove the filter prefix from search text
+                                if let colonIdx = viewModel.searchText.firstIndex(of: ":") {
+                                    viewModel.searchText = String(viewModel.searchText[viewModel.searchText.index(after: colonIdx)...])
+                                        .trimmingCharacters(in: .whitespaces)
+                                }
+                            }
+                    }
+                    .padding(.horizontal, 6)
+                    .padding(.vertical, 2)
+                    .background(.blue.opacity(0.15))
+                    .foregroundStyle(.blue)
+                    .clipShape(RoundedRectangle(cornerRadius: 4))
+                }
+
+                TextField(
+                    viewModel.activeDocFilter != nil ? "Search in \(viewModel.activeDocFilterNames.first ?? "")..." : "Search docs... (prefix: go:fmt)",
+                    text: $viewModel.searchText
+                )
                     .textFieldStyle(.plain)
                     .font(.system(size: 14))
+
                 if viewModel.isSearching {
                     ProgressView()
                         .controlSize(.small)

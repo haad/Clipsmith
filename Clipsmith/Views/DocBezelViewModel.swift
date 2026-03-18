@@ -13,6 +13,7 @@ struct DocSearchResult: Identifiable, Sendable {
     let docsetID: String
     let docsetName: String
     let entry: DocEntry
+    let score: Double
 }
 
 @Observable @MainActor
@@ -30,6 +31,8 @@ final class DocBezelViewModel {
             let query = searchText.trimmingCharacters(in: .whitespaces)
             guard !query.isEmpty else {
                 filteredResults = []
+                activeDocFilter = nil
+                activeDocFilterNames = []
                 return
             }
             searchTask = Task {
@@ -46,6 +49,11 @@ final class DocBezelViewModel {
     var filteredResults: [DocSearchResult] = []
     var isSearching: Bool = false
     var wraparoundBezel: Bool = false
+
+    /// Active doc filter prefix (e.g. "python" from "python:map")
+    var activeDocFilter: String?
+    /// Display names of docs matching the active filter
+    var activeDocFilterNames: [String] = []
 
     /// HTML content for the currently selected result (loaded from db.json).
     var currentHTML: String?
@@ -72,14 +80,35 @@ final class DocBezelViewModel {
     func performSearch(query: String) {
         guard let searchService, let managerService else { return }
         isSearching = true
+
+        // Parse doc prefix filter (e.g. "python:map")
+        let parsed = searchService.parseQuery(query)
+        activeDocFilter = parsed.docFilter
+
+        // Update filter display names
+        if let filter = parsed.docFilter {
+            let matching = searchService.matchingDocsets(filter: filter, from: managerService.enabledDocsets)
+            activeDocFilterNames = matching.map(\.displayName)
+        } else {
+            activeDocFilterNames = []
+        }
+
+        let searchQuery = parsed.query
+        guard !searchQuery.isEmpty else {
+            filteredResults = []
+            isSearching = false
+            return
+        }
+
         do {
             let docsets = managerService.enabledDocsets
-            let results = try searchService.searchAll(query: query, docsets: docsets)
-            filteredResults = results.map { pair in
+            let results = try searchService.searchAll(query: searchQuery, docFilter: parsed.docFilter, docsets: docsets)
+            filteredResults = results.map { (docset, entry, score) in
                 DocSearchResult(
-                    docsetID: pair.docset.id,
-                    docsetName: pair.docset.displayName,
-                    entry: pair.entry
+                    docsetID: docset.id,
+                    docsetName: docset.displayName,
+                    entry: entry,
+                    score: score
                 )
             }
         } catch {
@@ -120,10 +149,13 @@ final class DocBezelViewModel {
         let dbURL = DocsetInfo.docDirectory(for: slug).appendingPathComponent("db.json")
         guard let data = try? Data(contentsOf: dbURL) else { return nil }
         guard let dict = try? JSONSerialization.jsonObject(with: data) as? [String: String] else { return nil }
-        return dict[path]
+        // Strip #fragment from path — db.json keys are page paths without fragments.
+        // e.g. "pipelines#index-_0021" → look up "pipelines"
+        let pagePath = path.split(separator: "#", maxSplits: 1).first.map(String.init) ?? path
+        return dict[pagePath]
     }
 
-    // MARK: - Navigation (mirrors PromptBezelViewModel exactly)
+    // MARK: - Navigation
 
     func navigateUp() {
         if wraparoundBezel {

@@ -8,11 +8,14 @@ private let logger = Logger(
 )
 
 /// Metadata for a single DevDocs documentation set.
-struct DocsetInfo: Codable, Identifiable, Sendable {
+struct DocsetInfo: Codable, Identifiable, Sendable, Hashable {
     var id: String           // DevDocs slug, e.g. "javascript", "python~3.12"
     var displayName: String  // e.g. "JavaScript", "Python 3.12"
     var release: String?     // Version string from DevDocs
     var dbSize: Int          // Size of db.json in bytes
+    var homeURL: String?     // Project homepage
+    var codeURL: String?     // Source code repository
+    var docType: String?     // e.g. "python", "sphinx", "simple"
     var isEnabled: Bool
     var isDownloaded: Bool
 
@@ -97,6 +100,9 @@ final class DocsetManagerService {
                     displayName: entry.name + (entry.version.isEmpty ? "" : " \(entry.version)"),
                     release: entry.release,
                     dbSize: entry.db_size,
+                    homeURL: entry.links?.home,
+                    codeURL: entry.links?.code,
+                    docType: entry.type,
                     isEnabled: true,
                     isDownloaded: false
                 )
@@ -218,20 +224,25 @@ final class DocsetManagerService {
 
 // MARK: - DevDocs catalog JSON structure
 
+private struct DevDocsCatalogLinks: Codable {
+    let home: String?
+    let code: String?
+}
+
 private struct DevDocsCatalogEntry: Codable {
     let name: String
     let slug: String
     let version: String
     let release: String
     let db_size: Int
-    // Extra fields from docs.json that we don't need but must accept
     let type: String?
+    let links: DevDocsCatalogLinks?
     let mtime: Int?
     let attribution: String?
     let alias: String?
 
     private enum CodingKeys: String, CodingKey {
-        case name, slug, version, release, db_size, type, mtime, attribution, alias
+        case name, slug, version, release, db_size, type, links, mtime, attribution, alias
     }
 
     init(from decoder: Decoder) throws {
@@ -239,6 +250,7 @@ private struct DevDocsCatalogEntry: Codable {
         name = try c.decode(String.self, forKey: .name)
         slug = try c.decode(String.self, forKey: .slug)
         version = try c.decodeIfPresent(String.self, forKey: .version) ?? ""
+        links = try c.decodeIfPresent(DevDocsCatalogLinks.self, forKey: .links)
         release = try c.decodeIfPresent(String.self, forKey: .release) ?? ""
         db_size = try c.decodeIfPresent(Int.self, forKey: .db_size) ?? 0
         type = try c.decodeIfPresent(String.self, forKey: .type)
