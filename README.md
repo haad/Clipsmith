@@ -1,41 +1,151 @@
 # Clipsmith
 
-A keyboard-first clipboard, snippet, and prompt library manager for macOS.
+A keyboard-first clipboard, snippet, prompt library, and documentation manager for macOS.
 
-Clipsmith keeps your clipboard history, code snippets, and AI prompts one shortcut away. Built natively in Swift for macOS 15+.
+Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline documentation one shortcut away. Built natively in Swift for macOS 15+.
+
+![Clipsmith](site/clipsmith-logo.png)
 
 ## Features
 
-- **Clipboard History** — automatically saves everything you copy, scroll back and paste any previous item
-- **Fuzzy Search** — find any clipping instantly by typing, even with partial or misspelled queries
-- **Code Snippets** — save frequently used code as named snippets organized into folders
-- **Prompt Library** — built-in collection of curated AI prompts, searchable and pasteable
-- **Quick Actions** — transform text: uppercase, lowercase, trim, sort lines, URL encode, and more
-- **GitHub Gist Sharing** — share any clipping as a Gist with one keystroke
-- **Privacy First** — all data stays on your Mac, no cloud sync, no analytics, no tracking
+### Clipboard History
+- Automatically saves everything you copy
+- Scroll back and paste any previous item
+- Fuzzy search to find clippings instantly, even with partial or misspelled queries
+- Configurable history size, duplicate removal, and password-length filtering
+
+### Code Snippets
+- Save frequently used code as named snippets organized into folders
+- Syntax-highlighted editor with language detection
+- Quick access via keyboard shortcut
+
+### Prompt Library
+- Built-in collection of curated AI prompts, searchable and pasteable
+- Template variables with `{{variable}}` substitution
+- Sync prompts from a remote JSON URL (default: [clipsmith-prompts-library](https://github.com/haad/clipsmith-prompts-library))
+
+### Documentation Lookup (Experimental)
+- Offline documentation browser powered by [devdocs.io](https://devdocs.io)
+- 789+ documentation sets available (Python, Go, JavaScript, Rust, CSS, Bash, and more)
+- Fuzzy search across all downloaded docs
+- Doc-scoped search with prefix syntax: `python:map`, `go:fmt`, `css:grid`
+- HTML documentation rendered in a split-view panel with dark/light mode support
+- Download and manage docs in Settings > Docsets
+
+### Quick Actions
+- Transform text: uppercase, lowercase, trim whitespace, sort lines, URL encode, and more
+- Available via `Tab` key in the clipboard bezel
+
+### GitHub Gist Sharing
+- Share any clipping or snippet as a GitHub Gist
+- Automatic language detection for syntax highlighting
+- Public or private gists via personal access token
+
+### Import / Export
+- Export clipboard history to JSON, CSV, or plain text
+- Import history from exported files
 
 ## Keyboard Shortcuts
 
-| Action | Shortcut |
+All shortcuts are configurable in Settings > Shortcuts.
+
+| Action | Default Shortcut |
 |---|---|
-| Open Clipsmith | `⇧⌘V` |
-| Navigate clippings | `↑` `↓` |
+| Open Clipboard | `⇧⌘V` |
+| Search Clippings | `⇧⌘S` |
+| Open Snippets | `⇧⌘B` |
+| Prompt Library | `⇧⌘P` |
+| Documentation Lookup | `⇧⌘D` |
+
+### Inside the Bezel
+
+| Action | Key |
+|---|---|
+| Navigate | `↑` `↓` / `j` `k` |
 | Paste selected | `⏎` |
-| Search | `/` |
-| Delete clipping | `⌫` |
-| Star / unstar | `S` |
-| Share as Gist | `G` |
+| Page up / down | `PageUp` `PageDn` |
+| Jump to first / last | `Home` `End` |
+| Dismiss | `Esc` |
 | Quick actions | `Tab` |
-| All / Starred / Snippets / Prompts | `⌘1` `⌘2` `⌘3` `⌘4` |
+
+### Documentation Browser
+
+| Action | Key |
+|---|---|
+| Search | Type in the search field |
+| Filter by doc | `python:query`, `go:query` |
+| Navigate results | `↑` `↓` |
+| Open in browser | `⌘⏎` |
+| Dismiss | `Esc` |
 
 ## Requirements
 
 - macOS 15 (Sequoia) or later
-- Accessibility permission (System Settings → Privacy & Security → Accessibility)
+- Accessibility permission (System Settings > Privacy & Security > Accessibility)
 
 ## Building from Source
 
-Open `Clipsmith.xcodeproj` in Xcode 16+ and build the `Clipsmith` target.
+```bash
+git clone https://github.com/haad/Clipsmith.git
+cd Clipsmith
+open Clipsmith.xcodeproj
+```
+
+Build the `Clipsmith` scheme in Xcode 16+. The app runs as a menu bar utility — look for the Clipsmith icon in the menu bar after launching.
+
+### Dependencies (managed via SPM)
+
+- [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) — global hotkey registration
+- [HighlightSwift](https://github.com/appstefan/HighlightSwift) — syntax highlighting in snippet editor
+
+## Configuration
+
+### Settings Tabs
+
+- **General** — history size, paste behavior, bezel appearance, menu bar options, feature flags
+- **Shortcuts** — record custom keyboard shortcuts for all features
+- **Prompts** — manage prompt library, sync URL, template variables
+- **Gists** — GitHub personal access token, default visibility
+- **Docsets** — browse DevDocs catalog, download/delete documentation sets
+
+### Feature Flags
+
+Some features are behind experimental flags in Settings > General > Features:
+
+- **Documentation Lookup** — enables the doc browser bezel and hotkey (default: off)
+
+## Privacy
+
+All data stays on your Mac. No cloud sync, no analytics, no tracking. GitHub Gist sharing requires a personal access token stored in the macOS Keychain.
+
+## Changelog
+
+### v4.2.0
+- Fuzzy search in documentation browser (FuzzyMatcher subsequence matching)
+- Doc-scoped search with prefix filter (`python:map`, `go:fmt`)
+- Documentation catalog detail panel with homepage/source links
+- Fix j/k key interception in doc search field
+- Fix bezel auto-closing and reopen issues
+- Fix empty content for docs with fragment anchors (bash, CSS, etc.)
+
+### v4.1.0
+- Rework documentation backend from Kapeli docsets to devdocs.io
+- 789 documentation sets available (was 28)
+- Remove GRDB dependency (JSON-based search)
+- Documentation Lookup menu bar item with feature flag
+- Disable App Sandbox (incompatible with WKWebView + accessibility)
+- Resizable, movable doc bezel with persistent frame size
+- Dark/light mode CSS for documentation rendering
+
+### v3.0.0
+- Fuzzy search in clipboard bezel (Phase 7)
+- Quick actions and performance optimizations (Phase 6)
+- Prompt library with template variables and remote sync (Phase 5)
+- Code snippets with GitHub Gist sharing (Phase 4)
+- Full ObjC Flycut parity bug fixes (Phase 3.1)
+- SwiftUI bezel overlay with keyboard navigation (Phase 3)
+- Core clipboard engine with adaptive polling (Phase 2)
+- Foundation: SwiftData schema, accessibility, settings (Phase 1)
 
 ## License
 
@@ -43,4 +153,4 @@ MIT
 
 ## Credits
 
-Clipsmith is a ground-up Swift rewrite inspired by the original [Flycut](https://github.com/TermiT/Flycut) clipboard manager.
+Clipsmith is a ground-up Swift rewrite inspired by the original [Flycut](https://github.com/TermiT/Flycut) clipboard manager. Documentation powered by [DevDocs](https://devdocs.io) by [freeCodeCamp](https://github.com/freeCodeCamp/devdocs).
