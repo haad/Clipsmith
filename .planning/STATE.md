@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 08-documentation-lookup-08-03-PLAN.md
-last_updated: "2026-03-16T21:17:27.714Z"
+stopped_at: Completed 10-lemon-squeezy-licensing-monetization-01-PLAN.md
+last_updated: "2026-03-20T15:14:51.595Z"
 last_activity: 2026-03-05 — Plan 01-01 complete
 progress:
-  total_phases: 10
+  total_phases: 11
   completed_phases: 9
-  total_plans: 29
-  completed_plans: 29
+  total_plans: 31
+  completed_plans: 30
   percent: 100
 ---
 
@@ -79,6 +79,7 @@ Progress: [██████████] 100%
 | Phase 08-documentation-lookup P01 | 8 | 2 tasks | 10 files |
 | Phase 08-documentation-lookup P02 | 4 min | 2 tasks | 6 files |
 | Phase 08-documentation-lookup P03 | 8 | 2 tasks | 3 files |
+| Phase 10-lemon-squeezy-licensing-monetization P01 | 6 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -172,6 +173,8 @@ Recent decisions affecting current work:
 - [Phase 08-02]: WKWebView link interception: linkActivated non-file URLs open in NSWorkspace, cancel in-panel navigation — prevents doc pages navigating away
 - [Phase 08-02]: DocsetSettingsSection uses local @State DocsetManagerService — settings manages own lifecycle, not injected from AppDelegate
 - [Phase 08-documentation-lookup]: DocsetSettingsSection in Settings uses local @State DocsetManagerService — settings manages own lifecycle, not the AppDelegate instance
+- [Phase Phase 10-01]: httpBodyStream fallback used in URLProtocol request handler — URLSession ephemeral config delivers POST body via httpBodyStream not httpBody in MockURLProtocol
+- [Phase Phase 10-01]: expectedStoreId/expectedProductId declared static let not private — required for test helpers to reference without coupling; free function default params use literal 0 to avoid @testable import compilation issue
 
 ### Pending Todos
 
@@ -180,6 +183,7 @@ None.
 ### Roadmap Evolution
 
 - Phase 03.1 inserted after Phase 03: ObjC Parity Bug Fixes (URGENT) — 30+ behavioral gaps across clipboard capture, hotkey hold-navigate-release, bezel keyboard/mouse, bezel appearance/settings, menu bar, and polish
+- Phase 10 added: Lemon Squeezy Licensing & Monetization
 
 ### Blockers/Concerns
 
@@ -189,6 +193,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-16T21:12:39.583Z
-Stopped at: Completed 08-documentation-lookup-08-03-PLAN.md
+Last session: 2026-03-20T15:14:51.591Z
+Stopped at: Completed 10-lemon-squeezy-licensing-monetization-01-PLAN.md
 Resume file: None
