@@ -166,42 +166,47 @@ final class LicenseService {
         lastError = nil
         defer { isValidating = false }
 
-        let instanceName = Host.current().localizedName ?? "Mac"
-        let response: LSActivateResponse
         do {
-            response = try await post(
-                path: "/activate",
-                params: ["license_key": key, "instance_name": instanceName]
-            )
-        } catch let error as URLError {
-            throw LicenseError.networkError(error)
-        }
-
-        // Check for activation limit exceeded
-        if let errorMsg = response.error, errorMsg.lowercased().contains("limit") {
-            throw LicenseError.activationLimitReached
-        }
-
-        // Check for invalid key
-        if !response.activated {
-            if let errorMsg = response.error {
-                throw LicenseError.apiError(errorMsg)
+            let instanceName = Host.current().localizedName ?? "Mac"
+            let response: LSActivateResponse
+            do {
+                response = try await post(
+                    path: "/activate",
+                    params: ["license_key": key, "instance_name": instanceName]
+                )
+            } catch let error as URLError {
+                throw LicenseError.networkError(error)
             }
-            throw LicenseError.invalidKey
+
+            // Check for activation limit exceeded
+            if let errorMsg = response.error, errorMsg.lowercased().contains("limit") {
+                throw LicenseError.activationLimitReached
+            }
+
+            // Check for invalid key
+            if !response.activated {
+                if let errorMsg = response.error {
+                    throw LicenseError.apiError(errorMsg)
+                }
+                throw LicenseError.invalidKey
+            }
+
+            // Security: verify this key is for our store/product
+            guard response.meta.storeId == LicenseService.expectedStoreId,
+                  response.meta.productId == LicenseService.expectedProductId else {
+                throw LicenseError.wrongProduct
+            }
+
+            // Persist license state
+            UserDefaults.standard.set(key, forKey: AppSettingsKeys.licenseKey)
+            UserDefaults.standard.set(response.instance.id, forKey: AppSettingsKeys.licenseInstanceId)
+
+            isLicensed = true
+            customerEmail = response.meta.customerEmail
+        } catch {
+            lastError = error.localizedDescription
+            throw error
         }
-
-        // Security: verify this key is for our store/product
-        guard response.meta.storeId == LicenseService.expectedStoreId,
-              response.meta.productId == LicenseService.expectedProductId else {
-            throw LicenseError.wrongProduct
-        }
-
-        // Persist license state
-        UserDefaults.standard.set(key, forKey: AppSettingsKeys.licenseKey)
-        UserDefaults.standard.set(response.instance.id, forKey: AppSettingsKeys.licenseInstanceId)
-
-        isLicensed = true
-        customerEmail = response.meta.customerEmail
     }
 
     /// Validates the persisted license key against the Lemon Squeezy /validate endpoint.
