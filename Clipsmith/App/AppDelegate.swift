@@ -32,6 +32,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var docsetManagerService: DocsetManagerService!
     var docBezelController: DocBezelController!
 
+    // Phase 10 — Licensing and Monetization
+    var licenseService: LicenseService!
+    var licenseNagController: LicenseNagController!
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // CRITICAL: Both LSUIElement=YES and setActivationPolicy(.accessory) are
         // required. LSUIElement suppresses the dock icon at cold launch, but
@@ -155,6 +159,36 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         docBezelController.appTracker = appTracker
         docBezelController.docsetSearchService = docsetSearchService
         docBezelController.docsetManagerService = docsetManagerService
+
+        // 8. Initialize License Service and Nag Controller (Phase 10).
+        licenseService = LicenseService()
+
+        // Background validate on launch — non-blocking (never block launch on license check).
+        Task {
+            await licenseService.validate()
+        }
+
+        licenseNagController = LicenseNagController()
+        licenseNagController.onOpenSettings = {
+            // Post notification to open Settings, then navigate to the License tab.
+            NotificationCenter.default.post(name: .clipsmithOpenLicenseSettings, object: nil)
+        }
+
+        // Show nag dialog periodically for unlicensed users (every ~30 days).
+        if !licenseService.isLicensed && LicenseService.shouldShowNag() {
+            UserDefaults.standard.set(Date(), forKey: AppSettingsKeys.lastNagShownDate)
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
+                self?.licenseNagController.showNag()
+            }
+        }
+
+        // Wire "Open License Settings" notification posted by LicenseNagView.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleOpenLicenseSettings),
+            name: .clipsmithOpenLicenseSettings,
+            object: nil
+        )
 
         // 6. Register global hotkeys (KeyboardShortcuts library, Pattern 5).
         KeyboardShortcuts.onKeyDown(for: .activateBezel) { [weak self] in
@@ -299,6 +333,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openDocLookupFromMenu() {
         docBezelController?.show()
+    }
+
+    // MARK: - License Settings (Phase 10)
+
+    /// Opens Settings and navigates directly to the License tab.
+    ///
+    /// CRITICAL: selectedSettingsTab must be written to UserDefaults BEFORE
+    /// showSettingsWindow: is sent, so SettingsView reads the correct @AppStorage
+    /// value on appear and selects the License tab immediately.
+    @objc private func handleOpenLicenseSettings() {
+        // Set the selected tab to License BEFORE opening the window.
+        UserDefaults.standard.set(SettingsTab.license.rawValue, forKey: "selectedSettingsTab")
+
+        if #available(macOS 14, *) {
+            NSApp.activate()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+        }
+        NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 
     // MARK: - Share as Gist (from menu bar clipping context menu)
