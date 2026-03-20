@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 10-lemon-squeezy-licensing-monetization-01-PLAN.md
-last_updated: "2026-03-20T15:14:51.595Z"
+stopped_at: Completed 10-lemon-squeezy-licensing-monetization-02-PLAN.md
+last_updated: "2026-03-20T15:23:07.767Z"
 last_activity: 2026-03-05 — Plan 01-01 complete
 progress:
   total_phases: 11
-  completed_phases: 9
+  completed_phases: 10
   total_plans: 31
-  completed_plans: 30
+  completed_plans: 31
   percent: 100
 ---
 
@@ -80,6 +80,7 @@ Progress: [██████████] 100%
 | Phase 08-documentation-lookup P02 | 4 min | 2 tasks | 6 files |
 | Phase 08-documentation-lookup P03 | 8 | 2 tasks | 3 files |
 | Phase 10-lemon-squeezy-licensing-monetization P01 | 6 min | 2 tasks | 4 files |
+| Phase 10-lemon-squeezy-licensing-monetization P02 | 5 min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -175,6 +176,8 @@ Recent decisions affecting current work:
 - [Phase 08-documentation-lookup]: DocsetSettingsSection in Settings uses local @State DocsetManagerService — settings manages own lifecycle, not the AppDelegate instance
 - [Phase Phase 10-01]: httpBodyStream fallback used in URLProtocol request handler — URLSession ephemeral config delivers POST body via httpBodyStream not httpBody in MockURLProtocol
 - [Phase Phase 10-01]: expectedStoreId/expectedProductId declared static let not private — required for test helpers to reference without coupling; free function default params use literal 0 to avoid @testable import compilation issue
+- [Phase 10-lemon-squeezy-licensing-monetization]: [Phase 10-02]: SettingsTab Int enum at file scope — AppDelegate references SettingsTab.license.rawValue; handleOpenLicenseSettings writes UserDefaults BEFORE showSettingsWindow so SettingsView reads correct @AppStorage tab on appear
+- [Phase 10-lemon-squeezy-licensing-monetization]: [Phase 10-02]: LicenseNagController is NSObject+NSWindowDelegate holding private NSPanel (not NSPanel subclass) — activating dialog pattern distinct from bezel's .nonactivatingPanel; .accessory policy restored in windowWillClose
 
 ### Pending Todos
 
@@ -193,6 +196,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-20T15:14:51.591Z
-Stopped at: Completed 10-lemon-squeezy-licensing-monetization-01-PLAN.md
+Last session: 2026-03-20T15:23:07.763Z
+Stopped at: Completed 10-lemon-squeezy-licensing-monetization-02-PLAN.md
 Resume file: None

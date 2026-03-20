@@ -22,7 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Intelligent Search & AI** - Fuzzy matching, source app and date filtering, on-device AI integration via Apple Foundation Models (completed 2026-03-12)
 - [x] **Phase 8: Documentation Lookup** - Quick documentation search via hotkey with downloaded docsets (completed 2026-03-16)
 - [ ] **Phase 9: Favorites** - Pin clippings as favorites with dedicated view and hotkey; favorites survive history clearing
-- [ ] **Phase 10: Lemon Squeezy Licensing & Monetization** - License key validation, periodic nag dialog, License settings tab, PolyForm Noncommercial license
+- [x] **Phase 10: Lemon Squeezy Licensing & Monetization** - License key validation, periodic nag dialog, License settings tab, PolyForm Noncommercial license (completed 2026-03-20)
 
 ## Phase Details
 
@@ -198,7 +198,7 @@ Plans:
   4. Users can enter and activate a license key in Settings > License tab with validation feedback
   5. Licensed users see a green status indicator and can deactivate their license
   6. PolyForm Noncommercial license file and .github/FUNDING.yml are in place
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 10-01-PLAN.md — LicenseService with Codable types, API methods, AppSettingsKeys + LicenseServiceTests (LIC-01 through LIC-06)
@@ -221,4 +221,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 7. Intelligent Search & AI | 1/1 | Complete   | 2026-03-12 |
 | 8. Documentation Lookup | 3/3 | Complete   | 2026-03-16 |
 | 9. Favorites | 0/TBD | Not started | - |
-| 10. Licensing & Monetization | 1/2 | In Progress|  |
+| 10. Licensing & Monetization | 2/2 | Complete   | 2026-03-20 |
