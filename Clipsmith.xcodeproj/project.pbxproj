@@ -80,6 +80,9 @@
 		AA0074 /* DocsetSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0075 /* DocsetSettingsSection.swift */; };
 		AA0075 /* LicenseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0076 /* LicenseService.swift */; };
 		AA0076 /* LicenseServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0077 /* LicenseServiceTests.swift */; };
+		AA0077 /* LicenseNagController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0078 /* LicenseNagController.swift */; };
+		AA0078 /* LicenseNagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0079 /* LicenseNagView.swift */; };
+		AA0079 /* LicenseSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0080 /* LicenseSettingsSection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -168,6 +171,9 @@
 		AF0075 /* DocsetSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetSettingsSection.swift; sourceTree = "<group>"; };
 		AF0076 /* LicenseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseService.swift; sourceTree = "<group>"; };
 		AF0077 /* LicenseServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseServiceTests.swift; sourceTree = "<group>"; };
+		AF0078 /* LicenseNagController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseNagController.swift; sourceTree = "<group>"; };
+		AF0079 /* LicenseNagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseNagView.swift; sourceTree = "<group>"; };
+		AF0080 /* LicenseSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseSettingsSection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -271,6 +277,8 @@
 				AF0071 /* DocBezelViewModel.swift */,
 				AF0073 /* DocBezelController.swift */,
 				AF0074 /* DocBezelView.swift */,
+				AF0078 /* LicenseNagController.swift */,
+				AF0079 /* LicenseNagView.swift */,
 				GG0009 /* Settings */,
 				GG0011 /* Snippets */,
 				GG0012 /* Gists */,
@@ -317,6 +325,7 @@
 				AF0043 /* GistSettingsSection.swift */,
 				AF0053 /* PromptLibrarySettingsSection.swift */,
 				AF0075 /* DocsetSettingsSection.swift */,
+				AF0080 /* LicenseSettingsSection.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -542,6 +551,9 @@
 				AA0073 /* DocBezelView.swift in Sources */,
 				AA0074 /* DocsetSettingsSection.swift in Sources */,
 				AA0075 /* LicenseService.swift in Sources */,
+				AA0077 /* LicenseNagController.swift in Sources */,
+				AA0078 /* LicenseNagView.swift in Sources */,
+				AA0079 /* LicenseSettingsSection.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

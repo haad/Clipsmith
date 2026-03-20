@@ -14,6 +14,8 @@ extension Notification.Name {
     static let clipsmithExportHistory = Notification.Name("clipsmithExportHistory")
     /// Posted to trigger clipboard history import via NSOpenPanel.
     static let clipsmithImportHistory = Notification.Name("clipsmithImportHistory")
+    /// Posted by LicenseNagView "I Already Have a License" to open Settings > License tab.
+    static let clipsmithOpenLicenseSettings = Notification.Name("clipsmithOpenLicenseSettings")
 }
 
 struct MenuBarView: View {
