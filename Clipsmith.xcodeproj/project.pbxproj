@@ -78,6 +78,8 @@
 		AA0072 /* DocBezelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0073 /* DocBezelController.swift */; };
 		AA0073 /* DocBezelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0074 /* DocBezelView.swift */; };
 		AA0074 /* DocsetSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0075 /* DocsetSettingsSection.swift */; };
+		AA0075 /* LicenseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0076 /* LicenseService.swift */; };
+		AA0076 /* LicenseServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0077 /* LicenseServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -164,6 +166,8 @@
 		AF0073 /* DocBezelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocBezelController.swift; sourceTree = "<group>"; };
 		AF0074 /* DocBezelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocBezelView.swift; sourceTree = "<group>"; };
 		AF0075 /* DocsetSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetSettingsSection.swift; sourceTree = "<group>"; };
+		AF0076 /* LicenseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseService.swift; sourceTree = "<group>"; };
+		AF0077 /* LicenseServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -248,6 +252,7 @@
 				AF0064 /* DocsetSearchService.swift */,
 				AF0065 /* DocsetManagerService.swift */,
 				AF0066 /* SelectedTextService.swift */,
+				AF0076 /* LicenseService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -338,6 +343,7 @@
 				AF0067 /* DocsetSearchServiceTests.swift */,
 				AF0068 /* DocsetManagerServiceTests.swift */,
 				AF0072 /* DocBezelViewModelTests.swift */,
+				AF0077 /* LicenseServiceTests.swift */,
 				GG0015 /* Fixtures */,
 			);
 			path = ClipsmithTests;
@@ -535,6 +541,7 @@
 				AA0072 /* DocBezelController.swift in Sources */,
 				AA0073 /* DocBezelView.swift in Sources */,
 				AA0074 /* DocsetSettingsSection.swift in Sources */,
+				AA0075 /* LicenseService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -561,6 +568,7 @@
 				AA0068 /* DocsetSearchServiceTests.swift in Sources */,
 				AA0069 /* DocsetManagerServiceTests.swift in Sources */,
 				AA0071 /* DocBezelViewModelTests.swift in Sources */,
+				AA0076 /* LicenseServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -720,6 +728,7 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Clipsmith/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -747,6 +756,7 @@
 				ENABLE_APP_SANDBOX = NO;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = Clipsmith/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

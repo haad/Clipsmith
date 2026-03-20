@@ -41,4 +41,9 @@ enum AppSettingsKeys {
 
     // Phase 8 additions (Documentation Lookup)
     static let docLookupEnabled = "docLookupEnabled"
+
+    // Phase 10 additions (Licensing & Monetization)
+    static let licenseKey = "licenseKey"
+    static let licenseInstanceId = "licenseInstanceId"
+    static let lastNagShownDate = "lastNagShownDate"
 }
