@@ -22,6 +22,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 7: Intelligent Search & AI** - Fuzzy matching, source app and date filtering, on-device AI integration via Apple Foundation Models (completed 2026-03-12)
 - [x] **Phase 8: Documentation Lookup** - Quick documentation search via hotkey with downloaded docsets (completed 2026-03-16)
 - [ ] **Phase 9: Favorites** - Pin clippings as favorites with dedicated view and hotkey; favorites survive history clearing
+- [ ] **Phase 10: Lemon Squeezy Licensing & Monetization** - License key validation, periodic nag dialog, License settings tab, PolyForm Noncommercial license
 
 ## Phase Details
 
@@ -185,10 +186,28 @@ Plans:
   1. User can pin a clipping as a favorite and switch to favorites view via hotkey; favorites survive history clearing
 **Plans**: TBD
 
+### Phase 10: Lemon Squeezy Licensing & Monetization
+
+**Goal:** Non-blocking monetization layer with Lemon Squeezy license key validation, periodic nag dialog for unlicensed users, License settings tab, PolyForm Noncommercial license file, and GitHub FUNDING.yml
+**Requirements**: LIC-01, LIC-02, LIC-03, LIC-04, LIC-05, LIC-06, LIC-07, LIC-08, LIC-09, LIC-10, LIC-11
+**Depends on:** Phase 8
+**Success Criteria** (what must be TRUE):
+  1. LicenseService activates, validates, and deactivates license keys against the Lemon Squeezy API with storeId/productId security checks
+  2. Network errors during validation do not revoke an already-licensed state
+  3. Unlicensed users see a nag dialog on launch (gated to every 30 days) with links to Sponsor and Buy
+  4. Users can enter and activate a license key in Settings > License tab with validation feedback
+  5. Licensed users see a green status indicator and can deactivate their license
+  6. PolyForm Noncommercial license file and .github/FUNDING.yml are in place
+**Plans:** 2 plans
+
+Plans:
+- [ ] 10-01-PLAN.md — LicenseService with Codable types, API methods, AppSettingsKeys + LicenseServiceTests (LIC-01 through LIC-06)
+- [ ] 10-02-PLAN.md — LicenseNagController, LicenseNagView, LicenseSettingsSection, AppDelegate wiring, LICENSE, FUNDING.yml + human verify (LIC-07 through LIC-11)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 → 8 → 9
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -202,3 +221,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 3.1 → 4 → 5 → 6 → 7 �
 | 7. Intelligent Search & AI | 1/1 | Complete   | 2026-03-12 |
 | 8. Documentation Lookup | 3/3 | Complete   | 2026-03-16 |
 | 9. Favorites | 0/TBD | Not started | - |
+| 10. Licensing & Monetization | 0/2 | Planning complete | - |
