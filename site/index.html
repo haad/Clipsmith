@@ -111,16 +111,16 @@
     .theme-toggle:hover { background-color: var(--toggle-btn-hover); }
 
     /* Sections */
-    .section { max-width: 1080px; margin: 0 auto; padding: 64px 24px; }
-    .section-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
-    .section-subtitle { font-size: 1rem; color: var(--text-secondary); margin-bottom: 32px; }
+    .section { max-width: 1080px; margin: 0 auto; padding: 80px 24px; }
+    .section-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .section-subtitle { font-size: 1rem; color: var(--text-secondary); margin-bottom: 40px; }
 
     /* Hero */
-    .hero { text-align: center; padding: 80px 24px 64px; max-width: 1080px; margin: 0 auto; }
-    .hero-icon { width: 120px; height: 120px; margin-bottom: 24px; border-radius: 22%; }
-    .hero h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 8px; }
-    .hero-tagline { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 12px; }
-    .hero-meta { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 32px; }
+    .hero { text-align: center; padding: 96px 24px 80px; max-width: 1080px; margin: 0 auto; }
+    .hero-icon { width: 120px; height: 120px; margin-bottom: 28px; border-radius: 22%; }
+    .hero h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .hero-tagline { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+    .hero-meta { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 36px; }
     .hero-meta span::after { content: "\00b7"; margin: 0 8px; }
     .hero-meta span:last-child::after { content: none; }
     .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
@@ -146,22 +146,25 @@
     /* Feature rows — major features */
     .feature-row {
       background-color: var(--bg-card); border-radius: var(--radius-card);
-      box-shadow: var(--shadow-card); padding: 32px;
-      margin-bottom: 20px;
+      box-shadow: var(--shadow-card); padding: 36px 32px;
+      margin-bottom: 28px;
       transition: box-shadow var(--transition), background-color var(--transition);
     }
     .feature-row:hover { box-shadow: var(--shadow-card-hover); }
     .feature-row-header {
-      display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 14px; margin-bottom: 10px;
     }
-    .feature-row-icon { font-size: 1.75rem; flex-shrink: 0; }
-    .feature-row-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+    .feature-row-icon { font-size: 2rem; flex-shrink: 0; }
+    .feature-row-title { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; }
     .feature-row-tagline {
-      font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.55;
+      font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.6;
+      max-width: 720px;
     }
     .feature-row-highlights {
-      display: grid; grid-template-columns: 1fr; gap: 12px;
+      display: grid; grid-template-columns: 1fr; gap: 0;
       list-style: none;
+      border-top: 1px solid var(--border-color);
+      transition: border-color var(--transition);
     }
     @media (min-width: 640px) {
       .feature-row-highlights { grid-template-columns: repeat(2, 1fr); }
@@ -170,39 +173,60 @@
       .feature-row-highlights { grid-template-columns: repeat(3, 1fr); }
     }
     .highlight-item {
-      font-size: 0.8125rem; line-height: 1.55;
-      padding-left: 22px; position: relative;
+      font-size: 0.8125rem; line-height: 1.6;
+      padding: 16px 16px 16px 38px; position: relative;
+      border-bottom: 1px solid var(--border-color);
+      transition: border-color var(--transition);
+    }
+    @media (min-width: 640px) {
+      .highlight-item { border-right: 1px solid var(--border-color); }
+      .highlight-item:nth-child(2n) { border-right: none; }
+    }
+    @media (min-width: 1024px) {
+      .highlight-item { border-right: 1px solid var(--border-color); }
+      .highlight-item:nth-child(2n) { border-right: 1px solid var(--border-color); }
+      .highlight-item:nth-child(3n) { border-right: none; }
     }
     .highlight-item::before {
-      content: "\2713"; position: absolute; left: 0; top: 0;
+      content: "\2713"; position: absolute; left: 16px; top: 16px;
       color: var(--accent); font-weight: 700; font-size: 0.875rem;
     }
-    .highlight-item strong { color: var(--text-primary); font-weight: 600; }
+    .highlight-item strong {
+      color: var(--text-primary); font-weight: 600;
+      display: block; margin-bottom: 3px;
+    }
     .highlight-item span { color: var(--text-secondary); }
 
     /* Secondary feature grid */
-    .card-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    .card-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
     @media (min-width: 640px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 1024px) { .card-grid { grid-template-columns: repeat(3, 1fr); } }
     .feature-card {
       background-color: var(--bg-card); border-radius: var(--radius-card);
-      box-shadow: var(--shadow-card); padding: 24px;
+      box-shadow: var(--shadow-card); padding: 28px;
       transition: box-shadow var(--transition), background-color var(--transition);
     }
     .feature-card:hover { box-shadow: var(--shadow-card-hover); }
-    .feature-icon { font-size: 1.5rem; margin-bottom: 12px; display: block; }
-    .feature-title { font-size: 0.9375rem; font-weight: 600; margin-bottom: 6px; }
-    .feature-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55; }
+    .feature-icon { font-size: 1.75rem; margin-bottom: 14px; display: block; }
+    .feature-title { font-size: 0.9375rem; font-weight: 600; margin-bottom: 8px; }
+    .feature-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.65; }
 
     /* Keyboard shortcuts */
-    .shortcuts-grid { display: grid; grid-template-columns: 1fr; gap: 24px; }
+    .shortcuts-grid { display: grid; grid-template-columns: 1fr; gap: 28px; }
     @media (min-width: 640px) { .shortcuts-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 1024px) { .shortcuts-grid { grid-template-columns: repeat(3, 1fr); } }
+    .shortcut-group {
+      background-color: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); padding: 24px;
+      transition: box-shadow var(--transition), background-color var(--transition);
+    }
     .shortcut-group h3 {
       font-size: 0.8125rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 12px;
+      letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 16px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border-color);
+      transition: border-color var(--transition);
     }
-    .shortcut-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .shortcut-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
     .shortcut-item {
       display: flex; align-items: center; justify-content: space-between;
       gap: 12px; font-size: 0.875rem;
@@ -211,7 +235,7 @@
     kbd {
       font-family: var(--font-mono); font-size: 0.75rem;
       background-color: var(--bg-card); border: 1px solid var(--border-color);
-      border-radius: 4px; padding: 2px 7px; box-shadow: 0 1px 0 var(--border-color);
+      border-radius: 4px; padding: 3px 8px; box-shadow: 0 1px 0 var(--border-color);
       white-space: nowrap; color: var(--text-primary);
       transition: background-color var(--transition), border-color var(--transition);
     }
@@ -259,8 +283,11 @@
       .hero h1 { font-size: 2rem; }
       .hero-tagline { font-size: 1.05rem; }
       .hero-icon { width: 96px; height: 96px; }
-      .section { padding: 48px 20px; }
-      .hero { padding: 56px 20px 48px; }
+      .section { padding: 56px 20px; }
+      .hero { padding: 64px 20px 56px; }
+      .feature-row { padding: 24px 20px; }
+      .highlight-item { padding: 14px 14px 14px 34px; }
+      .highlight-item::before { left: 12px; top: 14px; }
     }
   </style>
 </head>
@@ -314,15 +341,15 @@
       </div>
       <p class="feature-row-tagline">Everything you copy, always one shortcut away. Adaptive polling keeps it responsive without draining your battery.</p>
       <ul class="feature-row-highlights">
-        <li class="highlight-item"><strong>Quick Actions</strong> <span>&mdash; press Tab to transform: uppercase, lowercase, title case, trim, URL encode/decode, JSON pretty print, Markdown code block</span></li>
-        <li class="highlight-item"><strong>Fuzzy search</strong> <span>&mdash; subsequence matching with consecutive-bonus scoring finds what you need even with typos</span></li>
-        <li class="highlight-item"><strong>Keyboard navigation</strong> <span>&mdash; arrows, j/k, 0-9 numeric jump, Page Up/Down, Home/End. Paste with Return, never touch the mouse</span></li>
-        <li class="highlight-item"><strong>Password filtering</strong> <span>&mdash; auto-skips likely credentials from 1Password, LastPass, and configurable length heuristics</span></li>
-        <li class="highlight-item"><strong>Smart deduplication</strong> <span>&mdash; duplicates move to top with fresh timestamps instead of cluttering your history</span></li>
-        <li class="highlight-item"><strong>Source app tracking</strong> <span>&mdash; see which app each clipping came from. Star favorites, export/import full history as JSON</span></li>
-        <li class="highlight-item"><strong>GitHub Gist sharing</strong> <span>&mdash; press G to share any clipping as a public or private Gist instantly</span></li>
-        <li class="highlight-item"><strong>Plain text paste</strong> <span>&mdash; strips all rich formatting (RTF, HTML) for predictable paste behavior. No surprise fonts</span></li>
-        <li class="highlight-item"><strong>Non-activating panel</strong> <span>&mdash; the bezel never steals focus from your current app. Copy, pick, paste &mdash; your cursor stays where it was</span></li>
+        <li class="highlight-item"><strong>Quick Actions</strong> <span>Press Tab to transform: uppercase, lowercase, title case, trim, URL encode/decode, JSON pretty print, Markdown code block</span></li>
+        <li class="highlight-item"><strong>Fuzzy search</strong> <span>subsequence matching with consecutive-bonus scoring finds what you need even with typos</span></li>
+        <li class="highlight-item"><strong>Keyboard navigation</strong> <span>arrows, j/k, 0-9 numeric jump, Page Up/Down, Home/End. Paste with Return, never touch the mouse</span></li>
+        <li class="highlight-item"><strong>Password filtering</strong> <span>auto-skips likely credentials from 1Password, LastPass, and configurable length heuristics</span></li>
+        <li class="highlight-item"><strong>Smart deduplication</strong> <span>duplicates move to top with fresh timestamps instead of cluttering your history</span></li>
+        <li class="highlight-item"><strong>Source app tracking</strong> <span>see which app each clipping came from. Star favorites, export/import full history as JSON</span></li>
+        <li class="highlight-item"><strong>GitHub Gist sharing</strong> <span>press G to share any clipping as a public or private Gist instantly</span></li>
+        <li class="highlight-item"><strong>Plain text paste</strong> <span>strips all rich formatting (RTF, HTML) for predictable paste behavior. No surprise fonts</span></li>
+        <li class="highlight-item"><strong>Non-activating panel</strong> <span>the bezel never steals focus from your current app. Copy, pick, paste &mdash; your cursor stays where it was</span></li>
       </ul>
     </article>
 
@@ -334,12 +361,12 @@
       </div>
       <p class="feature-row-tagline">A persistent library of reusable code blocks with syntax highlighting. Not another clipping &mdash; a named, tagged, searchable snippet you keep forever.</p>
       <ul class="feature-row-highlights">
-        <li class="highlight-item"><strong>Syntax highlighting</strong> <span>&mdash; 20+ languages: Swift, Python, JavaScript, TypeScript, Go, Rust, Ruby, Java, Kotlin, C, C++, Bash, SQL, JSON, YAML, HTML, CSS, Markdown, and more</span></li>
-        <li class="highlight-item"><strong>Multi-tag system</strong> <span>&mdash; assign multiple tags per snippet for flexible cross-cutting organization. Filter by tag or language</span></li>
-        <li class="highlight-item"><strong>Full-text search</strong> <span>&mdash; search across name, content, and tags simultaneously with locale-aware matching</span></li>
-        <li class="highlight-item"><strong>Dedicated editor</strong> <span>&mdash; monospaced font, auto-save on edit. Undo/redo, no auto-correct interference, no smart quotes</span></li>
-        <li class="highlight-item"><strong>Keyboard access</strong> <span>&mdash; press <kbd>&#8679;&#8984;S</kbd> to open the snippet editor from anywhere. Search, select, paste &mdash; same flow</span></li>
-        <li class="highlight-item"><strong>Separate from history</strong> <span>&mdash; snippets persist independently and never get trimmed. Your clipboard history can rotate while snippets stay permanent</span></li>
+        <li class="highlight-item"><strong>Syntax highlighting</strong> <span>20+ languages: Swift, Python, JavaScript, TypeScript, Go, Rust, Ruby, Java, Kotlin, C, C++, Bash, SQL, JSON, YAML, HTML, CSS, Markdown, and more</span></li>
+        <li class="highlight-item"><strong>Multi-tag system</strong> <span>assign multiple tags per snippet for flexible cross-cutting organization. Filter by tag or language</span></li>
+        <li class="highlight-item"><strong>Full-text search</strong> <span>search across name, content, and tags simultaneously with locale-aware matching</span></li>
+        <li class="highlight-item"><strong>Dedicated editor</strong> <span>monospaced font, auto-save on edit. Undo/redo, no auto-correct interference, no smart quotes</span></li>
+        <li class="highlight-item"><strong>Keyboard access</strong> <span>press <kbd>&#8679;&#8984;S</kbd> to open the snippet editor from anywhere. Search, select, paste &mdash; same flow</span></li>
+        <li class="highlight-item"><strong>Separate from history</strong> <span>snippets persist independently and never get trimmed. Your clipboard history can rotate while snippets stay permanent</span></li>
       </ul>
     </article>
 
@@ -351,12 +378,12 @@
       </div>
       <p class="feature-row-tagline">40+ curated AI prompts for coding, analysis, research, and DevOps &mdash; with template variables that auto-fill from your clipboard.</p>
       <ul class="feature-row-highlights">
-        <li class="highlight-item"><strong>Template variables</strong> <span>&mdash; use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{clipboard}}</code>, <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{selected_text}}</code>, and custom variables. Auto-substituted on paste</span></li>
-        <li class="highlight-item"><strong>Category filtering</strong> <span>&mdash; Tab to cycle categories, or type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#coding review</code> to search within a category. Use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#my</code> for your own prompts</span></li>
-        <li class="highlight-item"><strong>3-second flow</strong> <span>&mdash; hotkey &rarr; type a few characters &rarr; Enter. The prompt is pasted with your clipboard content already injected</span></li>
-        <li class="highlight-item"><strong>Remote sync</strong> <span>&mdash; sync prompts from a configurable URL. Share a team prompt library via JSON hosted anywhere</span></li>
-        <li class="highlight-item"><strong>Create your own</strong> <span>&mdash; add custom prompts alongside the built-in library. User prompts are flagged separately and never overwritten by sync</span></li>
-        <li class="highlight-item"><strong>Browse online</strong> <span>&mdash; all built-in prompts are also available in the <a href="./prompts/">web-based Prompt Library</a> to browse and copy</span></li>
+        <li class="highlight-item"><strong>Template variables</strong> <span>use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{clipboard}}</code>, <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{selected_text}}</code>, and custom variables. Auto-substituted on paste</span></li>
+        <li class="highlight-item"><strong>Category filtering</strong> <span>Tab to cycle categories, or type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#coding review</code> to search within a category. Use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#my</code> for your own prompts</span></li>
+        <li class="highlight-item"><strong>3-second flow</strong> <span>hotkey &rarr; type a few characters &rarr; Enter. The prompt is pasted with your clipboard content already injected</span></li>
+        <li class="highlight-item"><strong>Remote sync</strong> <span>sync prompts from a configurable URL. Share a team prompt library via JSON hosted anywhere</span></li>
+        <li class="highlight-item"><strong>Create your own</strong> <span>add custom prompts alongside the built-in library. User prompts are flagged separately and never overwritten by sync</span></li>
+        <li class="highlight-item"><strong>Browse online</strong> <span>all built-in prompts are also available in the <a href="./prompts/">web-based Prompt Library</a> to browse and copy</span></li>
       </ul>
     </article>
 
@@ -368,17 +395,17 @@
       </div>
       <p class="feature-row-tagline">Search 789+ DevDocs documentation sets from a single hotkey. Download docs for offline use &mdash; never leave your editor to look something up.</p>
       <ul class="feature-row-highlights">
-        <li class="highlight-item"><strong>789+ documentation sets</strong> <span>&mdash; Python, Go, Rust, JavaScript, React, Node.js, Ruby, CSS, HTML, and hundreds more from devdocs.io</span></li>
-        <li class="highlight-item"><strong>Prefix search</strong> <span>&mdash; type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">python:map</code> or <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">go:fmt</code> to scope search to a single doc. Partial names work too &mdash; &ldquo;py&rdquo; matches &ldquo;python~3.12&rdquo;</span></li>
-        <li class="highlight-item"><strong>Offline support</strong> <span>&mdash; selectively download docs. Search and viewing work entirely offline after download</span></li>
-        <li class="highlight-item"><strong>Dark &amp; light themes</strong> <span>&mdash; documentation renders in WKWebView with custom CSS matching your system appearance</span></li>
-        <li class="highlight-item"><strong>Split-pane UI</strong> <span>&mdash; search results on the left, rendered HTML on the right. Resizable, with position remembered across sessions</span></li>
-        <li class="highlight-item"><strong>Fuzzy matching</strong> <span>&mdash; same scoring engine as clipboard search. Top 100 results ranked by relevance, then by name length</span></li>
+        <li class="highlight-item"><strong>789+ documentation sets</strong> <span>Python, Go, Rust, JavaScript, React, Node.js, Ruby, CSS, HTML, and hundreds more from devdocs.io</span></li>
+        <li class="highlight-item"><strong>Prefix search</strong> <span>type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">python:map</code> or <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">go:fmt</code> to scope search to a single doc. Partial names work too &mdash; &ldquo;py&rdquo; matches &ldquo;python~3.12&rdquo;</span></li>
+        <li class="highlight-item"><strong>Offline support</strong> <span>selectively download docs. Search and viewing work entirely offline after download</span></li>
+        <li class="highlight-item"><strong>Dark &amp; light themes</strong> <span>documentation renders in WKWebView with custom CSS matching your system appearance</span></li>
+        <li class="highlight-item"><strong>Split-pane UI</strong> <span>search results on the left, rendered HTML on the right. Resizable, with position remembered across sessions</span></li>
+        <li class="highlight-item"><strong>Fuzzy matching</strong> <span>same scoring engine as clipboard search. Top 100 results ranked by relevance, then by name length</span></li>
       </ul>
     </article>
 
     <!-- Secondary features grid -->
-    <h3 style="font-size: 1.125rem; font-weight: 700; margin-top: 40px; margin-bottom: 16px;">And more</h3>
+    <h3 style="font-size: 1.125rem; font-weight: 700; margin-top: 48px; margin-bottom: 24px; padding-top: 28px; border-top: 1px solid var(--border-color);">And more</h3>
     <div class="card-grid">
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128190;</span>
@@ -469,7 +496,7 @@
       <a href="https://github.com/haad/Clipsmith" class="btn btn-secondary" target="_blank" rel="noopener">View Source on GitHub</a>
     </div>
 
-    <div class="licensing" style="margin-top: 32px; margin-bottom: 24px;">
+    <div class="licensing" style="margin-top: 40px; margin-bottom: 32px;">
       <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 8px;">Licensing</h3>
       <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.7; max-width: 600px; margin: 0 auto 16px;">
         Clipsmith is <strong style="color: var(--text-primary);">free for personal use</strong>. If you use it professionally or want to support development, you can purchase a license key via Lemon Squeezy or sponsor on GitHub. Licensed users skip the occasional reminder prompt and help keep the project alive.
