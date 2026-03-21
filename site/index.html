@@ -143,7 +143,44 @@
     }
     .btn-secondary:hover { background-color: var(--toggle-btn-bg); }
 
-    /* Feature grid */
+    /* Feature rows — major features */
+    .feature-row {
+      background-color: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); padding: 32px;
+      margin-bottom: 20px;
+      transition: box-shadow var(--transition), background-color var(--transition);
+    }
+    .feature-row:hover { box-shadow: var(--shadow-card-hover); }
+    .feature-row-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    }
+    .feature-row-icon { font-size: 1.75rem; flex-shrink: 0; }
+    .feature-row-title { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.02em; }
+    .feature-row-tagline {
+      font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 20px; line-height: 1.55;
+    }
+    .feature-row-highlights {
+      display: grid; grid-template-columns: 1fr; gap: 12px;
+      list-style: none;
+    }
+    @media (min-width: 640px) {
+      .feature-row-highlights { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .feature-row-highlights { grid-template-columns: repeat(3, 1fr); }
+    }
+    .highlight-item {
+      font-size: 0.8125rem; line-height: 1.55;
+      padding-left: 22px; position: relative;
+    }
+    .highlight-item::before {
+      content: "\2713"; position: absolute; left: 0; top: 0;
+      color: var(--accent); font-weight: 700; font-size: 0.875rem;
+    }
+    .highlight-item strong { color: var(--text-primary); font-weight: 600; }
+    .highlight-item span { color: var(--text-secondary); }
+
+    /* Secondary feature grid */
     .card-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
     @media (min-width: 640px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
     @media (min-width: 1024px) { .card-grid { grid-template-columns: repeat(3, 1fr); } }
@@ -252,7 +289,7 @@
   <section class="hero">
     <img src="clipsmith-logo.png" alt="Clipsmith app icon" class="hero-icon" width="120" height="120" />
     <h1>Clipsmith</h1>
-    <p class="hero-tagline">Clipboard history, code snippets, AI prompts, and documentation &mdash; one shortcut away</p>
+    <p class="hero-tagline">Clipboard history, code snippets, AI prompts, and documentation &mdash; one shortcut away. Native macOS, no Electron.</p>
     <p class="hero-meta">
       <span>Keyboard-first</span>
       <span>Native Swift &amp; SwiftUI</span>
@@ -269,118 +306,155 @@
     <h2 class="section-title">Features</h2>
     <p class="section-subtitle">One tool for everything you type, copy, and reuse.</p>
 
+    <!-- Clipboard History -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128203;</span>
+        <h3 class="feature-row-title">Clipboard History</h3>
+      </div>
+      <p class="feature-row-tagline">Everything you copy, always one shortcut away. Adaptive polling keeps it responsive without draining your battery.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>Quick Actions</strong> <span>&mdash; press Tab to transform: uppercase, lowercase, title case, trim, URL encode/decode, JSON pretty print, Markdown code block</span></li>
+        <li class="highlight-item"><strong>Fuzzy search</strong> <span>&mdash; subsequence matching with consecutive-bonus scoring finds what you need even with typos</span></li>
+        <li class="highlight-item"><strong>Keyboard navigation</strong> <span>&mdash; arrows, j/k, 0-9 numeric jump, Page Up/Down, Home/End. Paste with Return, never touch the mouse</span></li>
+        <li class="highlight-item"><strong>Password filtering</strong> <span>&mdash; auto-skips likely credentials from 1Password, LastPass, and configurable length heuristics</span></li>
+        <li class="highlight-item"><strong>Smart deduplication</strong> <span>&mdash; duplicates move to top with fresh timestamps instead of cluttering your history</span></li>
+        <li class="highlight-item"><strong>Source app tracking</strong> <span>&mdash; see which app each clipping came from. Star favorites, export/import full history as JSON</span></li>
+        <li class="highlight-item"><strong>GitHub Gist sharing</strong> <span>&mdash; press G to share any clipping as a public or private Gist instantly</span></li>
+        <li class="highlight-item"><strong>Plain text paste</strong> <span>&mdash; strips all rich formatting (RTF, HTML) for predictable paste behavior. No surprise fonts</span></li>
+        <li class="highlight-item"><strong>Non-activating panel</strong> <span>&mdash; the bezel never steals focus from your current app. Copy, pick, paste &mdash; your cursor stays where it was</span></li>
+      </ul>
+    </article>
+
+    <!-- Code Snippets -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128221;</span>
+        <h3 class="feature-row-title">Code Snippets</h3>
+      </div>
+      <p class="feature-row-tagline">A persistent library of reusable code blocks with syntax highlighting. Not another clipping &mdash; a named, tagged, searchable snippet you keep forever.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>Syntax highlighting</strong> <span>&mdash; 20+ languages: Swift, Python, JavaScript, TypeScript, Go, Rust, Ruby, Java, Kotlin, C, C++, Bash, SQL, JSON, YAML, HTML, CSS, Markdown, and more</span></li>
+        <li class="highlight-item"><strong>Multi-tag system</strong> <span>&mdash; assign multiple tags per snippet for flexible cross-cutting organization. Filter by tag or language</span></li>
+        <li class="highlight-item"><strong>Full-text search</strong> <span>&mdash; search across name, content, and tags simultaneously with locale-aware matching</span></li>
+        <li class="highlight-item"><strong>Dedicated editor</strong> <span>&mdash; monospaced font, auto-save on edit. Undo/redo, no auto-correct interference, no smart quotes</span></li>
+        <li class="highlight-item"><strong>Keyboard access</strong> <span>&mdash; press <kbd>&#8679;&#8984;S</kbd> to open the snippet editor from anywhere. Search, select, paste &mdash; same flow</span></li>
+        <li class="highlight-item"><strong>Separate from history</strong> <span>&mdash; snippets persist independently and never get trimmed. Your clipboard history can rotate while snippets stay permanent</span></li>
+      </ul>
+    </article>
+
+    <!-- Prompt Library -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128172;</span>
+        <h3 class="feature-row-title">Prompt Library</h3>
+      </div>
+      <p class="feature-row-tagline">40+ curated AI prompts for coding, analysis, research, and DevOps &mdash; with template variables that auto-fill from your clipboard.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>Template variables</strong> <span>&mdash; use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{clipboard}}</code>, <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{selected_text}}</code>, and custom variables. Auto-substituted on paste</span></li>
+        <li class="highlight-item"><strong>Category filtering</strong> <span>&mdash; Tab to cycle categories, or type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#coding review</code> to search within a category. Use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#my</code> for your own prompts</span></li>
+        <li class="highlight-item"><strong>3-second flow</strong> <span>&mdash; hotkey &rarr; type a few characters &rarr; Enter. The prompt is pasted with your clipboard content already injected</span></li>
+        <li class="highlight-item"><strong>Remote sync</strong> <span>&mdash; sync prompts from a configurable URL. Share a team prompt library via JSON hosted anywhere</span></li>
+        <li class="highlight-item"><strong>Create your own</strong> <span>&mdash; add custom prompts alongside the built-in library. User prompts are flagged separately and never overwritten by sync</span></li>
+        <li class="highlight-item"><strong>Browse online</strong> <span>&mdash; all built-in prompts are also available in the <a href="./prompts/">web-based Prompt Library</a> to browse and copy</span></li>
+      </ul>
+    </article>
+
+    <!-- Documentation Browser -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128214;</span>
+        <h3 class="feature-row-title">Documentation Browser</h3>
+      </div>
+      <p class="feature-row-tagline">Search 789+ DevDocs documentation sets from a single hotkey. Download docs for offline use &mdash; never leave your editor to look something up.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>789+ documentation sets</strong> <span>&mdash; Python, Go, Rust, JavaScript, React, Node.js, Ruby, CSS, HTML, and hundreds more from devdocs.io</span></li>
+        <li class="highlight-item"><strong>Prefix search</strong> <span>&mdash; type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">python:map</code> or <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">go:fmt</code> to scope search to a single doc. Partial names work too &mdash; &ldquo;py&rdquo; matches &ldquo;python~3.12&rdquo;</span></li>
+        <li class="highlight-item"><strong>Offline support</strong> <span>&mdash; selectively download docs. Search and viewing work entirely offline after download</span></li>
+        <li class="highlight-item"><strong>Dark &amp; light themes</strong> <span>&mdash; documentation renders in WKWebView with custom CSS matching your system appearance</span></li>
+        <li class="highlight-item"><strong>Split-pane UI</strong> <span>&mdash; search results on the left, rendered HTML on the right. Resizable, with position remembered across sessions</span></li>
+        <li class="highlight-item"><strong>Fuzzy matching</strong> <span>&mdash; same scoring engine as clipboard search. Top 100 results ranked by relevance, then by name length</span></li>
+      </ul>
+    </article>
+
+    <!-- Secondary features grid -->
+    <h3 style="font-size: 1.125rem; font-weight: 700; margin-top: 40px; margin-bottom: 16px;">And more</h3>
     <div class="card-grid">
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128203;</span>
-        <h3 class="feature-title">Clipboard History</h3>
-        <p class="feature-desc">Automatically saves everything you copy. Scroll back through your history and paste any previous item instantly. Configurable history size, duplicate removal, and password filtering.</p>
-      </article>
-
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#9000;</span>
-        <h3 class="feature-title">Keyboard-First</h3>
-        <p class="feature-desc">Navigate with arrow keys, paste with Return, search with /. Every action is a keystroke away. Designed for developers who keep their hands on the keyboard.</p>
-      </article>
-
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128270;</span>
-        <h3 class="feature-title">Fuzzy Search</h3>
-        <p class="feature-desc">Instantly find any clipping by typing. Fuzzy matching with consecutive-bonus scoring surfaces what you need even with partial or misspelled queries.</p>
-      </article>
-
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128221;</span>
-        <h3 class="feature-title">Code Snippets</h3>
-        <p class="feature-desc">Save frequently used code as named snippets with syntax highlighting for 20+ languages. Organize with tags and folders, search and paste with a keyboard shortcut.</p>
-      </article>
-
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128172;</span>
-        <h3 class="feature-title">Prompt Library</h3>
-        <p class="feature-desc">Built-in collection of 40+ curated AI prompts organized by category. Template variables with <code>{{clipboard}}</code> substitution. Sync from remote JSON sources or create your own.</p>
-      </article>
-
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#128214;</span>
-        <h3 class="feature-title">Documentation Browser</h3>
-        <p class="feature-desc">Search and browse 789+ DevDocs documentation sets without leaving your editor. Prefix search like <code>python:map</code> or <code>go:fmt</code>. Offline support with downloaded docs.</p>
-      </article>
-
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#9889;</span>
-        <h3 class="feature-title">Quick Actions</h3>
-        <p class="feature-desc">Transform text instantly: uppercase, lowercase, title case, trim whitespace, URL encode/decode, wrap in quotes, JSON pretty print, Markdown code block, and more.</p>
-      </article>
-
-      <article class="feature-card">
-        <span class="feature-icon" aria-hidden="true">&#9729;</span>
-        <h3 class="feature-title">GitHub Gist Sharing</h3>
-        <p class="feature-desc">Share any clipping as a GitHub Gist with one keystroke. Choose public or private, with share history tracking. Perfect for quickly sharing code with teammates.</p>
-      </article>
-
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128190;</span>
         <h3 class="feature-title">Export &amp; Import</h3>
-        <p class="feature-desc">Export your full clipboard history to JSON and import it back. Preserves timestamps and source app metadata. Never lose your clipping history.</p>
+        <p class="feature-desc">Back up your full clipboard history to JSON and restore it anytime. Preserves timestamps and source app metadata.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#127912;</span>
         <h3 class="feature-title">Customizable Bezel</h3>
-        <p class="feature-desc">Adjust the overlay width, height, and transparency. Choose your menu bar icon. Enable sticky mode, wraparound navigation, paste sounds, and more.</p>
+        <p class="feature-desc">Adjust overlay width, height, and transparency. Choose your menu bar icon. Sticky mode, wraparound navigation, paste sounds.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128274;</span>
         <h3 class="feature-title">Privacy First</h3>
-        <p class="feature-desc">All data stays on your Mac. No cloud sync, no analytics, no tracking. Automatic password filtering skips likely credentials. Your clipboard is yours.</p>
+        <p class="feature-desc">All data stays on your Mac. No cloud, no analytics, no tracking. Auto-filters passwords from known managers.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#9729;</span>
+        <h3 class="feature-title">GitHub Gist Sharing</h3>
+        <p class="feature-desc">One keystroke to share any clipping as a public or private Gist. Share history tracking built in.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128736;</span>
         <h3 class="feature-title">Open Source</h3>
-        <p class="feature-desc">Fully open source under the MIT license. Built with Swift 6, SwiftUI, and SwiftData. Inspect the code, contribute features, or fork it for your own needs.</p>
+        <p class="feature-desc">MIT license. Built with Swift 6, SwiftUI, and SwiftData. Inspect the code, contribute, or fork it.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#9000;</span>
+        <h3 class="feature-title">Native macOS</h3>
+        <p class="feature-desc">No Electron, no web wrapper. Native Swift with hardened runtime, menu bar integration, and system appearance support.</p>
       </article>
     </div>
   </section>
 
   <section class="section" id="shortcuts">
     <h2 class="section-title">Keyboard Shortcuts</h2>
-    <p class="section-subtitle">Every action is a keystroke away. All shortcuts are customizable in Settings.</p>
+    <p class="section-subtitle">Every action is a keystroke away. Global hotkeys are customizable in Settings.</p>
 
     <div class="shortcuts-grid">
       <div class="shortcut-group">
+        <h3>Global Hotkeys</h3>
+        <ul class="shortcut-list">
+          <li class="shortcut-item"><span class="shortcut-label">Clipboard history</span><kbd>&#8679;&#8984;B</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Prompt library</span><kbd>&#8679;&#8984;P</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Documentation lookup</span><kbd>&#8679;&#8984;D</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Snippets editor</span><kbd>&#8679;&#8984;S</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Preferences</span><kbd>&#8984;,</kbd></li>
+        </ul>
+      </div>
+
+      <div class="shortcut-group">
         <h3>Navigation</h3>
         <ul class="shortcut-list">
-          <li class="shortcut-item"><span class="shortcut-label">Open Clipsmith</span><kbd>&#8679;&#8984;V</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Previous clipping</span><kbd>&#8593;</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Next clipping</span><kbd>&#8595;</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Paste selected</span><kbd>&#9166;</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Search clippings</span><kbd>/</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Dismiss</span><kbd>Esc</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Move up / down</span><kbd>&#8593;</kbd> <kbd>&#8595;</kbd> or <kbd>j</kbd> <kbd>k</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Jump 10 items</span><kbd>Page Up</kbd> <kbd>Page Down</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">First / last item</span><kbd>Home</kbd> <kbd>End</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Jump to position</span><kbd>1</kbd>&ndash;<kbd>9</kbd>, <kbd>0</kbd>=10th</li>
+          <li class="shortcut-item"><span class="shortcut-label">Fuzzy search</span>just start typing</li>
         </ul>
       </div>
 
       <div class="shortcut-group">
         <h3>Actions</h3>
         <ul class="shortcut-list">
+          <li class="shortcut-item"><span class="shortcut-label">Paste and close</span><kbd>&#9166;</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Dismiss</span><kbd>Esc</kbd></li>
           <li class="shortcut-item"><span class="shortcut-label">Delete clipping</span><kbd>&#8998;</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Star / unstar</span><kbd>S</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Share as Gist</span><kbd>G</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Quick actions</span><kbd>Tab</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Preview</span><kbd>Space</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Shortcut help</span><kbd>?</kbd></li>
-        </ul>
-      </div>
-
-      <div class="shortcut-group">
-        <h3>Organization</h3>
-        <ul class="shortcut-list">
-          <li class="shortcut-item"><span class="shortcut-label">All clippings</span><kbd>&#8984;1</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Starred</span><kbd>&#8984;2</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Snippets</span><kbd>&#8984;3</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">Prompts</span><kbd>&#8984;4</kbd></li>
-          <li class="shortcut-item"><span class="shortcut-label">New snippet folder</span><kbd>&#8984;N</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Quick actions menu</span><kbd>Tab</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Save to file</span><kbd>s</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Save and delete</span><kbd>S</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Cheat sheet</span><kbd>?</kbd></li>
         </ul>
       </div>
     </div>
