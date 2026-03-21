@@ -57,7 +57,7 @@ struct LicenseSettingsSection: View {
                     }
 
                     Link("Buy a License ->",
-                         destination: URL(string: "https://clipsmith.lemonsqueezy.com/checkout/buy/e920bdd1-f9d6-4db7-a89c-bdfe36fb3c4b")!)
+                         destination: URL(string: "https://clipsmith.lemonsqueezy.com/checkout/buy/8cd09174-7dab-493e-a929-cb8e767670ed")!)
                         .font(.footnote)
                         .foregroundStyle(.secondary)
 

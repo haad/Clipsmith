@@ -11,7 +11,7 @@ private func makeMockSession() -> URLSession {
 
 private func makeLicenseActivateSuccessResponse(
     storeId: Int = 322611,
-    productId: Int = 909754,
+    productId: Int = 909857,
     instanceId: String = "test-instance-id",
     licenseKey: String = "test-key"
 ) -> (HTTPURLResponse, Data) {
@@ -93,7 +93,7 @@ private func makeLicenseActivateFailedResponse(error: String = "License key not 
 private func makeLicenseValidateSuccessResponse(
     valid: Bool = true,
     storeId: Int = 322611,
-    productId: Int = 909754,
+    productId: Int = 909857,
     instanceId: String = "test-instance-id"
 ) -> (HTTPURLResponse, Data) {
     let json = """
