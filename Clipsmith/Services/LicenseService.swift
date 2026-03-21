@@ -124,9 +124,9 @@ final class LicenseService {
     // MARK: - Constants
 
     /// TODO: set before shipping — assign your real Lemon Squeezy store ID here
-    static let expectedStoreId: Int = 0  // TODO: set before shipping
+    static let expectedStoreId: Int = 322611
     /// TODO: set before shipping — assign your real Lemon Squeezy product ID here
-    static let expectedProductId: Int = 0  // TODO: set before shipping
+    static let expectedProductId: Int = 909754
 
     // MARK: - Observable Properties
 

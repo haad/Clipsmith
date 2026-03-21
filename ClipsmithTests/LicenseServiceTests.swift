@@ -10,8 +10,8 @@ private func makeMockSession() -> URLSession {
 }
 
 private func makeLicenseActivateSuccessResponse(
-    storeId: Int = 0,
-    productId: Int = 0,
+    storeId: Int = 322611,
+    productId: Int = 909754,
     instanceId: String = "test-instance-id",
     licenseKey: String = "test-key"
 ) -> (HTTPURLResponse, Data) {
@@ -92,8 +92,8 @@ private func makeLicenseActivateFailedResponse(error: String = "License key not 
 
 private func makeLicenseValidateSuccessResponse(
     valid: Bool = true,
-    storeId: Int = 0,
-    productId: Int = 0,
+    storeId: Int = 322611,
+    productId: Int = 909754,
     instanceId: String = "test-instance-id"
 ) -> (HTTPURLResponse, Data) {
     let json = """
@@ -215,7 +215,7 @@ final class LicenseServiceTests: XCTestCase {
 
     func testActivateWrongProduct() async throws {
         MockURLProtocol.requestHandler = { _ in
-            // storeId=999 does not match expectedStoreId=0
+            // storeId=999 does not match expectedStoreId=322611
             makeLicenseActivateSuccessResponse(storeId: 999, productId: 0)
         }
         let service = LicenseService(session: makeMockSession())
