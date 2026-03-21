@@ -3,9 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clipsmith Prompt Library</title>
+  <title>Clipsmith Prompt Library &mdash; Curated AI Prompts for macOS</title>
+  <meta name="description" content="Browse and copy 40+ curated AI prompts for coding, analysis, writing, research, and DevOps. Part of Clipsmith clipboard manager for macOS." />
+  <meta name="keywords" content="AI prompts, ChatGPT prompts, Claude prompts, prompt library, developer prompts, macOS" />
+  <meta property="og:title" content="Clipsmith Prompt Library" />
+  <meta property="og:description" content="Browse and copy 40+ curated AI prompts organized by category. Part of Clipsmith for macOS." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="../clipsmith-logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" type="image/png" href="../clipsmith-logo.png" />
+  <link rel="canonical" href="https://haad.github.io/Clipsmith/prompts/" />
   <script>
-    // Apply theme before DOM renders to prevent flash of wrong theme
     (function () {
       var saved = localStorage.getItem('theme');
       if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -46,6 +54,10 @@
       --badge-analysis-text: #116329;
       --badge-creative-bg: #ffeff7;
       --badge-creative-text: #a0126c;
+      --badge-research-bg: #e8def8;
+      --badge-research-text: #4a148c;
+      --badge-devops-bg: #ffecd2;
+      --badge-devops-text: #7c4a03;
 
       --toggle-btn-bg: #eaeef2;
       --toggle-btn-hover: #d0d7de;
@@ -90,6 +102,10 @@
       --badge-analysis-text: #56d364;
       --badge-creative-bg: #3d0030;
       --badge-creative-text: #ff7fd8;
+      --badge-research-bg: #2d1b4e;
+      --badge-research-text: #c9b1ff;
+      --badge-devops-bg: #3d2800;
+      --badge-devops-text: #f0b050;
 
       --toggle-btn-bg: #21262d;
       --toggle-btn-hover: #30363d;
@@ -117,6 +133,10 @@
       transition: background-color var(--transition), color var(--transition);
       min-height: 100vh;
     }
+
+    a { color: #0969da; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    [data-theme="dark"] a { color: #388bfd; }
 
     /* ============================================================
        Header
@@ -158,7 +178,6 @@
       color: var(--text-secondary);
     }
 
-    /* Nav links */
     .header-nav {
       display: flex;
       align-items: center;
@@ -177,7 +196,6 @@
       color: var(--text-primary);
     }
 
-    /* Theme toggle */
     .theme-toggle {
       background-color: var(--toggle-btn-bg);
       border: 1px solid var(--border-color);
@@ -222,7 +240,6 @@
       }
     }
 
-    /* Category tabs */
     .category-tabs {
       display: flex;
       gap: 4px;
@@ -255,7 +272,6 @@
       color: var(--text-tab-active);
     }
 
-    /* Search input */
     .search-wrapper {
       position: relative;
       flex-shrink: 0;
@@ -264,7 +280,7 @@
 
     @media (min-width: 640px) {
       .search-wrapper {
-        width: 240px;
+        width: 280px;
       }
     }
 
@@ -386,7 +402,6 @@
       line-height: 1.4;
     }
 
-    /* Category badges */
     .category-badge {
       border-radius: var(--radius-badge);
       font-size: 0.6875rem;
@@ -398,24 +413,13 @@
       flex-shrink: 0;
     }
 
-    .category-badge.coding {
-      background-color: var(--badge-coding-bg);
-      color: var(--badge-coding-text);
-    }
-    .category-badge.writing {
-      background-color: var(--badge-writing-bg);
-      color: var(--badge-writing-text);
-    }
-    .category-badge.analysis {
-      background-color: var(--badge-analysis-bg);
-      color: var(--badge-analysis-text);
-    }
-    .category-badge.creative {
-      background-color: var(--badge-creative-bg);
-      color: var(--badge-creative-text);
-    }
+    .category-badge.coding { background-color: var(--badge-coding-bg); color: var(--badge-coding-text); }
+    .category-badge.writing { background-color: var(--badge-writing-bg); color: var(--badge-writing-text); }
+    .category-badge.analysis { background-color: var(--badge-analysis-bg); color: var(--badge-analysis-text); }
+    .category-badge.creative { background-color: var(--badge-creative-bg); color: var(--badge-creative-text); }
+    .category-badge.research { background-color: var(--badge-research-bg); color: var(--badge-research-text); }
+    .category-badge.devops { background-color: var(--badge-devops-bg); color: var(--badge-devops-text); }
 
-    /* Prompt content */
     .card-content {
       flex: 1;
       font-size: 0.8125rem;
@@ -426,9 +430,22 @@
       margin-bottom: 16px;
       word-break: break-word;
       overflow-wrap: break-word;
+      max-height: 200px;
+      overflow-y: auto;
     }
 
-    /* Copy button */
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
     .copy-btn {
       align-self: flex-start;
       background-color: var(--bg-btn-copy);
@@ -456,6 +473,34 @@
     }
 
     /* ============================================================
+       Info banner
+    ============================================================ */
+    .info-banner {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 0.8125rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+
+    .info-banner strong {
+      color: var(--text-primary);
+    }
+
+    .info-banner code {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      background-color: var(--bg-page);
+      padding: 1px 5px;
+      border-radius: 3px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* ============================================================
        Footer
     ============================================================ */
     footer {
@@ -466,6 +511,17 @@
       padding: 20px 24px;
       text-align: center;
       transition: border-color var(--transition);
+    }
+
+    footer a { color: var(--text-secondary); }
+    footer a:hover { color: var(--text-primary); }
+
+    /* ============================================================
+       Responsive
+    ============================================================ */
+    @media (max-width: 639px) {
+      .header-inner { flex-wrap: wrap; }
+      .header-nav { gap: 12px; }
     }
   </style>
 </head>
@@ -488,6 +544,12 @@
   </header>
 
   <main>
+    <div class="info-banner">
+      <strong>Use these prompts in Clipsmith:</strong> All prompts below are built into the Clipsmith app.
+      Open the prompt bezel, search by title or category, and paste directly.
+      Prompts support template variables like <code>{{clipboard}}</code> that auto-substitute with your current clipboard content.
+    </div>
+
     <div class="controls">
       <div class="category-tabs" id="categoryTabs" role="tablist" aria-label="Filter by category">
         <!-- Populated dynamically -->
@@ -498,8 +560,8 @@
           type="search"
           class="search-input"
           id="searchInput"
-          placeholder="Search prompts..."
-          aria-label="Search prompts by title"
+          placeholder="Search prompts by title or content..."
+          aria-label="Search prompts by title or content"
           autocomplete="off"
         />
       </div>
@@ -510,7 +572,8 @@
   </main>
 
   <footer>
-    <span>Clipsmith Prompt Library &mdash; curated prompts for Clipsmith clipboard manager</span>
+    <a href="../">Clipsmith</a> &mdash;
+    Curated prompts for developers. MIT License &mdash; &copy; 2025 Clipsmith contributors
   </footer>
 
   <script>
@@ -543,20 +606,19 @@
 
       function updateThemeIcon() {
         var icon = document.getElementById('themeIcon');
-        icon.innerHTML = currentTheme() === 'dark' ? '&#9728;' : '&#9790;'; // sun or moon
+        icon.innerHTML = currentTheme() === 'dark' ? '&#9728;' : '&#9790;';
       }
 
       document.getElementById('themeToggle').addEventListener('click', function () {
         applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
       });
 
-      // Sync icon on load
       updateThemeIcon();
 
       /* ----------------------------------------------------------
          Category data
       ---------------------------------------------------------- */
-      var CATEGORY_ORDER = ['all', 'coding', 'writing', 'analysis', 'creative'];
+      var CATEGORY_ORDER = ['all', 'coding', 'analysis', 'research', 'devops', 'writing', 'creative'];
 
       function countByCategory(prompts) {
         var counts = { all: prompts.length };
@@ -585,7 +647,7 @@
 
           btn.addEventListener('click', function () {
             activeCategory = cat;
-            renderTabs(prompts); // re-render tabs to update active state
+            renderTabs(prompts);
             renderCards();
           });
 
@@ -594,13 +656,16 @@
       }
 
       /* ----------------------------------------------------------
-         Filtering
+         Filtering — searches title and content
       ---------------------------------------------------------- */
       function filteredPrompts() {
         return allPrompts.filter(function (p) {
           var matchCat = activeCategory === 'all' || p.category === activeCategory;
-          var matchSearch = !searchQuery || p.title.toLowerCase().indexOf(searchQuery.toLowerCase()) !== -1;
-          return matchCat && matchSearch;
+          if (!matchCat) return false;
+          if (!searchQuery) return true;
+          var q = searchQuery.toLowerCase();
+          return p.title.toLowerCase().indexOf(q) !== -1 ||
+                 p.content.toLowerCase().indexOf(q) !== -1;
         });
       }
 
@@ -617,12 +682,16 @@
         return d.innerHTML;
       }
 
+      function truncate(str, maxLen) {
+        if (str.length <= maxLen) return str;
+        return str.substring(0, maxLen).trimEnd() + '...';
+      }
+
       function renderCards() {
         var prompts = filteredPrompts();
         var content = document.getElementById('content');
         var resultsCount = document.getElementById('resultsCount');
 
-        // Update count label
         if (allPrompts.length > 0) {
           resultsCount.textContent = prompts.length === allPrompts.length
             ? 'Showing all ' + prompts.length + ' prompts'
@@ -659,7 +728,15 @@
 
           var contentDiv = document.createElement('div');
           contentDiv.className = 'card-content';
-          contentDiv.textContent = prompt.content; // textContent preserves literal text incl. {{vars}}
+          contentDiv.textContent = prompt.content;
+
+          var footer = document.createElement('div');
+          footer.className = 'card-footer';
+
+          var meta = document.createElement('span');
+          meta.className = 'card-meta';
+          var hasVars = prompt.content.indexOf('{{') !== -1;
+          meta.textContent = hasVars ? 'Has template variables' : '';
 
           var copyBtn = document.createElement('button');
           copyBtn.className = 'copy-btn';
@@ -684,7 +761,9 @@
 
           card.appendChild(header);
           card.appendChild(contentDiv);
-          card.appendChild(copyBtn);
+          footer.appendChild(meta);
+          footer.appendChild(copyBtn);
+          card.appendChild(footer);
           grid.appendChild(card);
         });
 
@@ -695,9 +774,27 @@
       /* ----------------------------------------------------------
          Search handler
       ---------------------------------------------------------- */
+      var searchTimeout;
       document.getElementById('searchInput').addEventListener('input', function (e) {
-        searchQuery = e.target.value;
-        renderCards();
+        clearTimeout(searchTimeout);
+        var val = e.target.value;
+        searchTimeout = setTimeout(function () {
+          searchQuery = val;
+          renderCards();
+        }, 150);
+      });
+
+      /* ----------------------------------------------------------
+         Keyboard shortcut: focus search with /
+      ---------------------------------------------------------- */
+      document.addEventListener('keydown', function (e) {
+        if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+          e.preventDefault();
+          document.getElementById('searchInput').focus();
+        }
+        if (e.key === 'Escape') {
+          document.getElementById('searchInput').blur();
+        }
       });
 
       /* ----------------------------------------------------------
@@ -727,16 +824,12 @@
           allPrompts = data.prompts || [];
           var total = allPrompts.length;
 
-          // Compute per-category counts for subtitle
           var categoryCounts = countByCategory(allPrompts);
           delete categoryCounts.all;
-          var catList = Object.keys(categoryCounts)
-            .sort()
-            .map(function (c) { return categoryCounts[c] + ' ' + c; })
-            .join(', ');
+          var catCount = Object.keys(categoryCounts).length;
 
           document.getElementById('headerSubtitle').textContent =
-            total + ' curated prompts for Clipsmith clipboard manager';
+            total + ' curated prompts across ' + catCount + ' categories';
 
           renderTabs(allPrompts);
           renderCards();

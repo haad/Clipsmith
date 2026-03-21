@@ -4,7 +4,15 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Clipsmith — Clipboard, Snippet &amp; Prompt Manager for macOS</title>
-  <meta name="description" content="Keyboard-first clipboard history, code snippets, and AI prompt library for macOS developers. Open source." />
+  <meta name="description" content="Keyboard-first clipboard history, code snippets, AI prompt library, and documentation browser for macOS. Native Swift app, open source." />
+  <meta name="keywords" content="clipboard manager, macOS, clipboard history, code snippets, prompt library, DevDocs, keyboard-first, developer tools, Swift" />
+  <meta property="og:title" content="Clipsmith — Clipboard, Snippet &amp; Prompt Manager for macOS" />
+  <meta property="og:description" content="Keyboard-first clipboard history, code snippets, AI prompt library, and documentation browser for macOS developers. Open source." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="clipsmith-logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" type="image/png" href="clipsmith-logo.png" />
+  <link rel="canonical" href="https://haad.github.io/Clipsmith/" />
   <script>
     (function () {
       var saved = localStorage.getItem('theme');
@@ -83,7 +91,9 @@
     .nav-brand {
       font-size: 1.125rem; font-weight: 700; color: var(--text-primary);
       text-decoration: none; letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 8px;
     }
+    .nav-brand img { width: 24px; height: 24px; border-radius: 5px; }
     .nav-brand:hover { text-decoration: none; }
     .nav-links { display: flex; align-items: center; gap: 16px; list-style: none; }
     .nav-links a {
@@ -169,6 +179,29 @@
       transition: background-color var(--transition), border-color var(--transition);
     }
 
+    /* Requirements callout */
+    .requirements {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      margin-top: 24px;
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+    .requirements h3 {
+      font-size: 0.9375rem; font-weight: 600; margin-bottom: 12px;
+    }
+    .requirements ul {
+      list-style: none; display: flex; flex-direction: column; gap: 6px;
+    }
+    .requirements li {
+      font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;
+      padding-left: 20px; position: relative;
+    }
+    .requirements li::before {
+      content: "\2713"; position: absolute; left: 0; color: var(--accent); font-weight: 600;
+    }
+
     /* Download */
     .download-section { text-align: center; border-top: 1px solid var(--border-color); transition: border-color var(--transition); }
     .download-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
@@ -198,8 +231,13 @@
 
   <nav>
     <div class="nav-inner">
-      <a href="#" class="nav-brand">Clipsmith</a>
+      <a href="#" class="nav-brand">
+        <img src="clipsmith-logo.png" alt="" width="24" height="24" />
+        Clipsmith
+      </a>
       <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#shortcuts">Shortcuts</a></li>
         <li><a href="./prompts/">Prompt Library</a></li>
         <li><a href="https://github.com/haad/Clipsmith" target="_blank" rel="noopener">GitHub</a></li>
         <li>
@@ -212,20 +250,22 @@
   </nav>
 
   <section class="hero">
+    <img src="clipsmith-logo.png" alt="Clipsmith app icon" class="hero-icon" width="120" height="120" />
     <h1>Clipsmith</h1>
-    <p class="hero-tagline">Clipboard history, code snippets, and AI prompts — one shortcut away</p>
+    <p class="hero-tagline">Clipboard history, code snippets, AI prompts, and documentation &mdash; one shortcut away</p>
     <p class="hero-meta">
       <span>Keyboard-first</span>
-      <span>Open source</span>
-      <span>macOS native</span>
+      <span>Native Swift &amp; SwiftUI</span>
+      <span>Free for personal use</span>
+      <span>macOS 15+</span>
     </p>
     <div class="hero-ctas">
-      <a href="https://github.com/haad/Clipsmith/releases" class="btn btn-primary" target="_blank" rel="noopener">Download from GitHub</a>
+      <a href="https://github.com/haad/Clipsmith/releases" class="btn btn-primary" target="_blank" rel="noopener">Download Latest Release</a>
       <a href="https://github.com/haad/Clipsmith" class="btn btn-secondary" target="_blank" rel="noopener">View Source</a>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="features">
     <h2 class="section-title">Features</h2>
     <p class="section-subtitle">One tool for everything you type, copy, and reuse.</p>
 
@@ -233,62 +273,80 @@
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128203;</span>
         <h3 class="feature-title">Clipboard History</h3>
-        <p class="feature-desc">Automatically saves everything you copy. Scroll back through your history and paste any previous item with one keystroke.</p>
+        <p class="feature-desc">Automatically saves everything you copy. Scroll back through your history and paste any previous item instantly. Configurable history size, duplicate removal, and password filtering.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#9000;</span>
         <h3 class="feature-title">Keyboard-First</h3>
-        <p class="feature-desc">Navigate with arrow keys, paste with Return, search with /. Designed for developers who keep their hands on the keyboard.</p>
+        <p class="feature-desc">Navigate with arrow keys, paste with Return, search with /. Every action is a keystroke away. Designed for developers who keep their hands on the keyboard.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128270;</span>
         <h3 class="feature-title">Fuzzy Search</h3>
-        <p class="feature-desc">Instantly find any clipping by typing. Fuzzy matching surfaces what you need even with partial or misspelled queries.</p>
+        <p class="feature-desc">Instantly find any clipping by typing. Fuzzy matching with consecutive-bonus scoring surfaces what you need even with partial or misspelled queries.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128221;</span>
         <h3 class="feature-title">Code Snippets</h3>
-        <p class="feature-desc">Save frequently used code as named snippets. Organize into folders and paste with a keyboard shortcut.</p>
+        <p class="feature-desc">Save frequently used code as named snippets with syntax highlighting for 20+ languages. Organize with tags and folders, search and paste with a keyboard shortcut.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128172;</span>
         <h3 class="feature-title">Prompt Library</h3>
-        <p class="feature-desc">Built-in collection of curated AI prompts organized by category. Browse, search, and paste prompts for ChatGPT, Claude, and more.</p>
+        <p class="feature-desc">Built-in collection of 40+ curated AI prompts organized by category. Template variables with <code>{{clipboard}}</code> substitution. Sync from remote JSON sources or create your own.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#128214;</span>
+        <h3 class="feature-title">Documentation Browser</h3>
+        <p class="feature-desc">Search and browse 789+ DevDocs documentation sets without leaving your editor. Prefix search like <code>python:map</code> or <code>go:fmt</code>. Offline support with downloaded docs.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#9889;</span>
         <h3 class="feature-title">Quick Actions</h3>
-        <p class="feature-desc">Transform text instantly: uppercase, lowercase, trim whitespace, sort lines, encode URLs, and more.</p>
+        <p class="feature-desc">Transform text instantly: uppercase, lowercase, title case, trim whitespace, URL encode/decode, wrap in quotes, JSON pretty print, Markdown code block, and more.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#9729;</span>
         <h3 class="feature-title">GitHub Gist Sharing</h3>
-        <p class="feature-desc">Share any clipping as a GitHub Gist with one keystroke. Perfect for quickly sharing code with teammates.</p>
+        <p class="feature-desc">Share any clipping as a GitHub Gist with one keystroke. Choose public or private, with share history tracking. Perfect for quickly sharing code with teammates.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#128190;</span>
+        <h3 class="feature-title">Export &amp; Import</h3>
+        <p class="feature-desc">Export your full clipboard history to JSON and import it back. Preserves timestamps and source app metadata. Never lose your clipping history.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#127912;</span>
+        <h3 class="feature-title">Customizable Bezel</h3>
+        <p class="feature-desc">Adjust the overlay width, height, and transparency. Choose your menu bar icon. Enable sticky mode, wraparound navigation, paste sounds, and more.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128274;</span>
         <h3 class="feature-title">Privacy First</h3>
-        <p class="feature-desc">All data stays on your Mac. No cloud sync, no analytics, no tracking. Your clipboard is yours.</p>
+        <p class="feature-desc">All data stays on your Mac. No cloud sync, no analytics, no tracking. Automatic password filtering skips likely credentials. Your clipboard is yours.</p>
       </article>
 
       <article class="feature-card">
         <span class="feature-icon" aria-hidden="true">&#128736;</span>
         <h3 class="feature-title">Open Source</h3>
-        <p class="feature-desc">Fully open source under the MIT license. Inspect the code, contribute features, or fork it for your own needs.</p>
+        <p class="feature-desc">Fully open source under the MIT license. Built with Swift 6, SwiftUI, and SwiftData. Inspect the code, contribute features, or fork it for your own needs.</p>
       </article>
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" id="shortcuts">
     <h2 class="section-title">Keyboard Shortcuts</h2>
-    <p class="section-subtitle">Every action is a keystroke away.</p>
+    <p class="section-subtitle">Every action is a keystroke away. All shortcuts are customizable in Settings.</p>
 
     <div class="shortcuts-grid">
       <div class="shortcut-group">
@@ -328,26 +386,42 @@
     </div>
   </section>
 
-  <section class="section download-section">
+  <section class="section download-section" id="download">
     <h2 class="section-title">Get Clipsmith</h2>
-    <p class="section-subtitle">Free and open source. Download and start using in seconds.</p>
+    <p class="section-subtitle">Free for personal use. Download and start using in seconds.</p>
 
     <div class="download-ctas">
-      <a href="https://github.com/haad/Clipsmith/releases" class="btn btn-primary" target="_blank" rel="noopener">Download from GitHub</a>
+      <a href="https://github.com/haad/Clipsmith/releases" class="btn btn-primary" target="_blank" rel="noopener">Download Latest Release</a>
+      <a href="https://github.com/haad/Clipsmith" class="btn btn-secondary" target="_blank" rel="noopener">View Source on GitHub</a>
     </div>
 
-    <p class="download-note">
-      Requires macOS 15 (Sequoia) or later.<br>
-      Clipsmith needs Accessibility permission to paste clippings into other apps.<br>
-      Grant it in System Settings &rarr; Privacy &amp; Security &rarr; Accessibility.
-    </p>
+    <div class="licensing" style="margin-top: 32px; margin-bottom: 24px;">
+      <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 8px;">Licensing</h3>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.7; max-width: 600px; margin: 0 auto 16px;">
+        Clipsmith is <strong style="color: var(--text-primary);">free for personal use</strong>. If you use it professionally or want to support development, you can purchase a license key via Lemon Squeezy or sponsor on GitHub. Licensed users skip the occasional reminder prompt and help keep the project alive.
+      </p>
+      <div class="download-ctas">
+        <a href="https://clipsmith.lemonsqueezy.com/checkout/buy/e920bdd1-f9d6-4db7-a89c-bdfe36fb3c4b?discount=0" class="btn btn-primary" target="_blank" rel="noopener">Buy a License</a>
+        <a href="https://github.com/sponsors/haad" class="btn btn-secondary" target="_blank" rel="noopener">Sponsor on GitHub</a>
+      </div>
+    </div>
+
+    <div class="requirements">
+      <h3>Requirements</h3>
+      <ul>
+        <li>macOS 15 (Sequoia) or later</li>
+        <li>Accessibility permission for paste functionality (System Settings &rarr; Privacy &amp; Security &rarr; Accessibility)</li>
+        <li>Optional: GitHub personal access token for Gist sharing</li>
+      </ul>
+    </div>
   </section>
 
   <footer>
     <div class="footer-links">
       <a href="./prompts/">Prompt Library</a>
       <a href="https://github.com/haad/Clipsmith" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://www.paypal.com/donate/?hosted_button_id=BPGMKCULNBCH8" target="_blank" rel="noopener">Donate</a>
+      <a href="https://github.com/haad/Clipsmith/issues" target="_blank" rel="noopener">Report a Bug</a>
+      <a href="https://github.com/sponsors/haad" target="_blank" rel="noopener">Sponsor</a>
     </div>
     <span>MIT License &mdash; &copy; 2025 Clipsmith contributors</span>
   </footer>
