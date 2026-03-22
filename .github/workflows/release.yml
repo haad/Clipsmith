@@ -1,10 +1,12 @@
-name: Build and Release
+name: Build and Release (Unsigned - DISABLED)
 
-on:
-  push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
+# Disabled: use release-signed.yml instead, which handles both signed and unsigned paths.
+# on:
+#   push:
+#     tags:
+#       - 'v*'
+#   workflow_dispatch:
+on: workflow_dispatch
 
 
 permissions:
@@ -92,6 +94,21 @@ jobs:
           -archivePath build/Clipsmith.xcarchive \
           -exportPath build/Export \
           -exportOptionsPlist build/ExportOptions.plist
+
+    - name: Ad-hoc Code Sign
+      run: |
+        APP_PATH=$(find build -name "Clipsmith.app" -type d | head -1)
+        if [ -z "$APP_PATH" ]; then
+          echo "Error: Could not find Clipsmith.app for signing"
+          exit 1
+        fi
+        echo "Ad-hoc signing: $APP_PATH"
+        codesign --force --deep --sign - \
+          --entitlements Clipsmith/Clipsmith.entitlements \
+          "$APP_PATH"
+        echo "Verifying signature..."
+        codesign --verify --deep --strict "$APP_PATH"
+        codesign -dvvv "$APP_PATH" 2>&1 | head -10
 
     - name: Verify Export
       run: |

@@ -48,6 +48,12 @@ final class PasteService {
         //    because that steals focus from the app we're about to paste into (Pitfall 3).
         guard AXIsProcessTrusted() else {
             logger.error("Cannot paste: Accessibility permission not granted")
+            // Copy content to pasteboard so the user can manually Cmd-V.
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.setString(content, forType: .string)
+            clipboardMonitor?.blockedChangeCount = pasteboard.changeCount
+            logger.info("Content copied to clipboard — user can paste manually with Cmd-V")
             return
         }
 

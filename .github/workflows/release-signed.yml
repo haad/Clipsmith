@@ -170,6 +170,22 @@ jobs:
           -exportPath build/Export \
           -exportOptionsPlist build/ExportOptions.plist
 
+    - name: Ad-hoc Code Sign (unsigned fallback)
+      if: steps.check_secrets.outputs.has_certs != 'true'
+      run: |
+        APP_PATH=$(find build -name "Clipsmith.app" -type d | head -1)
+        if [ -z "$APP_PATH" ]; then
+          echo "Error: Could not find Clipsmith.app for signing"
+          exit 1
+        fi
+        echo "Ad-hoc signing (no developer certificate): $APP_PATH"
+        codesign --force --deep --sign - \
+          --entitlements Clipsmith/Clipsmith.entitlements \
+          "$APP_PATH"
+        echo "Verifying signature..."
+        codesign --verify --deep --strict "$APP_PATH"
+        codesign -dvvv "$APP_PATH" 2>&1 | head -10
+
     - name: Verify Export
       run: |
         echo "Checking build directory structure:"
