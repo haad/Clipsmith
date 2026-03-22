@@ -1,0 +1,95 @@
+name: Bug Report
+description: Report a bug or unexpected behavior in Clipsmith
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the sections below so we can reproduce and fix the issue.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the bug.
+      placeholder: What happened?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this?
+      placeholder: |
+        1. Open Clipsmith
+        2. Press Cmd+Shift+B
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: input
+    id: macos-version
+    attributes:
+      label: macOS Version
+      description: e.g. macOS 15.3 (Sequoia)
+      placeholder: macOS 15.x
+    validations:
+      required: true
+
+  - type: input
+    id: clipsmith-version
+    attributes:
+      label: Clipsmith Version
+      description: Check in Clipsmith menu bar > About Clipsmith
+      placeholder: e.g. 1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected Area
+      options:
+        - Clipboard History
+        - Code Snippets
+        - Prompt Library
+        - Documentation Browser
+        - Quick Actions
+        - GitHub Gist
+        - Settings / Preferences
+        - Keyboard Shortcuts
+        - Menu Bar
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs / Screenshots
+      description: Paste any relevant Console.app logs or attach screenshots.
+      render: text
+
+  - type: checkboxes
+    id: permissions
+    attributes:
+      label: Permissions
+      options:
+        - label: Accessibility permission is granted in System Settings
