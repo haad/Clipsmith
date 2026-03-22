@@ -319,11 +319,9 @@ jobs:
               "$SOURCE_DIR"
           }
 
-        # Sign the DMG if we have a signing identity
-        if [ -n "$SIGNING_IDENTITY" ]; then
-          echo "Signing DMG..."
-          codesign --force --sign "$SIGNING_IDENTITY" "$DMG_PATH"
-        fi
+        # Do NOT sign the DMG itself — only the app inside is signed.
+        # Signing the DMG with an Apple Development cert triggers Gatekeeper
+        # rejection on download. The unsigned DMG with signed app inside works.
 
         # Verify DMG was created
         if [ -f "$DMG_PATH" ]; then
