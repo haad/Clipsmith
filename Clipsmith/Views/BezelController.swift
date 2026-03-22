@@ -35,6 +35,14 @@ final class BezelController: NSPanel {
     var clipboardStore: ClipboardStore?
     var clipboardMonitor: ClipboardMonitor?
 
+    /// Accumulated scroll delta for threshold-based navigation.
+    /// Smooth-scrolling devices (trackpad, Magic Mouse) send many small deltas per
+    /// gesture — accumulating prevents one-item-per-delta stutter.
+    private var scrollAccumulator: CGFloat = 0
+
+    /// Threshold of accumulated scroll delta before navigating one item.
+    private let scrollThreshold: CGFloat = 3.0
+
     /// Global event monitor for click-outside dismissal. Removed on hide().
     private var globalMonitor: Any?
 
@@ -190,8 +198,10 @@ final class BezelController: NSPanel {
     /// view is still in a stable state — ordering out can trigger a SwiftUI layout
     /// pass, and mutating @Observable properties during that pass causes
     /// "Modifying state during view update" faults.
-    func hide() {
-        pasteService?.cancelPendingPaste()
+    func hide(cancelPaste: Bool = true) {
+        if cancelPaste {
+            pasteService?.cancelPendingPaste()
+        }
         removeClickOutsideMonitor()
         removeFlagsMonitor()
         viewModel.selectedIndex = 0
@@ -274,10 +284,35 @@ final class BezelController: NSPanel {
     // MARK: - Scroll wheel navigation (Bug #12)
 
     override func scrollWheel(with event: NSEvent) {
-        if event.deltaY > 0 {
+        // Ignore momentum (inertial) scrolling — only respond to direct user input.
+        if event.momentumPhase != [] { return }
+
+        // Line-based (discrete) scroll devices: navigate one item per click.
+        if !event.hasPreciseScrollingDeltas {
+            if event.scrollingDeltaY > 0 {
+                viewModel.navigateUp()
+            } else if event.scrollingDeltaY < 0 {
+                viewModel.navigateDown()
+            }
+            return
+        }
+
+        // Smooth-scrolling (trackpad / Magic Mouse): accumulate deltas and
+        // navigate only when the threshold is crossed to prevent stutter.
+        scrollAccumulator += event.scrollingDeltaY
+
+        while scrollAccumulator >= scrollThreshold {
             viewModel.navigateUp()
-        } else if event.deltaY < 0 {
+            scrollAccumulator -= scrollThreshold
+        }
+        while scrollAccumulator <= -scrollThreshold {
             viewModel.navigateDown()
+            scrollAccumulator += scrollThreshold
+        }
+
+        // Reset accumulator when the gesture ends so the next swipe starts fresh.
+        if event.phase == .ended || event.phase == .cancelled {
+            scrollAccumulator = 0
         }
     }
 
@@ -509,9 +544,11 @@ final class BezelController: NSPanel {
             guard let self, self.isHotkeyHold else { return }
             let modifiers: NSEvent.ModifierFlags = [.command, .option, .control, .shift]
             if event.modifierFlags.intersection(modifiers).isEmpty {
+                // Set immediately (before Task) to prevent both global and local
+                // monitors from each firing pasteAndHide() for the same release.
+                self.isHotkeyHold = false
                 Task { @MainActor in
                     await self.pasteAndHide()
-                    self.isHotkeyHold = false
                 }
             }
         }
@@ -574,13 +611,16 @@ final class BezelController: NSPanel {
         // 1. Write to pasteboard and schedule delayed Cmd-V (fires in 0.5s).
         pasteService?.paste(content: content, into: appTracker?.previousApp)
 
-        // 2. Bug #23: move pasted clipping to top of history when pasteMovesToTop is enabled.
+        // 2. Hide the bezel IMMEDIATELY — before any await suspension points.
+        //    This must happen before moveToTop() because during the await, other
+        //    event monitors (click-outside, flags) could fire hide(cancelPaste: true)
+        //    and cancel the pending Cmd-V injection.
+        hide(cancelPaste: false)
+
+        // 3. Bug #23: move pasted clipping to top of history when pasteMovesToTop is enabled.
         if UserDefaults.standard.bool(forKey: AppSettingsKeys.pasteMovesToTop) {
             try? await clipboardStore?.moveToTop(content: content)
         }
-
-        // 3. Hide the bezel NOW — before the 0.5s Cmd-V delay fires.
-        hide()
     }
 
     /// Saves the current clipping to a timestamped .txt file on the configured save location (Bug #25).
