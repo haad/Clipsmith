@@ -95,8 +95,12 @@ jobs:
 
         rm certificate.p12
 
-        # Find and set signing identity
-        IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | grep "Developer ID Application" | head -1 | sed -E 's/.*"(.*)"/\1/')
+        # Find and set signing identity — try Developer ID first, fall back to Apple Development
+        IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | grep -E "Developer ID Application|Apple Development" | head -1 | sed -E 's/.*"(.*)"/\1/')
+        if [ -z "$IDENTITY" ]; then
+          echo "WARNING: No codesigning identity found in imported certificate"
+          security find-identity -v -p codesigning "$KEYCHAIN_PATH"
+        fi
         echo "SIGNING_IDENTITY=$IDENTITY" >> $GITHUB_ENV
         echo "Using identity: $IDENTITY"
 
@@ -132,18 +136,18 @@ jobs:
     - name: Export App
       run: |
         if [ -n "$SIGNING_IDENTITY" ]; then
-          # Export with signing
+          # Export with signing — use development method for Apple Development certs
           cat > build/ExportOptions.plist <<EOF
         <?xml version="1.0" encoding="UTF-8"?>
         <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
         <plist version="1.0">
         <dict>
             <key>method</key>
-            <string>developer-id</string>
+            <string>mac-application</string>
             <key>signingStyle</key>
             <string>manual</string>
             <key>signingCertificate</key>
-            <string>Developer ID Application</string>
+            <string>${SIGNING_IDENTITY}</string>
         </dict>
         </plist>
         EOF
