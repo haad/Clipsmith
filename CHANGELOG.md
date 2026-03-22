@@ -5,8 +5,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.0.2] - 2026-03-22
+
+### Added
+- Changelog on website — auto-generated from CHANGELOG.md during GitHub Pages deploy
+- Changelog nav link on website
+- Release notes now pulled from CHANGELOG.md instead of raw git log
+
 ### Changed
 - Updated Lemon Squeezy product ID and checkout URL
+- CLAUDE.md updated with website, changelog, and licensing documentation
 
 ## [5.0.1] - 2026-03-21
 
@@ -81,7 +89,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Syntax-highlighted snippet editor (20+ languages)
 - Menu bar app with configurable hotkeys
 
-[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.0.1...HEAD
+[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.0.2...HEAD
+[5.0.2]: https://github.com/haad/Clipsmith/compare/v5.0.1...v5.0.2
 [5.0.1]: https://github.com/haad/Clipsmith/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/haad/Clipsmith/compare/v4.2.0...v5.0.0
 [4.2.0]: https://github.com/haad/Clipsmith/compare/v4.1.0...v4.2.0
