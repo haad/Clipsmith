@@ -51,11 +51,10 @@ All shortcuts are configurable in Settings > Shortcuts.
 
 | Action | Default Shortcut |
 |---|---|
-| Open Clipboard | `⇧⌘V` |
-| Search Clippings | `⇧⌘S` |
-| Open Snippets | `⇧⌘B` |
+| Open Clipboard | `⇧⌘B` |
 | Prompt Library | `⇧⌘P` |
 | Documentation Lookup | `⇧⌘D` |
+| Open Snippets | `⇧⌘S` |
 
 ### Inside the Bezel
 
@@ -146,6 +145,56 @@ All data stays on your Mac. No cloud sync, no analytics, no tracking. GitHub Gis
 - SwiftUI bezel overlay with keyboard navigation (Phase 3)
 - Core clipboard engine with adaptive polling (Phase 2)
 - Foundation: SwiftData schema, accessibility, settings (Phase 1)
+
+## Contributing Prompts
+
+The Clipsmith Prompt Library is community-driven. There are two ways to contribute:
+
+### Option 1: Submit via Issue
+
+[Open a "Submit a Prompt" issue](https://github.com/haad/Clipsmith/issues/new?template=submit_prompt.yml) and fill in the form. We'll review it and add it to the library.
+
+### Option 2: Submit via Pull Request
+
+1. Fork the repository
+2. Edit `site/prompts/prompts.json`
+3. Add your prompt to the `prompts` array following this structure:
+
+```json
+{
+  "id": "your-prompt-id",
+  "title": "Your Prompt Title",
+  "category": "coding",
+  "version": 1,
+  "content": "Your prompt text here.\n\nUse {{clipboard}} for clipboard substitution."
+}
+```
+
+**Fields:**
+
+| Field | Description |
+|---|---|
+| `id` | Unique kebab-case identifier (e.g. `code-review-checklist`) |
+| `title` | Short, descriptive name shown in the UI |
+| `category` | One of: `analysis`, `coding`, `creative`, `development`, `devops`, `product`, `research`, `writing` |
+| `version` | Always `1` for new prompts |
+| `content` | The full prompt text. Use `\n` for newlines. |
+
+**Template variables** (auto-substituted when the user pastes):
+
+| Variable | Replaced With |
+|---|---|
+| `{{clipboard}}` | User's current clipboard content |
+| `{{selected_text}}` | Currently selected text in the active app |
+| `$ARGUMENTS` | User-provided arguments |
+
+**Guidelines:**
+- Check the [existing prompts](https://haad.github.io/Clipsmith/prompts/) to avoid duplicates
+- Keep prompts general-purpose (not specific to your company or project)
+- Test your prompt with ChatGPT, Claude, or a similar AI assistant before submitting
+- Use structured output (numbered lists, markdown headings) for complex prompts
+
+4. Submit a PR with the title: `prompt: Add "Your Prompt Title"`
 
 ## License
 

@@ -1,0 +1,72 @@
+name: Submit a Prompt
+description: Contribute a new prompt to the Clipsmith Prompt Library
+labels: ["prompt-library"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for contributing a prompt! Your submission will be reviewed and, if accepted, added to the built-in Clipsmith Prompt Library.
+
+        **Before submitting**, please check the [existing prompts](https://haad.github.io/Clipsmith/prompts/) to avoid duplicates.
+
+        If you'd prefer to submit a PR directly, see the [Contributing Prompts](https://github.com/haad/Clipsmith#contributing-prompts) section in the README.
+
+  - type: input
+    id: title
+    attributes:
+      label: Prompt Title
+      description: A short, descriptive name for the prompt.
+      placeholder: e.g. Code Review Checklist
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: Choose the category that best fits your prompt.
+      options:
+        - analysis
+        - coding
+        - creative
+        - development
+        - devops
+        - product
+        - research
+        - writing
+    validations:
+      required: true
+
+  - type: textarea
+    id: content
+    attributes:
+      label: Prompt Content
+      description: |
+        Paste the full prompt text. You can use template variables:
+        - `{{clipboard}}` — replaced with the user's current clipboard content
+        - `{{selected_text}}` — replaced with the currently selected text
+        - `$ARGUMENTS` — replaced with user-provided arguments
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: When would someone use this prompt? What problem does it solve?
+      placeholder: e.g. Useful when reviewing pull requests to ensure nothing is missed.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: I have checked that a similar prompt does not already exist
+          required: true
+        - label: The prompt works well with ChatGPT, Claude, or similar AI assistants
+          required: true
+        - label: The prompt is general-purpose (not specific to my company or project)
+          required: true
