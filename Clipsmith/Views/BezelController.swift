@@ -198,7 +198,8 @@ final class BezelController: NSPanel {
     /// view is still in a stable state — ordering out can trigger a SwiftUI layout
     /// pass, and mutating @Observable properties during that pass causes
     /// "Modifying state during view update" faults.
-    func hide(cancelPaste: Bool = true) {
+    func hide(cancelPaste: Bool = true, caller: String = #function, line: Int = #line) {
+        logger.info("hide() called — cancelPaste=\(cancelPaste) from \(caller):\(line) isVisible=\(self.isVisible) isHotkeyHold=\(self.isHotkeyHold)")
         if cancelPaste {
             pasteService?.cancelPendingPaste()
         }
@@ -600,7 +601,11 @@ final class BezelController: NSPanel {
     func pasteAndHide() async {
         // If the bezel was already dismissed (e.g. user pressed Escape after modifier
         // release but before this Task ran), skip the paste entirely.
-        guard isVisible else { return }
+        logger.info("pasteAndHide() entered — isVisible=\(self.isVisible) isHotkeyHold=\(self.isHotkeyHold)")
+        guard isVisible else {
+            logger.info("pasteAndHide() skipped — bezel not visible")
+            return
+        }
         guard let content = viewModel.currentClipping else {
             hide()
             return
