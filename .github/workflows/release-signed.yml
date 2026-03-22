@@ -116,8 +116,8 @@ jobs:
           -configuration Release \
           -archivePath build/Clipsmith.xcarchive \
           archive \
-          CODE_SIGN_IDENTITY="$SIGNING_IDENTITY" \
-          CODE_SIGN_STYLE=Manual
+          DEVELOPMENT_TEAM=9478A8FXT3 \
+          CODE_SIGN_STYLE=Automatic
 
     - name: Build and Archive (Unsigned)
       if: steps.check_secrets.outputs.has_certs != 'true'
