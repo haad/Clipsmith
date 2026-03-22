@@ -4,12 +4,8 @@ on:
   push:
     branches: [main, master]
     paths:
-      - "site/prompts/prompts/**"
-      - "site/prompts/catalog.yaml"
-      - "site/prompts/scripts/build.sh"
-      - "site/prompts/schema/**"
-      - "site/prompts/index.html"
-      - "site/index.html"
+      - "site/**"
+      - "CHANGELOG.md"
   workflow_dispatch:
 
 concurrency:
@@ -29,6 +25,9 @@ jobs:
 
       - name: Build prompts.json
         run: bash site/prompts/scripts/build.sh
+
+      - name: Inject changelog into site
+        run: bash site/scripts/build-changelog.sh
 
       - name: Deploy to gh-pages
         uses: peaceiris/actions-gh-pages@v4

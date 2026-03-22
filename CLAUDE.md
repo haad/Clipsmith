@@ -92,6 +92,25 @@ Behind feature flag `docLookupEnabled` (Settings > Features). Uses devdocs.io as
 - HTML rendered in WKWebView with custom dark/light CSS
 - WKWebView WebContent process logs sandbox errors — these are harmless noise
 
+## Website & Changelog
+
+- **Website**: `site/index.html` — static single-page site deployed to GitHub Pages (`haad.github.io/Clipsmith`)
+- **Changelog**: `CHANGELOG.md` in repo root — single source of truth, [Keep a Changelog](https://keepachangelog.com/) format
+  - During GitHub Pages deploy, `site/scripts/build-changelog.sh` converts CHANGELOG.md to HTML and injects it into the `<!-- CHANGELOG_CONTENT -->` placeholder in `site/index.html`
+  - During GitHub Release (tag push), `release.yml` extracts the current version's section from CHANGELOG.md for release notes
+  - **When releasing**: update CHANGELOG.md before tagging — move items from `[Unreleased]` to a new version section
+- **Prompt Library subsite**: `site/prompts/` — built from `site/prompts/catalog.yaml` by `site/prompts/scripts/build.sh`
+- **Deploy trigger**: push to `site/**` or `CHANGELOG.md` on main → `.github/workflows/deploy-site.yml`
+
+## Licensing (Phase 10)
+
+- `LicenseService` — wraps Lemon Squeezy activate/validate/deactivate API (3 POST endpoints, no SDK)
+- `LicenseNagController` — activating NSPanel shown every 30 days for unlicensed users
+- `LicenseSettingsSection` — Settings > License tab with key entry and validation feedback
+- Store ID and Product ID are in `LicenseService.swift` (`expectedStoreId`, `expectedProductId`)
+- Purchase URL is in `LicenseNagController.swift`, `LicenseSettingsSection.swift`, and `.github/FUNDING.yml`
+- License: PolyForm Noncommercial 1.0.0 (`LICENSE` file)
+
 ## Files to Watch
 
 - `AppDelegate.swift` — the wiring hub, gets large with each new feature

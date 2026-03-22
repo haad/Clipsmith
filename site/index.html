@@ -268,6 +268,36 @@
     .download-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
     .download-note { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.7; }
 
+    /* Changelog */
+    .changelog-section { border-top: 1px solid var(--border-color); transition: border-color var(--transition); }
+    .changelog-entry {
+      background-color: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); padding: 24px 28px; margin-bottom: 20px;
+      transition: box-shadow var(--transition), background-color var(--transition);
+    }
+    .changelog-entry:hover { box-shadow: var(--shadow-card-hover); }
+    .changelog-version {
+      font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+    }
+    .changelog-version a { color: var(--text-primary); }
+    .changelog-version a:hover { color: var(--accent); }
+    .changelog-date { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 16px; }
+    .changelog-category {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--accent); margin-top: 14px; margin-bottom: 6px;
+    }
+    .changelog-category:first-of-type { margin-top: 0; }
+    .changelog-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .changelog-list li {
+      font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6;
+      padding-left: 18px; position: relative;
+    }
+    .changelog-list li::before {
+      content: "\2022"; position: absolute; left: 4px; color: var(--accent); font-weight: 700;
+    }
+    .changelog-list li strong { color: var(--text-primary); font-weight: 600; }
+
     /* Footer */
     footer {
       border-top: 1px solid var(--border-color); color: var(--text-secondary);
@@ -302,6 +332,7 @@
       <ul class="nav-links">
         <li><a href="#features">Features</a></li>
         <li><a href="#shortcuts">Shortcuts</a></li>
+        <li><a href="#changelog">Changelog</a></li>
         <li><a href="./prompts/">Prompt Library</a></li>
         <li><a href="https://github.com/haad/Clipsmith" target="_blank" rel="noopener">GitHub</a></li>
         <li>
@@ -516,6 +547,12 @@
         <li>Optional: GitHub personal access token for Gist sharing</li>
       </ul>
     </div>
+  </section>
+
+  <section class="section changelog-section" id="changelog">
+    <h2 class="section-title">Changelog</h2>
+    <p class="section-subtitle">What's new in each release.</p>
+    <!-- CHANGELOG_CONTENT -->
   </section>
 
   <footer>

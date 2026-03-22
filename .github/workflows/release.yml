@@ -227,36 +227,44 @@ jobs:
         fi
       id: create_dmg
 
-    - name: Generate Release Notes
+    - name: Generate Release Notes from CHANGELOG.md
       id: release_notes
       run: |
-        # Get commits since last tag
-        PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+        VERSION="${{ steps.get_version.outputs.version }}"
 
-        if [ -z "$PREV_TAG" ]; then
-          # First release, get all commits
-          COMMITS=$(git log --pretty=format:"- %s (%h)" --reverse)
-        else
-          # Get commits since previous tag
-          COMMITS=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --reverse)
+        # Extract the section for this version from CHANGELOG.md
+        if [ -f CHANGELOG.md ]; then
+          NOTES=$(awk -v ver="$VERSION" '
+            /^## \[/ {
+              if (found) exit
+              if (index($0, "[" ver "]")) { found=1; next }
+            }
+            found { print }
+          ' CHANGELOG.md)
         fi
 
-        # Create release notes
-        cat > release_notes.md <<EOF
-        ## Changes in this release
+        if [ -z "$NOTES" ]; then
+          # Fallback to git log if version not in CHANGELOG.md
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            NOTES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s (%h)" --reverse)
+          else
+            NOTES=$(git log --pretty=format:"- %s (%h)" --reverse)
+          fi
+        fi
 
-        $COMMITS
+        cat > release_notes.md <<EOF
+        ${NOTES}
 
         ## Installation
 
         1. Download the DMG file below
-        2. Open the DMG
-        3. Drag Clipsmith.app to your Applications folder
-        4. Launch Clipsmith from Applications
+        2. Open the DMG and drag Clipsmith.app to Applications
+        3. Launch Clipsmith — grant Accessibility permission when prompted
 
-        ## Requirements
+        **Requirements:** macOS 15 (Sequoia) or later
 
-        - macOS 10.13 or later
+        **Licensing:** Free for personal use. [Buy a license](https://clipsmith.lemonsqueezy.com/checkout/buy/375993c0-94cd-4481-b258-6943249da314) for commercial use.
         EOF
 
         cat release_notes.md

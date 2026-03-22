@@ -17,7 +17,7 @@ final class LicenseNagController: NSObject, NSWindowDelegate {
     private let panel: NSPanel
 
     private let sponsorURL = URL(string: "https://github.com/sponsors/haad")!
-    private let purchaseURL = URL(string: "https://clipsmith.lemonsqueezy.com/checkout/buy/8cd09174-7dab-493e-a929-cb8e767670ed")!
+    private let purchaseURL = URL(string: "https://clipsmith.lemonsqueezy.com/checkout/buy/375993c0-94cd-4481-b258-6943249da314")!
 
     /// Called when the user taps "I Already Have a License".
     /// AppDelegate sets this to open Settings to the License tab.
