@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clipsmith — Clipboard, Snippet &amp; Prompt Manager for macOS</title>
+  <meta name="description" content="Keyboard-first clipboard history, code snippets, AI prompt library, and documentation browser for macOS. Native Swift app, open source." />
+  <meta name="keywords" content="clipboard manager, macOS, clipboard history, code snippets, prompt library, DevDocs, keyboard-first, developer tools, Swift" />
+  <meta property="og:title" content="Clipsmith — Clipboard, Snippet &amp; Prompt Manager for macOS" />
+  <meta property="og:description" content="Keyboard-first clipboard history, code snippets, AI prompt library, and documentation browser for macOS developers. Open source." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="clipsmith-logo.png" />
+  <meta name="twitter:card" content="summary" />
+  <link rel="icon" type="image/png" href="clipsmith-logo.png" />
+  <link rel="canonical" href="https://haad.github.io/Clipsmith/" />
+  <script>
+    (function () {
+      var saved = localStorage.getItem('theme');
+      if (saved === 'dark' || (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
+  <style>
+    :root {
+      --bg-page: #f6f8fa;
+      --bg-card: #ffffff;
+      --bg-header: #ffffff;
+      --bg-btn-primary: #0969da;
+      --bg-btn-primary-hover: #0860ca;
+      --text-primary: #1f2328;
+      --text-secondary: #656d76;
+      --text-btn-primary: #ffffff;
+      --border-color: #d0d7de;
+      --border-focus: #0969da;
+      --shadow-card: 0 1px 3px rgba(31, 35, 40, 0.08), 0 0 0 1px rgba(31, 35, 40, 0.06);
+      --shadow-card-hover: 0 4px 12px rgba(31, 35, 40, 0.12), 0 0 0 1px rgba(31, 35, 40, 0.08);
+      --toggle-btn-bg: #eaeef2;
+      --toggle-btn-hover: #d0d7de;
+      --accent: #0969da;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+      --radius-card: 10px;
+      --radius-btn: 6px;
+      --transition: 0.15s ease;
+    }
+
+    [data-theme="dark"] {
+      --bg-page: #0d1117;
+      --bg-card: #161b22;
+      --bg-header: #161b22;
+      --bg-btn-primary: #388bfd;
+      --bg-btn-primary-hover: #4d9dff;
+      --text-primary: #e6edf3;
+      --text-secondary: #7d8590;
+      --text-btn-primary: #ffffff;
+      --border-color: #30363d;
+      --border-focus: #388bfd;
+      --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(48, 54, 61, 0.6);
+      --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(56, 139, 253, 0.3);
+      --toggle-btn-bg: #21262d;
+      --toggle-btn-hover: #30363d;
+      --accent: #388bfd;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background-color: var(--bg-page);
+      color: var(--text-primary);
+      line-height: 1.6;
+      transition: background-color var(--transition), color var(--transition);
+      min-height: 100vh;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Nav */
+    nav {
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      padding: 14px 24px;
+      position: sticky; top: 0; z-index: 100;
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+    .nav-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .nav-brand {
+      font-size: 1.125rem; font-weight: 700; color: var(--text-primary);
+      text-decoration: none; letter-spacing: -0.02em;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .nav-brand img { width: 24px; height: 24px; border-radius: 5px; }
+    .nav-brand:hover { text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 16px; list-style: none; }
+    .nav-links a {
+      font-size: 0.875rem; font-weight: 500; color: var(--text-secondary);
+      transition: color var(--transition);
+    }
+    .nav-links a:hover { color: var(--text-primary); text-decoration: none; }
+    .theme-toggle {
+      background-color: var(--toggle-btn-bg); border: 1px solid var(--border-color);
+      border-radius: var(--radius-btn); cursor: pointer; padding: 6px 10px;
+      font-size: 1rem; line-height: 1; color: var(--text-primary);
+      transition: background-color var(--transition), border-color var(--transition);
+      flex-shrink: 0;
+    }
+    .theme-toggle:hover { background-color: var(--toggle-btn-hover); }
+
+    /* Sections */
+    .section { max-width: 1080px; margin: 0 auto; padding: 80px 24px; }
+    .section-title { font-size: 1.5rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 10px; }
+    .section-subtitle { font-size: 1rem; color: var(--text-secondary); margin-bottom: 40px; }
+
+    /* Hero */
+    .hero { text-align: center; padding: 96px 24px 80px; max-width: 1080px; margin: 0 auto; }
+    .hero-icon { width: 120px; height: 120px; margin-bottom: 28px; border-radius: 22%; }
+    .hero h1 { font-size: 2.5rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 12px; }
+    .hero-tagline { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5; }
+    .hero-meta { font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 36px; }
+    .hero-meta span::after { content: "\00b7"; margin: 0 8px; }
+    .hero-meta span:last-child::after { content: none; }
+    .hero-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: var(--font); font-size: 0.9375rem; font-weight: 600;
+      padding: 10px 20px; border-radius: var(--radius-btn); border: none;
+      cursor: pointer; transition: background-color var(--transition), transform 0.1s ease;
+      text-decoration: none;
+    }
+    .btn:hover { text-decoration: none; }
+    .btn:active { transform: scale(0.97); }
+    .btn-primary { background-color: var(--bg-btn-primary); color: var(--text-btn-primary); }
+    .btn-primary:hover { background-color: var(--bg-btn-primary-hover); }
+    .btn-secondary {
+      background-color: transparent; color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+    .btn-secondary:hover { background-color: var(--toggle-btn-bg); }
+
+    /* Feature rows — major features */
+    .feature-row {
+      background-color: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); padding: 36px 32px;
+      margin-bottom: 28px;
+      transition: box-shadow var(--transition), background-color var(--transition);
+    }
+    .feature-row:hover { box-shadow: var(--shadow-card-hover); }
+    .feature-row-header {
+      display: flex; align-items: center; gap: 14px; margin-bottom: 10px;
+    }
+    .feature-row-icon { font-size: 2rem; flex-shrink: 0; }
+    .feature-row-title { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; }
+    .feature-row-tagline {
+      font-size: 0.9375rem; color: var(--text-secondary); margin-bottom: 28px; line-height: 1.6;
+      max-width: 720px;
+    }
+    .feature-row-highlights {
+      display: grid; grid-template-columns: 1fr; gap: 0;
+      list-style: none;
+      border-top: 1px solid var(--border-color);
+      transition: border-color var(--transition);
+    }
+    @media (min-width: 640px) {
+      .feature-row-highlights { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (min-width: 1024px) {
+      .feature-row-highlights { grid-template-columns: repeat(3, 1fr); }
+    }
+    .highlight-item {
+      font-size: 0.8125rem; line-height: 1.6;
+      padding: 16px 16px 16px 38px; position: relative;
+      border-bottom: 1px solid var(--border-color);
+      transition: border-color var(--transition);
+    }
+    @media (min-width: 640px) {
+      .highlight-item { border-right: 1px solid var(--border-color); }
+      .highlight-item:nth-child(2n) { border-right: none; }
+    }
+    @media (min-width: 1024px) {
+      .highlight-item { border-right: 1px solid var(--border-color); }
+      .highlight-item:nth-child(2n) { border-right: 1px solid var(--border-color); }
+      .highlight-item:nth-child(3n) { border-right: none; }
+    }
+    .highlight-item::before {
+      content: "\2713"; position: absolute; left: 16px; top: 16px;
+      color: var(--accent); font-weight: 700; font-size: 0.875rem;
+    }
+    .highlight-item strong {
+      color: var(--text-primary); font-weight: 600;
+      display: block; margin-bottom: 3px;
+    }
+    .highlight-item span { color: var(--text-secondary); }
+
+    /* Secondary feature grid */
+    .card-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+    @media (min-width: 640px) { .card-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .card-grid { grid-template-columns: repeat(3, 1fr); } }
+    .feature-card {
+      background-color: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); padding: 28px;
+      transition: box-shadow var(--transition), background-color var(--transition);
+    }
+    .feature-card:hover { box-shadow: var(--shadow-card-hover); }
+    .feature-icon { font-size: 1.75rem; margin-bottom: 14px; display: block; }
+    .feature-title { font-size: 0.9375rem; font-weight: 600; margin-bottom: 8px; }
+    .feature-desc { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.65; }
+
+    /* Keyboard shortcuts */
+    .shortcuts-grid { display: grid; grid-template-columns: 1fr; gap: 28px; }
+    @media (min-width: 640px) { .shortcuts-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (min-width: 1024px) { .shortcuts-grid { grid-template-columns: repeat(3, 1fr); } }
+    .shortcut-group {
+      background-color: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); padding: 24px;
+      transition: box-shadow var(--transition), background-color var(--transition);
+    }
+    .shortcut-group h3 {
+      font-size: 0.8125rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--text-secondary); margin-bottom: 16px;
+      padding-bottom: 10px; border-bottom: 1px solid var(--border-color);
+      transition: border-color var(--transition);
+    }
+    .shortcut-list { list-style: none; display: flex; flex-direction: column; gap: 12px; }
+    .shortcut-item {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px; font-size: 0.875rem;
+    }
+    .shortcut-label { color: var(--text-primary); }
+    kbd {
+      font-family: var(--font-mono); font-size: 0.75rem;
+      background-color: var(--bg-card); border: 1px solid var(--border-color);
+      border-radius: 4px; padding: 3px 8px; box-shadow: 0 1px 0 var(--border-color);
+      white-space: nowrap; color: var(--text-primary);
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+
+    /* Requirements callout */
+    .requirements {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-card);
+      padding: 24px;
+      margin-top: 24px;
+      transition: background-color var(--transition), border-color var(--transition);
+    }
+    .requirements h3 {
+      font-size: 0.9375rem; font-weight: 600; margin-bottom: 12px;
+    }
+    .requirements ul {
+      list-style: none; display: flex; flex-direction: column; gap: 6px;
+    }
+    .requirements li {
+      font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.55;
+      padding-left: 20px; position: relative;
+    }
+    .requirements li::before {
+      content: "\2713"; position: absolute; left: 0; color: var(--accent); font-weight: 600;
+    }
+
+    /* Download */
+    .download-section { text-align: center; border-top: 1px solid var(--border-color); transition: border-color var(--transition); }
+    .download-ctas { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 24px; }
+    .download-note { font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.7; }
+
+    /* Changelog */
+    .changelog-section { border-top: 1px solid var(--border-color); transition: border-color var(--transition); }
+    .changelog-entry {
+      background-color: var(--bg-card); border-radius: var(--radius-card);
+      box-shadow: var(--shadow-card); padding: 24px 28px; margin-bottom: 20px;
+      transition: box-shadow var(--transition), background-color var(--transition);
+    }
+    .changelog-entry:hover { box-shadow: var(--shadow-card-hover); }
+    .changelog-version {
+      font-size: 1.125rem; font-weight: 700; letter-spacing: -0.01em;
+      display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+    }
+    .changelog-version a { color: var(--text-primary); }
+    .changelog-version a:hover { color: var(--accent); }
+    .changelog-date { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 16px; }
+    .changelog-category {
+      font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; color: var(--accent); margin-top: 14px; margin-bottom: 6px;
+    }
+    .changelog-category:first-of-type { margin-top: 0; }
+    .changelog-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .changelog-list li {
+      font-size: 0.8125rem; color: var(--text-secondary); line-height: 1.6;
+      padding-left: 18px; position: relative;
+    }
+    .changelog-list li::before {
+      content: "\2022"; position: absolute; left: 4px; color: var(--accent); font-weight: 700;
+    }
+    .changelog-list li strong { color: var(--text-primary); font-weight: 600; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--border-color); color: var(--text-secondary);
+      font-size: 0.8125rem; padding: 24px; text-align: center;
+      transition: border-color var(--transition);
+    }
+    .footer-links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 8px; }
+    .footer-links a { color: var(--text-secondary); }
+    .footer-links a:hover { color: var(--text-primary); }
+
+    /* Responsive */
+    @media (max-width: 639px) {
+      .hero h1 { font-size: 2rem; }
+      .hero-tagline { font-size: 1.05rem; }
+      .hero-icon { width: 96px; height: 96px; }
+      .section { padding: 56px 20px; }
+      .hero { padding: 64px 20px 56px; }
+      .feature-row { padding: 24px 20px; }
+      .highlight-item { padding: 14px 14px 14px 34px; }
+      .highlight-item::before { left: 12px; top: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="nav-inner">
+      <a href="#" class="nav-brand">
+        <img src="clipsmith-logo.png" alt="" width="24" height="24" />
+        Clipsmith
+      </a>
+      <ul class="nav-links">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#shortcuts">Shortcuts</a></li>
+        <li><a href="#changelog">Changelog</a></li>
+        <li><a href="./prompts/">Prompt Library</a></li>
+        <li><a href="https://github.com/haad/Clipsmith" target="_blank" rel="noopener">GitHub</a></li>
+        <li>
+          <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle dark/light mode">
+            <span id="themeIcon">&#9790;</span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <section class="hero">
+    <img src="clipsmith-logo.png" alt="Clipsmith app icon" class="hero-icon" width="120" height="120" />
+    <h1>Clipsmith</h1>
+    <p class="hero-tagline">Clipboard history, code snippets, AI prompts, and documentation &mdash; one shortcut away. Native macOS, no Electron.</p>
+    <p class="hero-meta">
+      <span>Keyboard-first</span>
+      <span>Native Swift &amp; SwiftUI</span>
+      <span>Free for personal use</span>
+      <span>macOS 15+</span>
+    </p>
+    <div class="hero-ctas">
+      <a href="https://github.com/haad/Clipsmith/releases" class="btn btn-primary" target="_blank" rel="noopener">Download Latest Release</a>
+      <a href="https://github.com/haad/Clipsmith" class="btn btn-secondary" target="_blank" rel="noopener">View Source</a>
+    </div>
+  </section>
+
+  <section class="section" id="features">
+    <h2 class="section-title">Features</h2>
+    <p class="section-subtitle">One tool for everything you type, copy, and reuse.</p>
+
+    <!-- Clipboard History -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128203;</span>
+        <h3 class="feature-row-title">Clipboard History</h3>
+      </div>
+      <p class="feature-row-tagline">Everything you copy, always one shortcut away. Adaptive polling keeps it responsive without draining your battery.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>Quick Actions</strong> <span>Press Tab to transform: uppercase, lowercase, title case, trim, URL encode/decode, JSON pretty print, Markdown code block</span></li>
+        <li class="highlight-item"><strong>Fuzzy search</strong> <span>subsequence matching with consecutive-bonus scoring finds what you need even with typos</span></li>
+        <li class="highlight-item"><strong>Keyboard navigation</strong> <span>arrows, j/k, 0-9 numeric jump, Page Up/Down, Home/End. Paste with Return, never touch the mouse</span></li>
+        <li class="highlight-item"><strong>Password filtering</strong> <span>auto-skips likely credentials from 1Password, LastPass, and configurable length heuristics</span></li>
+        <li class="highlight-item"><strong>Smart deduplication</strong> <span>duplicates move to top with fresh timestamps instead of cluttering your history</span></li>
+        <li class="highlight-item"><strong>Source app tracking</strong> <span>see which app each clipping came from. Star favorites, export/import full history as JSON</span></li>
+        <li class="highlight-item"><strong>GitHub Gist sharing</strong> <span>press G to share any clipping as a public or private Gist instantly</span></li>
+        <li class="highlight-item"><strong>Plain text paste</strong> <span>strips all rich formatting (RTF, HTML) for predictable paste behavior. No surprise fonts</span></li>
+        <li class="highlight-item"><strong>Non-activating panel</strong> <span>the bezel never steals focus from your current app. Copy, pick, paste &mdash; your cursor stays where it was</span></li>
+      </ul>
+    </article>
+
+    <!-- Code Snippets -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128221;</span>
+        <h3 class="feature-row-title">Code Snippets</h3>
+      </div>
+      <p class="feature-row-tagline">A persistent library of reusable code blocks with syntax highlighting. Not another clipping &mdash; a named, tagged, searchable snippet you keep forever.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>Syntax highlighting</strong> <span>20+ languages: Swift, Python, JavaScript, TypeScript, Go, Rust, Ruby, Java, Kotlin, C, C++, Bash, SQL, JSON, YAML, HTML, CSS, Markdown, and more</span></li>
+        <li class="highlight-item"><strong>Multi-tag system</strong> <span>assign multiple tags per snippet for flexible cross-cutting organization. Filter by tag or language</span></li>
+        <li class="highlight-item"><strong>Full-text search</strong> <span>search across name, content, and tags simultaneously with locale-aware matching</span></li>
+        <li class="highlight-item"><strong>Dedicated editor</strong> <span>monospaced font, auto-save on edit. Undo/redo, no auto-correct interference, no smart quotes</span></li>
+        <li class="highlight-item"><strong>Keyboard access</strong> <span>press <kbd>&#8679;&#8984;S</kbd> to open the snippet editor from anywhere. Search, select, paste &mdash; same flow</span></li>
+        <li class="highlight-item"><strong>Separate from history</strong> <span>snippets persist independently and never get trimmed. Your clipboard history can rotate while snippets stay permanent</span></li>
+      </ul>
+    </article>
+
+    <!-- Prompt Library -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128172;</span>
+        <h3 class="feature-row-title">Prompt Library</h3>
+      </div>
+      <p class="feature-row-tagline">40+ curated AI prompts for coding, analysis, research, and DevOps &mdash; with template variables that auto-fill from your clipboard.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>Template variables</strong> <span>use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{clipboard}}</code>, <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{selected_text}}</code>, and custom variables. Auto-substituted on paste</span></li>
+        <li class="highlight-item"><strong>Category filtering</strong> <span>Tab to cycle categories, or type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#coding review</code> to search within a category. Use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#my</code> for your own prompts</span></li>
+        <li class="highlight-item"><strong>3-second flow</strong> <span>hotkey &rarr; type a few characters &rarr; Enter. The prompt is pasted with your clipboard content already injected</span></li>
+        <li class="highlight-item"><strong>Remote sync</strong> <span>sync prompts from a configurable URL. Share a team prompt library via JSON hosted anywhere</span></li>
+        <li class="highlight-item"><strong>Create your own</strong> <span>add custom prompts alongside the built-in library. User prompts are flagged separately and never overwritten by sync</span></li>
+        <li class="highlight-item"><strong>Browse online</strong> <span>all built-in prompts are also available in the <a href="./prompts/">web-based Prompt Library</a> to browse and copy</span></li>
+        <li class="highlight-item"><strong>Community-driven</strong> <span>contribute your own prompts via <a href="https://github.com/haad/Clipsmith/issues/new?template=submit_prompt.yml">issue</a> or <a href="https://github.com/haad/Clipsmith#contributing-prompts">pull request</a>. The library grows with the community</span></li>
+      </ul>
+    </article>
+
+    <!-- Documentation Browser -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128214;</span>
+        <h3 class="feature-row-title">Documentation Browser</h3>
+      </div>
+      <p class="feature-row-tagline">Search 789+ DevDocs documentation sets from a single hotkey. Download docs for offline use &mdash; never leave your editor to look something up.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>789+ documentation sets</strong> <span>Python, Go, Rust, JavaScript, React, Node.js, Ruby, CSS, HTML, and hundreds more from devdocs.io</span></li>
+        <li class="highlight-item"><strong>Prefix search</strong> <span>type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">python:map</code> or <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">go:fmt</code> to scope search to a single doc. Partial names work too &mdash; &ldquo;py&rdquo; matches &ldquo;python~3.12&rdquo;</span></li>
+        <li class="highlight-item"><strong>Offline support</strong> <span>selectively download docs. Search and viewing work entirely offline after download</span></li>
+        <li class="highlight-item"><strong>Dark &amp; light themes</strong> <span>documentation renders in WKWebView with custom CSS matching your system appearance</span></li>
+        <li class="highlight-item"><strong>Split-pane UI</strong> <span>search results on the left, rendered HTML on the right. Resizable, with position remembered across sessions</span></li>
+        <li class="highlight-item"><strong>Fuzzy matching</strong> <span>same scoring engine as clipboard search. Top 100 results ranked by relevance, then by name length</span></li>
+      </ul>
+    </article>
+
+    <!-- Secondary features grid -->
+    <h3 style="font-size: 1.125rem; font-weight: 700; margin-top: 48px; margin-bottom: 24px; padding-top: 28px; border-top: 1px solid var(--border-color);">And more</h3>
+    <div class="card-grid">
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#128190;</span>
+        <h3 class="feature-title">Export &amp; Import</h3>
+        <p class="feature-desc">Back up your full clipboard history to JSON and restore it anytime. Preserves timestamps and source app metadata.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#127912;</span>
+        <h3 class="feature-title">Customizable Bezel</h3>
+        <p class="feature-desc">Adjust overlay width, height, and transparency. Choose your menu bar icon. Sticky mode, wraparound navigation, paste sounds.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#128274;</span>
+        <h3 class="feature-title">Privacy First</h3>
+        <p class="feature-desc">All data stays on your Mac. No cloud, no analytics, no tracking. Auto-filters passwords from known managers.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#9729;</span>
+        <h3 class="feature-title">GitHub Gist Sharing</h3>
+        <p class="feature-desc">One keystroke to share any clipping as a public or private Gist. Share history tracking built in.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#128736;</span>
+        <h3 class="feature-title">Open Source</h3>
+        <p class="feature-desc">MIT license. Built with Swift 6, SwiftUI, and SwiftData. Inspect the code, contribute, or fork it.</p>
+      </article>
+
+      <article class="feature-card">
+        <span class="feature-icon" aria-hidden="true">&#9000;</span>
+        <h3 class="feature-title">Native macOS</h3>
+        <p class="feature-desc">No Electron, no web wrapper. Native Swift with hardened runtime, menu bar integration, and system appearance support.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="shortcuts">
+    <h2 class="section-title">Keyboard Shortcuts</h2>
+    <p class="section-subtitle">Every action is a keystroke away. Global hotkeys are customizable in Settings.</p>
+
+    <div class="shortcuts-grid">
+      <div class="shortcut-group">
+        <h3>Global Hotkeys</h3>
+        <ul class="shortcut-list">
+          <li class="shortcut-item"><span class="shortcut-label">Clipboard history</span><kbd>&#8679;&#8984;B</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Prompt library</span><kbd>&#8679;&#8984;P</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Documentation lookup</span><kbd>&#8679;&#8984;D</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Snippets editor</span><kbd>&#8679;&#8984;S</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Preferences</span><kbd>&#8984;,</kbd></li>
+        </ul>
+      </div>
+
+      <div class="shortcut-group">
+        <h3>Navigation</h3>
+        <ul class="shortcut-list">
+          <li class="shortcut-item"><span class="shortcut-label">Move up / down</span><kbd>&#8593;</kbd> <kbd>&#8595;</kbd> or <kbd>j</kbd> <kbd>k</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Jump 10 items</span><kbd>Page Up</kbd> <kbd>Page Down</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">First / last item</span><kbd>Home</kbd> <kbd>End</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Jump to position</span><kbd>1</kbd>&ndash;<kbd>9</kbd>, <kbd>0</kbd>=10th</li>
+          <li class="shortcut-item"><span class="shortcut-label">Fuzzy search</span>just start typing</li>
+        </ul>
+      </div>
+
+      <div class="shortcut-group">
+        <h3>Actions</h3>
+        <ul class="shortcut-list">
+          <li class="shortcut-item"><span class="shortcut-label">Paste and close</span><kbd>&#9166;</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Dismiss</span><kbd>Esc</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Delete clipping</span><kbd>&#8998;</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Quick actions menu</span><kbd>Tab</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Save to file</span><kbd>s</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Save and delete</span><kbd>S</kbd></li>
+          <li class="shortcut-item"><span class="shortcut-label">Cheat sheet</span><kbd>?</kbd></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section download-section" id="download">
+    <h2 class="section-title">Get Clipsmith</h2>
+    <p class="section-subtitle">Free for personal use. Download and start using in seconds.</p>
+
+    <div class="download-ctas">
+      <a href="https://github.com/haad/Clipsmith/releases" class="btn btn-primary" target="_blank" rel="noopener">Download Latest Release</a>
+      <a href="https://github.com/haad/Clipsmith" class="btn btn-secondary" target="_blank" rel="noopener">View Source on GitHub</a>
+    </div>
+
+    <div class="licensing" style="margin-top: 40px; margin-bottom: 32px;">
+      <h3 style="font-size: 1.125rem; font-weight: 700; margin-bottom: 8px;">Support Development</h3>
+      <p style="font-size: 0.875rem; color: var(--text-secondary); line-height: 1.7; max-width: 600px; margin: 0 auto 16px;">
+        Clipsmith is <strong style="color: var(--text-primary);">free and open source</strong>. If you find it useful, please consider sponsoring development on GitHub to help keep the project alive.
+      </p>
+      <div class="download-ctas">
+        <a href="https://github.com/sponsors/haad" class="btn btn-primary" target="_blank" rel="noopener">Sponsor on GitHub</a>
+      </div>
+    </div>
+
+    <div class="requirements">
+      <h3>Requirements</h3>
+      <ul>
+        <li>macOS 15 (Sequoia) or later</li>
+        <li>Accessibility permission for paste functionality (System Settings &rarr; Privacy &amp; Security &rarr; Accessibility)</li>
+        <li>Optional: GitHub personal access token for Gist sharing</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section changelog-section" id="changelog">
+    <h2 class="section-title">Changelog</h2>
+    <p class="section-subtitle">What's new in each release.</p>
+    <div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v5.0.2">5.0.2</a></div><div class="changelog-date">2026-03-22</div><div class="changelog-category">Added</div><ul class="changelog-list"><li>Changelog on website — auto-generated from CHANGELOG.md during GitHub Pages deploy</li><li>Changelog nav link on website</li><li>Release notes now pulled from CHANGELOG.md instead of raw git log</li></ul><div class="changelog-category">Changed</div><ul class="changelog-list"><li>Updated Lemon Squeezy product ID and checkout URL</li><li>CLAUDE.md updated with website, changelog, and licensing documentation</li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v5.0.1">5.0.1</a></div><div class="changelog-date">2026-03-21</div><div class="changelog-category">Fixed</div><ul class="changelog-list"><li>Restored <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">com.apple.security.network.client</code> entitlement that was accidentally stripped, which invalidated TCC accessibility grants after rebuild</li><li>Improved site spacing and visual hierarchy</li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v5.0.0">5.0.0</a></div><div class="changelog-date">2026-03-21</div><div class="changelog-category">Added</div><ul class="changelog-list"><li><strong>Lemon Squeezy licensing</strong> — startup nag dialog (every 30 days) with "Buy a License", "Sponsor on GitHub", and "I Already Have a License" CTAs</li><li><strong>License key validation</strong> — Settings > License tab with key entry, Lemon Squeezy API activation/validation/deactivation, and licensed status display</li><li><strong>LicenseService</strong> — wraps Lemon Squeezy activate, validate, and deactivate endpoints with offline tolerance (network errors don't revoke license)</li><li><strong>PolyForm Noncommercial license</strong> — free for personal use, commercial use requires a license</li><li><code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">.github/FUNDING.yml</code> for GitHub Sponsors + Lemon Squeezy</li><li><code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">SettingsTab</code> enum with <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">@AppStorage</code> for programmatic tab selection — "I Already Have a License" navigates directly to the License tab</li><li>Group versioned docs into collapsible entries in the DevDocs catalog list</li></ul><div class="changelog-category">Fixed</div><ul class="changelog-list"><li><code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">LicenseService.activate()</code> now sets <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">lastError</code> before re-throwing so error messages display in Settings UI</li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v4.2.0">4.2.0</a></div><div class="changelog-date">2026-03-16</div><div class="changelog-category">Improved</div><ul class="changelog-list"><li>Documentation browser: fuzzy search across all enabled docs, doc prefix filter (<code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">python:map</code>), detail panel with slug/release/size/status, download progress indicators</li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v4.1.0">4.1.0</a></div><div class="changelog-date">2026-03-14</div><div class="changelog-category">Added</div><ul class="changelog-list"><li><strong>Documentation browser</strong> (Phase 8) — search 789+ DevDocs documentation sets from a hotkey, download for offline use, HTML rendering in WKWebView with dark/light CSS</li><li>DocsetSearchService with fuzzy search across index.json entries</li><li>DocsetManagerService for downloading and managing doc catalogs</li><li>SelectedTextService for reading selected text via AXUIElement</li><li>DocBezelController/View/ViewModel — split-pane UI with search results and rendered docs</li><li>DocsetSettingsSection in Settings for managing downloaded docs</li><li>Behind feature flag <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">docLookupEnabled</code> (Settings > Features)</li></ul><div class="changelog-category">Fixed</div><ul class="changelog-list"><li>ESC not cancelling paste after modifier key release</li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v4.0.2">4.0.2</a></div><div class="changelog-date">2026-03-10</div><div class="changelog-category">Changed</div><ul class="changelog-list"><li>Renamed bundle ID from <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">com.generalarcade.flycut</code> to <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">com.github.haad.clipsmith</code></li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v4.0.1">4.0.1</a></div><div class="changelog-date">2026-03-08</div><div class="changelog-category">Fixed</div><ul class="changelog-list"><li>Paste not working: matched original Flycut hide-then-paste timing</li><li>Bezel paste: intercept Enter key in search mode, add local flags monitor</li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v1.0.2">1.0.2</a></div><div class="changelog-date">2026-03-06</div><div class="changelog-category">Fixed</div><ul class="changelog-list"><li>Disabled upload-artifact step that caused builds to hang</li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v1.0.1">1.0.1</a></div><div class="changelog-date">2026-03-06</div><div class="changelog-category">Fixed</div><ul class="changelog-list"><li>GitHub release 403 error by adding <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">contents:write</code> permission to workflow</li></ul></div><div class="changelog-entry"><div class="changelog-version"><a href="https://github.com/haad/Clipsmith/releases/tag/v1.0.0">1.0.0</a></div><div class="changelog-date">2026-03-06</div><div class="changelog-category">Added</div><ul class="changelog-list"><li>Initial release — clipboard history, code snippets, prompt library, fuzzy search, quick actions, GitHub Gist sharing</li><li>Keyboard-first bezel UI with non-activating NSPanel</li><li>SwiftData persistence with schema migration</li><li>Adaptive clipboard polling</li><li>Password filtering for credential managers</li><li>Export/import clipboard history as JSON</li><li>40+ built-in AI prompts with template variable substitution</li><li>Syntax-highlighted snippet editor (20+ languages)</li><li>Menu bar app with configurable hotkeys</li></ul></div>
+
+  </section>
+
+  <footer>
+    <div class="footer-links">
+      <a href="./prompts/">Prompt Library</a>
+      <a href="https://github.com/haad/Clipsmith" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/haad/Clipsmith/issues" target="_blank" rel="noopener">Report a Bug</a>
+      <a href="https://github.com/sponsors/haad" target="_blank" rel="noopener">Sponsor</a>
+    </div>
+    <span>MIT License &mdash; &copy; 2025 Clipsmith contributors</span>
+  </footer>
+
+  <script>
+    (function () {
+      'use strict';
+      function currentTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      }
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+        updateThemeIcon();
+        localStorage.setItem('theme', theme);
+      }
+      function updateThemeIcon() {
+        var icon = document.getElementById('themeIcon');
+        icon.innerHTML = currentTheme() === 'dark' ? '&#9728;' : '&#9790;';
+      }
+      document.getElementById('themeToggle').addEventListener('click', function () {
+        applyTheme(currentTheme() === 'dark' ? 'light' : 'dark');
+      });
+      updateThemeIcon();
+    })();
+  </script>
+
+</body>
+</html>

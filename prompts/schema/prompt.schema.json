@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["version", "prompts"],
+  "additionalProperties": false,
+  "properties": {
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Catalog-level version number"
+    },
+    "prompts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "category", "version", "content"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9-]+$",
+            "description": "Stable slug derived from filename"
+          },
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display title"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["coding", "writing", "analysis", "creative", "devops", "product", "research", "development"],
+            "description": "Prompt category"
+          },
+          "version": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Per-prompt version for sync"
+          },
+          "content": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Prompt content with optional {{variable}} placeholders"
+          }
+        }
+      }
+    }
+  }
+}
