@@ -1,89 +1,24 @@
 import SwiftUI
 
-/// Settings tab for managing Lemon Squeezy license activation.
+/// Settings tab showing sponsorship information.
 ///
-/// Shows:
-/// - Unlicensed state: TextField for key entry, Activate button, ProgressView while validating,
-///   inline error message, and Buy link.
-/// - Licensed state: Green checkmark with "License active", customer email, Deactivate button.
-///
-/// Validates the persisted license key on .onAppear via a background Task.
+/// Lemon Squeezy licensing has been removed. This section now points
+/// users to GitHub Sponsors as the sole way to support development.
 struct LicenseSettingsSection: View {
 
-    @State private var licenseService = LicenseService()
-    @State private var licenseKeyInput = ""
+    private let sponsorURL = URL(string: "https://github.com/sponsors/haad")!
 
     var body: some View {
         Form {
-            Section("License") {
-                if licenseService.isLicensed {
-                    // MARK: Licensed state
-                    HStack {
-                        Image(systemName: "checkmark.circle.fill")
-                            .foregroundStyle(.green)
-                        Text("License active")
-                    }
+            Section("Support Clipsmith") {
+                Text("Clipsmith is free and open source. If you find it useful, please consider sponsoring development on GitHub.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
 
-                    if let email = licenseService.customerEmail {
-                        Text("Licensed to: \(email)")
-                            .font(.footnote)
-                            .foregroundStyle(.secondary)
-                    }
-
-                    Button("Deactivate License") {
-                        Task { await licenseService.deactivate() }
-                    }
-                    .foregroundStyle(.red)
-                    .buttonStyle(.link)
-                } else {
-                    // MARK: Unlicensed state
-                    TextField("License Key", text: $licenseKeyInput)
-                        .onSubmit { activateLicense() }
-
-                    Button("Activate License") {
-                        activateLicense()
-                    }
-                    .disabled(licenseKeyInput.trimmingCharacters(in: .whitespaces).isEmpty || licenseService.isValidating)
-
-                    if licenseService.isValidating {
-                        ProgressView()
-                            .controlSize(.small)
-                    }
-
-                    if let error = licenseService.lastError {
-                        Text(error)
-                            .font(.footnote)
-                            .foregroundStyle(.red)
-                    }
-
-                    Link("Buy a License ->",
-                         destination: URL(string: "https://clipsmith.lemonsqueezy.com/checkout/buy/375993c0-94cd-4481-b258-6943249da314")!)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-
-                    Text("One-time purchase — supports indie development.")
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
+                Link("Sponsor on GitHub ->", destination: sponsorURL)
+                    .font(.footnote)
             }
         }
         .frame(minWidth: 350)
-        .onAppear {
-            Task { await licenseService.validate() }
-        }
-    }
-
-    // MARK: - Private Helpers
-
-    private func activateLicense() {
-        let key = licenseKeyInput.trimmingCharacters(in: .whitespaces)
-        guard !key.isEmpty else { return }
-        Task {
-            do {
-                try await licenseService.activate(key: key)
-            } catch {
-                // LicenseService sets lastError internally; no need to handle here.
-            }
-        }
     }
 }

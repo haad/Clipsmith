@@ -264,7 +264,7 @@ jobs:
 
         **Requirements:** macOS 15 (Sequoia) or later
 
-        **Licensing:** Free for personal use. [Buy a license](https://clipsmith.lemonsqueezy.com/checkout/buy/375993c0-94cd-4481-b258-6943249da314) for commercial use.
+        **Free and open source.** [Sponsor on GitHub](https://github.com/sponsors/haad) to support development.
         EOF
 
         cat release_notes.md

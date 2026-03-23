@@ -17,11 +17,6 @@ final class LicenseNagController: NSObject, NSWindowDelegate {
     private let panel: NSPanel
 
     private let sponsorURL = URL(string: "https://github.com/sponsors/haad")!
-    private let purchaseURL = URL(string: "https://clipsmith.lemonsqueezy.com/checkout/buy/375993c0-94cd-4481-b258-6943249da314")!
-
-    /// Called when the user taps "I Already Have a License".
-    /// AppDelegate sets this to open Settings to the License tab.
-    var onOpenSettings: (() -> Void)?
 
     // MARK: - Init
 
@@ -45,14 +40,8 @@ final class LicenseNagController: NSObject, NSWindowDelegate {
                 guard let self else { return }
                 NSWorkspace.shared.open(self.sponsorURL)
             },
-            onBuy: { [weak self] in
-                guard let self else { return }
-                NSWorkspace.shared.open(self.purchaseURL)
-            },
-            onHaveKey: { [weak self] in
-                guard let self else { return }
-                self.close()
-                self.onOpenSettings?()
+            onDismiss: { [weak self] in
+                self?.close()
             }
         )
 

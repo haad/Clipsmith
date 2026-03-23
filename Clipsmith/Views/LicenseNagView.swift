@@ -2,14 +2,12 @@ import SwiftUI
 
 /// SwiftUI view hosted in LicenseNagController's activating NSPanel.
 ///
-/// Presents a friendly monetization prompt with three CTAs:
+/// Presents a friendly monetization prompt with two CTAs:
 /// - Sponsor on GitHub (opens browser)
-/// - Buy a License (opens Lemon Squeezy store)
-/// - I Already Have a License (opens Settings > License tab)
+/// - Dismiss
 struct LicenseNagView: View {
     let onSponsor: () -> Void
-    let onBuy: () -> Void
-    let onHaveKey: () -> Void
+    let onDismiss: () -> Void
 
     var body: some View {
         VStack(spacing: 16) {
@@ -19,18 +17,14 @@ struct LicenseNagView: View {
             Text("Enjoying Clipsmith?")
                 .font(.title2.bold())
 
-            Text("Clipsmith is free for personal use. If you use it for work, please consider supporting development.")
+            Text("Clipsmith is free and open source. If you find it useful, please consider sponsoring development on GitHub.")
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
 
-            HStack(spacing: 8) {
-                Button("Sponsor on GitHub") { onSponsor() }
-                    .buttonStyle(.bordered)
-                Button("Buy a License") { onBuy() }
-                    .buttonStyle(.borderedProminent)
-            }
+            Button("Sponsor on GitHub") { onSponsor() }
+                .buttonStyle(.borderedProminent)
 
-            Button("I Already Have a License") { onHaveKey() }
+            Button("Maybe Later") { onDismiss() }
                 .buttonStyle(.plain)
                 .font(.footnote)
         }

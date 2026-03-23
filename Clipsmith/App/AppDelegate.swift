@@ -169,10 +169,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         licenseNagController = LicenseNagController()
-        licenseNagController.onOpenSettings = {
-            // Post notification to open Settings, then navigate to the License tab.
-            NotificationCenter.default.post(name: .clipsmithOpenLicenseSettings, object: nil)
-        }
 
         // Show nag dialog periodically for unlicensed users (every ~30 days).
         if !licenseService.isLicensed && LicenseService.shouldShowNag() {
