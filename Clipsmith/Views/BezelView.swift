@@ -151,12 +151,18 @@ struct BezelView: View {
             }
 
             // Clipping text content
-            ScrollView {
-                Text(viewModel.currentClipping ?? "")
-                    .font(.body)
-                    .multilineTextAlignment(.leading)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
+            ScrollViewReader { proxy in
+                ScrollView {
+                    Text(displayText)
+                        .font(.body)
+                        .multilineTextAlignment(.leading)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .id("clippingTop")
+                }
+                .onChange(of: viewModel.selectedIndex) {
+                    proxy.scrollTo("clippingTop", anchor: .top)
+                }
             }
         }
     }
@@ -236,6 +242,21 @@ struct BezelView: View {
         let icon = NSWorkspace.shared.icon(forFile: bundlePath)
         viewModel.iconCache[bundlePath] = icon
         return icon
+    }
+
+    // MARK: - Display text
+
+    /// Maximum characters to render in the bezel preview.
+    /// Full content is still used for paste — this only limits the SwiftUI Text layout cost.
+    private static let displayLimit = 5_000
+
+    /// Truncated clipping text for display. Avoids expensive full-text layout
+    /// for very large clippings (copied files, log dumps, etc.).
+    private var displayText: String {
+        guard let content = viewModel.currentClipping else { return "" }
+        if content.count <= Self.displayLimit { return content }
+        let truncated = String(content.prefix(Self.displayLimit))
+        return truncated + "\n\n— (\(content.count - Self.displayLimit) more characters) —"
     }
 
     // MARK: - Helpers

@@ -42,6 +42,7 @@ final class DocBezelController: NSPanel {
 
         let bezelView = DocBezelView(viewModel: viewModel)
         let hostingView = NSHostingView(rootView: bezelView)
+        hostingView.sizingOptions = []
         contentView = hostingView
 
         // Remember window size/position across launches

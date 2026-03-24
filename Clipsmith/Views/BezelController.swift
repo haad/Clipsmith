@@ -113,6 +113,12 @@ final class BezelController: NSPanel {
             rootView = AnyView(bezelView)
         }
         let hostingView = NSHostingView(rootView: rootView)
+        // Prevent the hosting view from trying to set the window's min/max content
+        // size. The bezel panel has a fixed size set by setContentSize — letting the
+        // hosting view negotiate size causes an infinite constraint update loop
+        // (updateWindowContentSizeExtremaIfNecessary → sizeThatFits → graphDidChange
+        // → setNeedsUpdateConstraints → repeat → crash).
+        hostingView.sizingOptions = []
         contentView = hostingView
 
         logger.debug("BezelController initialised — level: \(self.level.rawValue, privacy: .public)")

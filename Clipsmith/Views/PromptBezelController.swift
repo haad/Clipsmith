@@ -99,6 +99,7 @@ final class PromptBezelController: NSPanel {
             rootView = AnyView(bezelView)
         }
         let hostingView = NSHostingView(rootView: rootView)
+        hostingView.sizingOptions = []
         contentView = hostingView
 
         logger.debug("PromptBezelController initialised — level: \(self.level.rawValue, privacy: .public)")
