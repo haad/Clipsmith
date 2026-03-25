@@ -550,11 +550,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Activation policy restoration
 
     @objc private func windowDidClose(_ notification: Notification) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-            let visibleRegularWindows = NSApp.windows.filter {
-                $0.isVisible && !($0 is NSPanel) && $0.level == .normal
+        // Delay slightly so the closing window's state has settled.
+        // Use 0.5s because the standard About panel creates ViewBridge
+        // auxiliary windows that linger briefly after the panel closes.
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            // canBecomeMain excludes NSPanels, ViewBridge helper windows,
+            // and status bar windows — only real app windows (Settings,
+            // Snippets) keep the app in .regular mode.
+            let hasMainableWindow = NSApp.windows.contains {
+                $0.isVisible && $0.canBecomeMain
             }
-            if visibleRegularWindows.isEmpty {
+            if !hasMainableWindow {
                 NSApp.setActivationPolicy(.accessory)
             }
         }
