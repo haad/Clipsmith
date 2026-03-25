@@ -246,6 +246,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
+        // Restore .accessory policy when any window closes (catches the
+        // standard About panel and any future windows that lack onDisappear).
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidClose),
+            name: NSWindow.willCloseNotification,
+            object: nil
+        )
+
         // Request notification authorization for Gist creation alerts.
         // Delivers silently if the user denies (no sound by default).
         UNUserNotificationCenter.current().delegate = self
@@ -536,6 +545,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")
         alert.runModal()
+    }
+
+    // MARK: - Activation policy restoration
+
+    @objc private func windowDidClose(_ notification: Notification) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            let visibleRegularWindows = NSApp.windows.filter {
+                $0.isVisible && !($0 is NSPanel) && $0.level == .normal
+            }
+            if visibleRegularWindows.isEmpty {
+                NSApp.setActivationPolicy(.accessory)
+            }
+        }
     }
 
     // MARK: - Keyboard layout observer (Bug #30)
