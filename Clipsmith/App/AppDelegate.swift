@@ -1,9 +1,19 @@
 import AppKit
 import OSLog
+import SwiftUI
 import SwiftData
 import KeyboardShortcuts
 import UserNotifications
 import UniformTypeIdentifiers
+
+// Protocol trick to access NSHostingView.sizingOptions without knowing the
+// generic parameter. All NSHostingView<T> specializations already have this
+// property — the extension simply declares conformance so we can cast
+// contentView (typed as NSView) and set it.
+private protocol HostingSizingConfigurable: AnyObject {
+    var sizingOptions: NSHostingSizingOptions { get set }
+}
+extension NSHostingView: @retroactive HostingSizingConfigurable {}
 
 private let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier ?? "com.github.haad.clipsmith",
@@ -252,6 +262,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self,
             selector: #selector(windowDidClose),
             name: NSWindow.willCloseNotification,
+            object: nil
+        )
+
+        // Disable NSHostingView size negotiation on ALL windows — including
+        // SwiftUI-managed ones (Settings, WindowGroup) whose hosting views we
+        // don't create directly. Prevents the infinite constraint update loop
+        // crash (updateWindowContentSizeExtremaIfNecessary → sizeThatFits →
+        // graphDidChange → setNeedsUpdateConstraints → repeat).
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(windowDidBecomeKey),
+            name: NSWindow.didBecomeKeyNotification,
             object: nil
         )
 
@@ -545,6 +567,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         alert.alertStyle = .warning
         alert.addButton(withTitle: "OK")
         alert.runModal()
+    }
+
+    // MARK: - Hosting view sizing fix
+
+    /// Set of windows already configured — avoids redundant work.
+    private var configuredWindowIDs = Set<ObjectIdentifier>()
+
+    @objc private func windowDidBecomeKey(_ notification: Notification) {
+        guard let window = notification.object as? NSWindow else { return }
+        let id = ObjectIdentifier(window)
+        guard !configuredWindowIDs.contains(id) else { return }
+        configuredWindowIDs.insert(id)
+        if let hostingView = window.contentView as? (any HostingSizingConfigurable) {
+            hostingView.sizingOptions = []
+        }
     }
 
     // MARK: - Activation policy restoration

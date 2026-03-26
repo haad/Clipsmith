@@ -45,7 +45,9 @@ final class LicenseNagController: NSObject, NSWindowDelegate {
             }
         )
 
-        panel.contentView = NSHostingView(rootView: nagView)
+        let hostingView = NSHostingView(rootView: nagView)
+        hostingView.sizingOptions = []
+        panel.contentView = hostingView
     }
 
     // MARK: - Show / Close
