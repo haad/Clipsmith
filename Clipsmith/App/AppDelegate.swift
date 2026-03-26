@@ -10,10 +10,11 @@ import UniformTypeIdentifiers
 // generic parameter. All NSHostingView<T> specializations already have this
 // property — the extension simply declares conformance so we can cast
 // contentView (typed as NSView) and set it.
+@MainActor
 private protocol HostingSizingConfigurable: AnyObject {
     var sizingOptions: NSHostingSizingOptions { get set }
 }
-extension NSHostingView: @retroactive HostingSizingConfigurable {}
+extension NSHostingView: HostingSizingConfigurable {}
 
 private let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier ?? "com.github.haad.clipsmith",
