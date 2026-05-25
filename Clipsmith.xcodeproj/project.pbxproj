@@ -83,6 +83,9 @@
 		AA0077 /* LicenseNagController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0078 /* LicenseNagController.swift */; };
 		AA0078 /* LicenseNagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0079 /* LicenseNagView.swift */; };
 		AA0079 /* LicenseSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0080 /* LicenseSettingsSection.swift */; };
+		AA0080 /* AppScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0081 /* AppScannerService.swift */; };
+		AA0081 /* AppScannerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0082 /* AppScannerServiceTests.swift */; };
+		AA0082 /* AppLaunchViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0083 /* AppLaunchViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -174,6 +177,9 @@
 		AF0078 /* LicenseNagController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseNagController.swift; sourceTree = "<group>"; };
 		AF0079 /* LicenseNagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseNagView.swift; sourceTree = "<group>"; };
 		AF0080 /* LicenseSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseSettingsSection.swift; sourceTree = "<group>"; };
+		AF0081 /* AppScannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScannerService.swift; sourceTree = "<group>"; };
+		AF0082 /* AppScannerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScannerServiceTests.swift; sourceTree = "<group>"; };
+		AF0083 /* AppLaunchViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -259,6 +265,7 @@
 				AF0065 /* DocsetManagerService.swift */,
 				AF0066 /* SelectedTextService.swift */,
 				AF0076 /* LicenseService.swift */,
+				AF0081 /* AppScannerService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -353,6 +360,8 @@
 				AF0068 /* DocsetManagerServiceTests.swift */,
 				AF0072 /* DocBezelViewModelTests.swift */,
 				AF0077 /* LicenseServiceTests.swift */,
+				AF0082 /* AppScannerServiceTests.swift */,
+				AF0083 /* AppLaunchViewModelTests.swift */,
 				GG0015 /* Fixtures */,
 			);
 			path = ClipsmithTests;
@@ -554,6 +563,7 @@
 				AA0077 /* LicenseNagController.swift in Sources */,
 				AA0078 /* LicenseNagView.swift in Sources */,
 				AA0079 /* LicenseSettingsSection.swift in Sources */,
+				AA0080 /* AppScannerService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -581,6 +591,8 @@
 				AA0069 /* DocsetManagerServiceTests.swift in Sources */,
 				AA0071 /* DocBezelViewModelTests.swift in Sources */,
 				AA0076 /* LicenseServiceTests.swift in Sources */,
+				AA0081 /* AppScannerServiceTests.swift in Sources */,
+				AA0082 /* AppLaunchViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
