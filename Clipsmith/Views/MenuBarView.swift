@@ -99,6 +99,10 @@ struct MenuBarView: View {
             }
         }
 
+        Button("Claude Toolkit...") {
+            openClaudeToolkitWindow()
+        }
+
         Divider()
 
         if !clippings.isEmpty {
@@ -206,6 +210,14 @@ struct MenuBarView: View {
             // Brief delay ensures SnippetWindowView has appeared before tab switch fires.
             try? await Task.sleep(for: .milliseconds(150))
             NotificationCenter.default.post(name: .clipsmithOpenPrompts, object: nil)
+        }
+    }
+
+    private func openClaudeToolkitWindow() {
+        Task { @MainActor in
+            activateAsRegularApp()
+            try? await Task.sleep(for: .milliseconds(100))
+            openWindow(id: "claude-toolkit")
         }
     }
 }

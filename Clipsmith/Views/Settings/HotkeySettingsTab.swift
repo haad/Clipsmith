@@ -30,8 +30,12 @@ struct HotkeySettingsTab: View {
                     "Doc Lookup",
                     name: .activateDocLookup
                 )
+                KeyboardShortcuts.Recorder(
+                    "Save Clipboard as Snippet",
+                    name: .saveClipboardAsSnippet
+                )
             } footer: {
-                Text("Assign hotkeys for clipboard, search, snippets, prompt library, and documentation lookup.")
+                Text("Assign hotkeys for clipboard, search, snippets, prompt library, documentation lookup, and saving clipboard as a snippet.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

@@ -69,6 +69,12 @@ struct ClipsmithApp: App {
         }
         .modelContainer(ClipsmithApp.sharedModelContainer)
         .windowResizability(.contentSize)
+
+        WindowGroup(id: "claude-toolkit") {
+            ClaudeToolkitWindowView()
+                .frame(minWidth: 700, minHeight: 480)
+        }
+        .windowResizability(.contentSize)
     }
 
     /// Returns the SF Symbol name for the current menu bar icon selection.

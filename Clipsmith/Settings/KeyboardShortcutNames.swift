@@ -18,4 +18,7 @@ extension KeyboardShortcuts.Name {
     /// Hotkey that triggers documentation lookup for selected text.
     static let activateDocLookup = Self("activateDocLookup",
         default: .init(.d, modifiers: [.command, .shift]))
+
+    /// Hotkey that saves the current clipboard content as a new snippet.
+    static let saveClipboardAsSnippet = Self("saveClipboardAsSnippet")
 }

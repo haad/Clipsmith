@@ -10,9 +10,8 @@ import UniformTypeIdentifiers
 // generic parameter. All NSHostingView<T> specializations already have this
 // property — the extension simply declares conformance so we can cast
 // contentView (typed as NSView) and set it.
-@MainActor
 private protocol HostingSizingConfigurable: AnyObject {
-    var sizingOptions: NSHostingSizingOptions { get set }
+    @MainActor var sizingOptions: NSHostingSizingOptions { get set }
 }
 extension NSHostingView: HostingSizingConfigurable {}
 
@@ -323,6 +322,21 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     self.promptBezelController.isHotkeyHold = !stickyBezel
                     self.promptBezelController.show()
                 }
+            }
+        }
+
+        // Register global hotkey to save the current clipboard content as a snippet.
+        KeyboardShortcuts.onKeyDown(for: .saveClipboardAsSnippet) { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                guard let content = NSPasteboard.general.string(forType: .string),
+                      !content.isEmpty else { return }
+                // Auto-name from the first non-empty line, capped at 50 characters.
+                let firstLine = content
+                    .components(separatedBy: .newlines)
+                    .first { !$0.trimmingCharacters(in: .whitespaces).isEmpty } ?? content
+                let name = String(firstLine.prefix(50))
+                try? await self.snippetStore.insert(name: name, content: content, language: nil, tags: [])
             }
         }
 

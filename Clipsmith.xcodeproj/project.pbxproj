@@ -86,6 +86,8 @@
 		AA0080 /* AppScannerService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0081 /* AppScannerService.swift */; };
 		AA0081 /* AppScannerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0082 /* AppScannerServiceTests.swift */; };
 		AA0082 /* AppLaunchViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0083 /* AppLaunchViewModelTests.swift */; };
+		AA0083 /* ClaudeToolkitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0084 /* ClaudeToolkitService.swift */; };
+		AA0084 /* ClaudeToolkitWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0085 /* ClaudeToolkitWindowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -180,6 +182,8 @@
 		AF0081 /* AppScannerService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScannerService.swift; sourceTree = "<group>"; };
 		AF0082 /* AppScannerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScannerServiceTests.swift; sourceTree = "<group>"; };
 		AF0083 /* AppLaunchViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchViewModelTests.swift; sourceTree = "<group>"; };
+		AF0084 /* ClaudeToolkitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeToolkitService.swift; sourceTree = "<group>"; };
+		AF0085 /* ClaudeToolkitWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeToolkitWindowView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -266,6 +270,7 @@
 				AF0066 /* SelectedTextService.swift */,
 				AF0076 /* LicenseService.swift */,
 				AF0081 /* AppScannerService.swift */,
+				AF0084 /* ClaudeToolkitService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -290,6 +295,7 @@
 				GG0011 /* Snippets */,
 				GG0012 /* Gists */,
 				GG0014 /* Prompts */,
+				GG0016 /* ClaudeToolkit */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -407,6 +413,14 @@
 			children = (
 			);
 			path = Fixtures;
+			sourceTree = "<group>";
+		};
+		GG0016 /* ClaudeToolkit */ = {
+			isa = PBXGroup;
+			children = (
+				AF0085 /* ClaudeToolkitWindowView.swift */,
+			);
+			path = ClaudeToolkit;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -564,6 +578,8 @@
 				AA0078 /* LicenseNagView.swift in Sources */,
 				AA0079 /* LicenseSettingsSection.swift in Sources */,
 				AA0080 /* AppScannerService.swift in Sources */,
+				AA0083 /* ClaudeToolkitService.swift in Sources */,
+				AA0084 /* ClaudeToolkitWindowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
