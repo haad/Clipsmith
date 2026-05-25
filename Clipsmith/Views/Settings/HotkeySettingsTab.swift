@@ -31,11 +31,15 @@ struct HotkeySettingsTab: View {
                     name: .activateDocLookup
                 )
                 KeyboardShortcuts.Recorder(
+                    "App Launcher",
+                    name: .appLauncher
+                )
+                KeyboardShortcuts.Recorder(
                     "Save Clipboard as Snippet",
                     name: .saveClipboardAsSnippet
                 )
             } footer: {
-                Text("Assign hotkeys for clipboard, search, snippets, prompt library, documentation lookup, and saving clipboard as a snippet.")
+                Text("Assign hotkeys for clipboard, search, snippets, prompt library, documentation lookup, app launcher, and saving clipboard as a snippet.")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }

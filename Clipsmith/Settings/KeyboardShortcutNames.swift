@@ -21,4 +21,9 @@ extension KeyboardShortcuts.Name {
 
     /// Hotkey that saves the current clipboard content as a new snippet.
     static let saveClipboardAsSnippet = Self("saveClipboardAsSnippet")
+
+    /// Hotkey that opens the app launcher bezel.
+    /// D-07: No default binding — user must configure this in Settings > Shortcuts.
+    /// The handler is registered at startup; an unset recorder means it never fires.
+    static let appLauncher = Self("appLauncher")
 }

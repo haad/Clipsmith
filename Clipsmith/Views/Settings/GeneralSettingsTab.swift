@@ -42,6 +42,9 @@ struct GeneralSettingsTab: View {
     // Phase 8: feature flag
     @AppStorage(AppSettingsKeys.docLookupEnabled) private var docLookupEnabled: Bool = false
 
+    // Phase 11: App Launcher feature flag
+    @AppStorage(AppSettingsKeys.appLauncherEnabled) private var appLauncherEnabled: Bool = false
+
     var body: some View {
         Form {
             // MARK: - History
@@ -156,6 +159,8 @@ struct GeneralSettingsTab: View {
             Section("Features") {
                 Toggle("Documentation Lookup (experimental)", isOn: $docLookupEnabled)
                     .help("Enable the documentation browser. Requires app restart for hotkey to take effect.")
+                Toggle("App Launcher", isOn: $appLauncherEnabled)
+                    .help("Enable keyboard-driven app launcher (no default hotkey — configure in Shortcuts tab).")
             }
 
             // MARK: - Launch
