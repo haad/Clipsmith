@@ -88,6 +88,9 @@
 		AA0082 /* AppLaunchViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0083 /* AppLaunchViewModelTests.swift */; };
 		AA0083 /* ClaudeToolkitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0084 /* ClaudeToolkitService.swift */; };
 		AA0084 /* ClaudeToolkitWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0085 /* ClaudeToolkitWindowView.swift */; };
+		AA0085 /* AppLaunchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0086 /* AppLaunchViewModel.swift */; };
+		AA0086 /* AppLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0087 /* AppLaunchView.swift */; };
+		AA0087 /* AppLaunchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0088 /* AppLaunchController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -184,6 +187,9 @@
 		AF0083 /* AppLaunchViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchViewModelTests.swift; sourceTree = "<group>"; };
 		AF0084 /* ClaudeToolkitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeToolkitService.swift; sourceTree = "<group>"; };
 		AF0085 /* ClaudeToolkitWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeToolkitWindowView.swift; sourceTree = "<group>"; };
+		AF0086 /* AppLaunchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchViewModel.swift; sourceTree = "<group>"; };
+		AF0087 /* AppLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchView.swift; sourceTree = "<group>"; };
+		AF0088 /* AppLaunchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -291,6 +297,9 @@
 				AF0074 /* DocBezelView.swift */,
 				AF0078 /* LicenseNagController.swift */,
 				AF0079 /* LicenseNagView.swift */,
+				AF0086 /* AppLaunchViewModel.swift */,
+				AF0087 /* AppLaunchView.swift */,
+				AF0088 /* AppLaunchController.swift */,
 				GG0009 /* Settings */,
 				GG0011 /* Snippets */,
 				GG0012 /* Gists */,
@@ -580,6 +589,9 @@
 				AA0080 /* AppScannerService.swift in Sources */,
 				AA0083 /* ClaudeToolkitService.swift in Sources */,
 				AA0084 /* ClaudeToolkitWindowView.swift in Sources */,
+				AA0085 /* AppLaunchViewModel.swift in Sources */,
+				AA0086 /* AppLaunchView.swift in Sources */,
+				AA0087 /* AppLaunchController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
