@@ -79,6 +79,11 @@ final class AppScannerService {
 
     /// Rescans all five search paths and updates `apps`.
     /// Guards against concurrent scans; safe to call multiple times.
+    ///
+    /// After setting the initial (icon-nil) list, spawns a second Task.detached
+    /// to load icons via NSWorkspace on a background thread (Pitfall 2 — never
+    /// load icons on @MainActor during scan). Updates `apps` again when icons
+    /// are ready.
     func refresh() async {
         guard !isLoading else { return }
         isLoading = true
@@ -88,8 +93,17 @@ final class AppScannerService {
             await self.scanApps()
         }.value
 
+        // Publish the icon-nil list immediately so the bezel can show app names
         self.apps = entries
         logger.info("AppScannerService scanned \(entries.count) apps")
+
+        // Load icons on a background thread — NSWorkspace.icon(forFile:) is
+        // documented as thread-safe (read-only file system access).
+        let withIcons = await Task.detached(priority: .userInitiated) {
+            self.loadIcons(for: entries)
+        }.value
+        self.apps = withIcons
+        logger.debug("AppScannerService icon loading complete")
     }
 
     /// Records that an app was launched.
@@ -107,6 +121,25 @@ final class AppScannerService {
         UserDefaults.standard.set(recent, forKey: AppSettingsKeys.recentAppBundleIDs)
         recentBundleIDs = recent
         logger.debug("Recorded launch: \(bundleID); recents=\(recent)")
+    }
+
+    // MARK: - Private Icon Loading
+
+    /// Loads the app icon for each entry using `NSWorkspace.shared.icon(forFile:)`.
+    ///
+    /// `nonisolated` so it can be called from `Task.detached` without Swift 6
+    /// compiler warnings about capturing `self` across actor isolation.
+    ///
+    /// `NSWorkspace.icon(forFile:)` is documented as thread-safe — it performs
+    /// read-only file system access to load the icon from the bundle. No UI
+    /// mutation occurs on the calling thread; results are batched and the returned
+    /// array is assigned to `self.apps` on @MainActor after the Task completes.
+    nonisolated private func loadIcons(for entries: [AppEntry]) -> [AppEntry] {
+        entries.map { entry in
+            var copy = entry
+            copy.icon = NSWorkspace.shared.icon(forFile: entry.url.path)
+            return copy
+        }
     }
 
     // MARK: - Private Scan
