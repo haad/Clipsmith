@@ -258,7 +258,7 @@ Plans:
   3. Pressing Enter launches the selected app via NSWorkspace
   4. Feature is behind a flag (e.g. `appLauncherEnabled`) in Settings
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 **Wave 1**
@@ -267,7 +267,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 11-02-PLAN.md — AppLaunchViewModel + AppLaunchController + AppLaunchView + filled-in ViewModel tests (D-04/D-05 ranking, D-08 non-activating panel, D-09 launch via NSWorkspace)
+- [x] 11-02-PLAN.md — AppLaunchViewModel + AppLaunchController + AppLaunchView + filled-in ViewModel tests (D-04/D-05 ranking, D-08 non-activating panel, D-09 launch via NSWorkspace)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -291,7 +291,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 8. Documentation Lookup | 3/3 | Complete   | 2026-03-16 |
 | 9. Favorites | 0/TBD | Not started | - |
 | 10. Licensing & Monetization | 2/2 | Complete    | 2026-03-20 |
-| 11. App Launcher | 1/3 | In Progress|  |
+| 11. App Launcher | 2/3 | In Progress|  |
 
 ### Phase 12: Launcher Command Palette — math expression evaluation, currency conversion, and unit conversion inline in the app launcher bezel
 
