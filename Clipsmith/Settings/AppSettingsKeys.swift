@@ -46,4 +46,8 @@ enum AppSettingsKeys {
     static let licenseKey = "licenseKey"
     static let licenseInstanceId = "licenseInstanceId"
     static let lastNagShownDate = "lastNagShownDate"
+
+    // Phase 11 additions (App Launcher)
+    static let appLauncherEnabled = "appLauncherEnabled"
+    static let recentAppBundleIDs = "recentAppBundleIDs"
 }
