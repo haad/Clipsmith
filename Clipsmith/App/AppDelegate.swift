@@ -46,6 +46,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var licenseService: LicenseService!
     var licenseNagController: LicenseNagController!
 
+    // Phase 11 — App Launcher
+    var appScannerService: AppScannerService!
+    var appLaunchController: AppLaunchController!
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // CRITICAL: Both LSUIElement=YES and setActivationPolicy(.accessory) are
         // required. LSUIElement suppresses the dock icon at cold launch, but
@@ -82,7 +86,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             "skipPasswordLengthsList": "12, 20, 32",
             "revealPasteboardTypes": false,
             "saveToLocation": NSHomeDirectory() + "/Desktop",
-            "clipboardPollingInterval": 1.0
+            "clipboardPollingInterval": 1.0,
+            // Phase 11 — App Launcher feature flag
+            AppSettingsKeys.appLauncherEnabled: false
         ])
 
         accessibilityMonitor.start()
@@ -170,6 +176,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         docBezelController.docsetSearchService = docsetSearchService
         docBezelController.docsetManagerService = docsetManagerService
 
+        // 9. Initialize App Launcher components (Phase 11).
+        appScannerService = AppScannerService()
+        appLaunchController = AppLaunchController()
+        appLaunchController.appScannerService = appScannerService
+        Task { await appScannerService.loadInitially() }
+
         // 8. Initialize License Service and Nag Controller (Phase 10).
         licenseService = LicenseService()
 
@@ -253,6 +265,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self,
             selector: #selector(openDocLookupFromMenu),
             name: .clipsmithOpenDocLookup,
+            object: nil
+        )
+
+        // Wire "App Launcher..." menu bar button (Phase 11).
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(openAppLauncherFromMenu),
+            name: .clipsmithOpenAppLauncher,
             object: nil
         )
 
@@ -363,6 +383,24 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+
+        // Register global hotkey for app launcher (Phase 11).
+        // Always registered, but checks feature flag at invocation time (D-10)
+        // so toggling the setting works without app restart.
+        // D-07: No default binding — user configures in Settings > Shortcuts.
+        KeyboardShortcuts.onKeyDown(for: .appLauncher) { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                guard UserDefaults.standard.bool(forKey: AppSettingsKeys.appLauncherEnabled) else {
+                    return
+                }
+                if self.appLaunchController.isVisible {
+                    self.appLaunchController.viewModel.navigateDown()
+                } else {
+                    self.appLaunchController.show()
+                }
+            }
+        }
     }
 
     // MARK: - In-menu search (Bug #21)
@@ -375,6 +413,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openDocLookupFromMenu() {
         docBezelController?.show()
+    }
+
+    // MARK: - App Launcher (from menu bar)
+
+    @objc private func openAppLauncherFromMenu() {
+        appLaunchController?.show()
     }
 
     // MARK: - License Settings (Phase 10)

@@ -11,6 +11,8 @@ extension Notification.Name {
     static let clipsmithShareSnippetAsGist = Notification.Name("clipsmithShareSnippetAsGist")
     /// Posted to trigger clipboard history export via NSSavePanel.
     static let clipsmithOpenDocLookup = Notification.Name("clipsmithOpenDocLookup")
+    /// Posted by the menu bar "App Launcher..." button to open the app launcher bezel (Phase 11).
+    static let clipsmithOpenAppLauncher = Notification.Name("clipsmithOpenAppLauncher")
     static let clipsmithExportHistory = Notification.Name("clipsmithExportHistory")
     /// Posted to trigger clipboard history import via NSOpenPanel.
     static let clipsmithImportHistory = Notification.Name("clipsmithImportHistory")
@@ -36,6 +38,7 @@ struct MenuBarView: View {
     @AppStorage(AppSettingsKeys.displayLen) private var displayLen: Int = 40
     @AppStorage(AppSettingsKeys.menuSelectionPastes) private var menuSelectionPastes: Bool = true
     @AppStorage(AppSettingsKeys.docLookupEnabled) private var docLookupEnabled: Bool = false
+    @AppStorage(AppSettingsKeys.appLauncherEnabled) private var appLauncherEnabled: Bool = false
 
     private var modelContext: ModelContext {
         ClipsmithApp.sharedModelContainer.mainContext
@@ -96,6 +99,12 @@ struct MenuBarView: View {
         if docLookupEnabled {
             Button("Documentation Lookup...") {
                 NotificationCenter.default.post(name: .clipsmithOpenDocLookup, object: nil)
+            }
+        }
+
+        if appLauncherEnabled {
+            Button("App Launcher...") {
+                NotificationCenter.default.post(name: .clipsmithOpenAppLauncher, object: nil)
             }
         }
 
