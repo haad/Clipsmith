@@ -43,6 +43,17 @@ final class ExpressionEvaluatorTests: XCTestCase {
         XCTAssertNil(ExpressionEvaluator.evaluate("10.0 / 0.0"))
     }
 
+    // MARK: - Trailing-operator gate (T-12-01 extension)
+
+    /// Incomplete expressions ending with a dangling operator must return nil
+    /// without calling NSExpression (which would throw an uncaught ObjC exception).
+    func testTrailingOperatorReturnsNil() {
+        XCTAssertNil(ExpressionEvaluator.evaluate("2+"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("250/"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("5*"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("3-"))
+    }
+
     // MARK: - Result formatting (D-06)
 
     /// D-06: Whole-number results must be displayed without a decimal point.
