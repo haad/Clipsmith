@@ -53,22 +53,77 @@ final class AppLaunchViewModel {
     /// Always true — app launcher is always in instant-search mode (CONTEXT D-03).
     var isSearchMode: Bool = true
 
+    // MARK: - Phase 12: Command palette state
+
+    /// The evaluated result for the current command-palette query. Nil when not in
+    /// command palette mode or when the expression is invalid.
+    var commandResult: CommandResult? = nil
+
+    /// Published toast state for the SwiftUI overlay. Set to `true` by AppLaunchController
+    /// in Plan 04 after the result is copied; the view animates it back to false.
+    var showCopiedToast: Bool = false
+
+    /// Injected by AppDelegate in Plan 04 after both services are wired. Nullable so
+    /// existing tests and previews continue to work without it.
+    var commandPaletteService: CommandPaletteService? = nil
+
+    // MARK: - Command palette mode
+
+    /// Returns `true` when the command-palette feature flag is enabled AND the current
+    /// `searchText` starts with the configured prefix.
+    ///
+    /// This is a computed property, not stored, so runtime changes to the flag or prefix
+    /// (via Settings) take effect immediately on the next `searchText` change (D-03).
+    var isCommandPaletteMode: Bool {
+        guard UserDefaults.standard.bool(forKey: AppSettingsKeys.commandPaletteEnabled) else {
+            return false
+        }
+        let prefix = UserDefaults.standard.string(forKey: AppSettingsKeys.commandPalettePrefix) ?? "="
+        guard !prefix.isEmpty else { return false }
+        return searchText.hasPrefix(prefix)
+    }
+
     // MARK: - Filtered cache
 
     /// Cached result of ranking/filtering apps by searchText and recentBundleIDs.
     /// Updated when `apps`, `recentBundleIDs`, or `searchText` changes.
     private(set) var displayedApps: [AppEntry] = []
 
+    // MARK: - Private helpers
+
+    /// The current command-palette prefix from UserDefaults (defaults to "=").
+    ///
+    /// Used to compute the query payload by dropping the correct number of characters
+    /// from `searchText`. A private computed property keeps the drop length correct
+    /// even if the prefix is multi-char in future.
+    private var currentPrefix: String {
+        UserDefaults.standard.string(forKey: AppSettingsKeys.commandPalettePrefix) ?? "="
+    }
+
     // MARK: - Ranking
 
     /// Recomputes `displayedApps` from current state.
     ///
     /// Ranking rules:
+    /// - Command palette mode (Phase 12): short-circuit — evaluate the query and clear the app list.
     /// - Empty query (D-04): return up to 5 most recent apps in recency order.
     /// - Non-empty query (D-05): FuzzyMatcher score + 0.1 recency boost for apps
     ///   whose bundleID is in `recentBundleIDs`. Sorted score-descending, then
     ///   name-ascending for equal scores.
     func recomputeDisplayedApps() {
+        // Phase 12 short-circuit: when in command palette mode, evaluate the query
+        // and hide the app list entirely (D-01).
+        if isCommandPaletteMode {
+            let prefix = currentPrefix
+            let queryPayload = String(searchText.dropFirst(prefix.count))
+            commandResult = commandPaletteService?.evaluate(queryPayload)
+            displayedApps = []   // hide app list (D-01)
+            return
+        }
+        // When leaving command palette mode, clear any stale result so the view
+        // doesn't flash the previous evaluation while the app list repopulates.
+        commandResult = nil
+
         let q = searchText.trimmingCharacters(in: .whitespaces)
         guard !q.isEmpty else {
             let recents = recentApps()
