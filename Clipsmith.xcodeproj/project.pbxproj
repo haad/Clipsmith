@@ -99,6 +99,8 @@
 		AA0093 /* UnitConversionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0094 /* UnitConversionService.swift */; };
 		AA0094 /* CurrencyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0095 /* CurrencyService.swift */; };
 		AA0095 /* exchange-rates-bundled.json in Resources */ = {isa = PBXBuildFile; fileRef = AF0096 /* exchange-rates-bundled.json */; };
+		AA0096 /* CommandPaletteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0097 /* CommandPaletteService.swift */; };
+		AA0097 /* CommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0098 /* CommandPaletteView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -206,6 +208,8 @@
 		AF0094 /* UnitConversionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionService.swift; sourceTree = "<group>"; };
 		AF0095 /* CurrencyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
 		AF0096 /* exchange-rates-bundled.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "exchange-rates-bundled.json"; sourceTree = "<group>"; };
+		AF0097 /* CommandPaletteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteService.swift; sourceTree = "<group>"; };
+		AF0098 /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -296,6 +300,7 @@
 				AF0089 /* ExpressionEvaluator.swift */,
 				AF0094 /* UnitConversionService.swift */,
 				AF0095 /* CurrencyService.swift */,
+				AF0097 /* CommandPaletteService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -319,6 +324,7 @@
 				AF0086 /* AppLaunchViewModel.swift */,
 				AF0087 /* AppLaunchView.swift */,
 				AF0088 /* AppLaunchController.swift */,
+				AF0098 /* CommandPaletteView.swift */,
 				GG0009 /* Settings */,
 				GG0011 /* Snippets */,
 				GG0012 /* Gists */,
@@ -620,6 +626,8 @@
 				AA0088 /* ExpressionEvaluator.swift in Sources */,
 				AA0093 /* UnitConversionService.swift in Sources */,
 				AA0094 /* CurrencyService.swift in Sources */,
+				AA0096 /* CommandPaletteService.swift in Sources */,
+				AA0097 /* CommandPaletteView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
