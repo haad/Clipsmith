@@ -35,11 +35,6 @@ final class AppLaunchController: NSPanel {
     /// App scanner service — injected by AppDelegate before first show() call.
     var appScannerService: AppScannerService?
 
-    /// Clipboard monitor injected by AppDelegate so that copyResult() can set
-    /// blockedChangeCount and prevent the calculator result from being captured
-    /// back into the clipboard history (Pitfall 6 / T-12-02).
-    var clipboardMonitor: ClipboardMonitor?
-
     /// Global event monitor for click-outside dismissal. Removed on hide().
     private var globalMonitor: Any?
 
@@ -110,11 +105,7 @@ final class AppLaunchController: NSPanel {
                 hide()
                 return
             case 36, 76:                        // Return, Enter (numpad)
-                if viewModel.isCommandPaletteMode {
-                    copyResult()
-                } else {
-                    launchSelected()
-                }
+                launchSelected()
                 return
             case 125, 126, 123, 124,            // Arrow keys
                  121, 116, 119, 115:            // Page Down/Up, End, Home
@@ -196,11 +187,7 @@ final class AppLaunchController: NSPanel {
         case 53:                        // Escape
             hide()
         case 36, 76:                    // Return, Enter (numpad)
-            if viewModel.isCommandPaletteMode {
-                copyResult()
-            } else {
-                launchSelected()
-            }
+            launchSelected()
         case 125, 124:                  // Down arrow, Right arrow
             viewModel.navigateDown()
         case 126, 123:                  // Up arrow, Left arrow
@@ -241,39 +228,6 @@ final class AppLaunchController: NSPanel {
                 }
             }
         )
-    }
-
-    // MARK: - Command palette copy
-
-    /// Copies the current command palette result to the clipboard without
-    /// triggering ClipboardMonitor self-capture (Pitfall 6 / T-12-02 mitigation).
-    ///
-    /// Flow per D-13:
-    /// 1. No-op if commandResult is nil (Invalid expression — bezel stays open)
-    /// 2. Write copyableValue to NSPasteboard.general
-    /// 3. Set clipboardMonitor.blockedChangeCount = pasteboard.changeCount
-    ///    so the monitor skips the cycle in which our write was recorded.
-    /// 4. Set viewModel.showCopiedToast = true (CommandPaletteView animates the
-    ///    "Copied ✓" overlay).
-    /// 5. After 1.2 seconds, clear the toast and hide the bezel.
-    ///
-    /// Note: this does NOT call PasteService.simulateCmdV — D-13 specifies "copy
-    /// to clipboard", not paste. Reusing PasteService here is an anti-pattern.
-    func copyResult() {
-        guard let result = viewModel.commandResult else { return }
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(result.copyableValue, forType: .string)
-        // T-12-02 mitigation: tell ClipboardMonitor to skip this changeCount
-        clipboardMonitor?.blockedChangeCount = pasteboard.changeCount
-        viewModel.showCopiedToast = true
-        Task { @MainActor [weak self] in
-            guard let self else { return }
-            try? await Task.sleep(for: .seconds(1.2))
-            self.viewModel.showCopiedToast = false
-            self.hide()
-        }
-        logger.info("Command palette result copied to clipboard")
     }
 
     // MARK: - Private helpers
