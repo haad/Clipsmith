@@ -15,6 +15,9 @@ final class AppLaunchViewModelTests: XCTestCase {
 
     override func tearDown() {
         viewModel = nil
+        // Clean up Phase 12 UserDefaults keys to prevent test state leakage
+        UserDefaults.standard.removeObject(forKey: AppSettingsKeys.commandPaletteEnabled)
+        UserDefaults.standard.removeObject(forKey: AppSettingsKeys.commandPalettePrefix)
         super.tearDown()
     }
 
@@ -143,6 +146,105 @@ final class AppLaunchViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.displayedApps[4].bundleID, "com.test.recent5",
             "Fifth most recent must be last in the capped list")
     }
+
+    // MARK: - Phase 12: Command Palette State Tests
+
+    /// D-03: isCommandPaletteMode returns false when the feature flag is disabled.
+    func testIsCommandPaletteModeFalseWhenFlagDisabled() {
+        UserDefaults.standard.set(false, forKey: AppSettingsKeys.commandPaletteEnabled)
+        viewModel.searchText = "=2+2"
+        XCTAssertFalse(viewModel.isCommandPaletteMode,
+            "isCommandPaletteMode must be false when commandPaletteEnabled=false")
+    }
+
+    /// D-01: isCommandPaletteMode returns true when flag is enabled and searchText has the prefix.
+    func testIsCommandPaletteModeTrueWhenFlagEnabledAndPrefixMatches() {
+        UserDefaults.standard.set(true, forKey: AppSettingsKeys.commandPaletteEnabled)
+        UserDefaults.standard.set("=", forKey: AppSettingsKeys.commandPalettePrefix)
+        viewModel.searchText = "=2+2"
+        XCTAssertTrue(viewModel.isCommandPaletteMode,
+            "isCommandPaletteMode must be true when flag=true and searchText starts with '='")
+    }
+
+    /// D-01: isCommandPaletteMode respects custom prefix from UserDefaults.
+    func testIsCommandPaletteModeRespectsCustomPrefix() {
+        UserDefaults.standard.set(true, forKey: AppSettingsKeys.commandPaletteEnabled)
+        UserDefaults.standard.set(">", forKey: AppSettingsKeys.commandPalettePrefix)
+        viewModel.searchText = ">5+5"
+        XCTAssertTrue(viewModel.isCommandPaletteMode,
+            "isCommandPaletteMode must be true with prefix '>' and matching searchText")
+        viewModel.searchText = "=5+5"
+        XCTAssertFalse(viewModel.isCommandPaletteMode,
+            "isCommandPaletteMode must be false when searchText uses a different prefix ('=')")
+    }
+
+    /// D-01: Entering command palette mode clears displayedApps and populates commandResult.
+    func testEnteringCommandPaletteModeClearsDisplayedApps() {
+        UserDefaults.standard.set(true, forKey: AppSettingsKeys.commandPaletteEnabled)
+        UserDefaults.standard.set("=", forKey: AppSettingsKeys.commandPalettePrefix)
+
+        // Populate apps so displayedApps is non-empty before entering mode
+        viewModel.apps = [makeEntry(name: "Finder", bundleID: "com.apple.Finder")]
+        viewModel.commandPaletteService = CommandPaletteService()
+        viewModel.searchText = "=2+2"
+
+        XCTAssertTrue(viewModel.displayedApps.isEmpty,
+            "displayedApps must be empty when in command palette mode (D-01)")
+        XCTAssertNotNil(viewModel.commandResult,
+            "commandResult must be non-nil when query evaluates successfully")
+        XCTAssertEqual(viewModel.commandResult?.displayValue, "4",
+            "commandResult.displayValue must be '4' for expression '2+2'")
+    }
+
+    /// Leaving command palette mode clears commandResult and re-shows the app list.
+    func testLeavingCommandPaletteModeRestoresAppList() {
+        UserDefaults.standard.set(true, forKey: AppSettingsKeys.commandPaletteEnabled)
+        UserDefaults.standard.set("=", forKey: AppSettingsKeys.commandPalettePrefix)
+
+        // Start in command palette mode
+        let finderEntry = makeEntry(name: "Finder", bundleID: "com.apple.Finder")
+        viewModel.apps = [finderEntry]
+        viewModel.commandPaletteService = CommandPaletteService()
+        viewModel.searchText = "=2+2"
+
+        XCTAssertTrue(viewModel.isCommandPaletteMode)
+
+        // Leave command palette mode by typing an app name
+        viewModel.searchText = "finder"
+        XCTAssertNil(viewModel.commandResult,
+            "commandResult must be nil after leaving command palette mode")
+        XCTAssertFalse(viewModel.displayedApps.isEmpty,
+            "displayedApps must repopulate after leaving command palette mode")
+    }
+
+    /// D-12: Empty payload after prefix (searchText == "=") should set commandResult to nil.
+    func testEmptyPayloadAfterPrefixReturnsNilResult() {
+        UserDefaults.standard.set(true, forKey: AppSettingsKeys.commandPaletteEnabled)
+        UserDefaults.standard.set("=", forKey: AppSettingsKeys.commandPalettePrefix)
+
+        viewModel.commandPaletteService = CommandPaletteService()
+        viewModel.searchText = "="
+
+        XCTAssertTrue(viewModel.isCommandPaletteMode)
+        XCTAssertNil(viewModel.commandResult,
+            "commandResult must be nil when payload is empty (Invalid expression placeholder territory)")
+    }
+
+    /// showCopiedToast defaults to false on a fresh viewModel.
+    func testShowCopiedToastDefaultsToFalse() {
+        XCTAssertFalse(viewModel.showCopiedToast,
+            "showCopiedToast must default to false")
+    }
+
+    /// showCopiedToast is mutable.
+    func testShowCopiedToastIsMutable() {
+        viewModel.showCopiedToast = true
+        XCTAssertTrue(viewModel.showCopiedToast)
+        viewModel.showCopiedToast = false
+        XCTAssertFalse(viewModel.showCopiedToast)
+    }
+
+    // MARK: - Navigation
 
     /// Navigation methods must clamp to displayedApps bounds and never crash on empty lists.
     func testNavigationClampsToList() {
