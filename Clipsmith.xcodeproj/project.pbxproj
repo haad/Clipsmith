@@ -91,6 +91,11 @@
 		AA0085 /* AppLaunchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0086 /* AppLaunchViewModel.swift */; };
 		AA0086 /* AppLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0087 /* AppLaunchView.swift */; };
 		AA0087 /* AppLaunchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0088 /* AppLaunchController.swift */; };
+		AA0088 /* ExpressionEvaluator.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0089 /* ExpressionEvaluator.swift */; };
+		AA0089 /* ExpressionEvaluatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0090 /* ExpressionEvaluatorTests.swift */; };
+		AA0090 /* UnitConversionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0091 /* UnitConversionServiceTests.swift */; };
+		AA0091 /* CurrencyServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0092 /* CurrencyServiceTests.swift */; };
+		AA0092 /* CommandPaletteServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0093 /* CommandPaletteServiceTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -190,6 +195,11 @@
 		AF0086 /* AppLaunchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchViewModel.swift; sourceTree = "<group>"; };
 		AF0087 /* AppLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchView.swift; sourceTree = "<group>"; };
 		AF0088 /* AppLaunchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchController.swift; sourceTree = "<group>"; };
+		AF0089 /* ExpressionEvaluator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionEvaluator.swift; sourceTree = "<group>"; };
+		AF0090 /* ExpressionEvaluatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionEvaluatorTests.swift; sourceTree = "<group>"; };
+		AF0091 /* UnitConversionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionServiceTests.swift; sourceTree = "<group>"; };
+		AF0092 /* CurrencyServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyServiceTests.swift; sourceTree = "<group>"; };
+		AF0093 /* CommandPaletteServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteServiceTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -277,6 +287,7 @@
 				AF0076 /* LicenseService.swift */,
 				AF0081 /* AppScannerService.swift */,
 				AF0084 /* ClaudeToolkitService.swift */,
+				AF0089 /* ExpressionEvaluator.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -377,6 +388,10 @@
 				AF0077 /* LicenseServiceTests.swift */,
 				AF0082 /* AppScannerServiceTests.swift */,
 				AF0083 /* AppLaunchViewModelTests.swift */,
+				AF0090 /* ExpressionEvaluatorTests.swift */,
+				AF0091 /* UnitConversionServiceTests.swift */,
+				AF0092 /* CurrencyServiceTests.swift */,
+				AF0093 /* CommandPaletteServiceTests.swift */,
 				GG0015 /* Fixtures */,
 			);
 			path = ClipsmithTests;
@@ -592,6 +607,7 @@
 				AA0085 /* AppLaunchViewModel.swift in Sources */,
 				AA0086 /* AppLaunchView.swift in Sources */,
 				AA0087 /* AppLaunchController.swift in Sources */,
+				AA0088 /* ExpressionEvaluator.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -621,6 +637,10 @@
 				AA0076 /* LicenseServiceTests.swift in Sources */,
 				AA0081 /* AppScannerServiceTests.swift in Sources */,
 				AA0082 /* AppLaunchViewModelTests.swift in Sources */,
+				AA0089 /* ExpressionEvaluatorTests.swift in Sources */,
+				AA0090 /* UnitConversionServiceTests.swift in Sources */,
+				AA0091 /* CurrencyServiceTests.swift in Sources */,
+				AA0092 /* CommandPaletteServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
