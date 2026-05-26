@@ -391,9 +391,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         KeyboardShortcuts.onKeyDown(for: .appLauncher) { [weak self] in
             Task { @MainActor in
                 guard let self else { return }
-                guard UserDefaults.standard.bool(forKey: AppSettingsKeys.appLauncherEnabled) else {
-                    return
-                }
+                let flagOn = UserDefaults.standard.bool(forKey: AppSettingsKeys.appLauncherEnabled)
+                guard flagOn else { return }
                 if self.appLaunchController.isVisible {
                     self.appLaunchController.viewModel.navigateDown()
                 } else {

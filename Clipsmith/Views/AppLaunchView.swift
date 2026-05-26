@@ -104,7 +104,7 @@ struct AppLaunchView: View {
                 LazyVStack(spacing: 0) {
                     ForEach(Array(viewModel.displayedApps.enumerated()), id: \.element.id) { index, entry in
                         appRow(entry: entry, index: index)
-                            .id(index)
+                            .id(entry.id)
                             .onTapGesture {
                                 viewModel.navigateTo(index: index)
                             }
@@ -112,8 +112,10 @@ struct AppLaunchView: View {
                 }
             }
             .onChange(of: viewModel.selectedIndex) { _, newIndex in
+                let apps = viewModel.displayedApps
+                guard newIndex < apps.count else { return }
                 withAnimation(.easeInOut(duration: 0.1)) {
-                    proxy.scrollTo(newIndex, anchor: .center)
+                    proxy.scrollTo(apps[newIndex].id, anchor: .center)
                 }
             }
         }
@@ -146,6 +148,6 @@ struct AppLaunchView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 6)
-        .background(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
+        .background(isSelected ? Color.accentColor.opacity(0.3) : Color.clear)
     }
 }

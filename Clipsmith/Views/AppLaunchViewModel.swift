@@ -71,7 +71,10 @@ final class AppLaunchViewModel {
     func recomputeDisplayedApps() {
         let q = searchText.trimmingCharacters(in: .whitespaces)
         guard !q.isEmpty else {
-            displayedApps = recentApps()
+            let recents = recentApps()
+            displayedApps = recents.isEmpty
+                ? Array(apps.sorted { $0.name.lowercased() < $1.name.lowercased() }.prefix(9))
+                : recents
             return
         }
 
@@ -81,7 +84,6 @@ final class AppLaunchViewModel {
             if let bid = app.bundleID, recentIDs.contains(bid) { score += 0.1 }
             return (app, score)
         }
-
         // Sort by score descending; tie-break by lowercased name ascending.
         displayedApps = scored
             .sorted { lhs, rhs in
