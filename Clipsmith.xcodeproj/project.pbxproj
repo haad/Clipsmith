@@ -96,6 +96,9 @@
 		AA0090 /* UnitConversionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0091 /* UnitConversionServiceTests.swift */; };
 		AA0091 /* CurrencyServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0092 /* CurrencyServiceTests.swift */; };
 		AA0092 /* CommandPaletteServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0093 /* CommandPaletteServiceTests.swift */; };
+		AA0093 /* UnitConversionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0094 /* UnitConversionService.swift */; };
+		AA0094 /* CurrencyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0095 /* CurrencyService.swift */; };
+		AA0095 /* exchange-rates-bundled.json in Resources */ = {isa = PBXBuildFile; fileRef = AF0096 /* exchange-rates-bundled.json */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -200,6 +203,9 @@
 		AF0091 /* UnitConversionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionServiceTests.swift; sourceTree = "<group>"; };
 		AF0092 /* CurrencyServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyServiceTests.swift; sourceTree = "<group>"; };
 		AF0093 /* CommandPaletteServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteServiceTests.swift; sourceTree = "<group>"; };
+		AF0094 /* UnitConversionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionService.swift; sourceTree = "<group>"; };
+		AF0095 /* CurrencyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
+		AF0096 /* exchange-rates-bundled.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "exchange-rates-bundled.json"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -288,6 +294,8 @@
 				AF0081 /* AppScannerService.swift */,
 				AF0084 /* ClaudeToolkitService.swift */,
 				AF0089 /* ExpressionEvaluator.swift */,
+				AF0094 /* UnitConversionService.swift */,
+				AF0095 /* CurrencyService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -420,6 +428,7 @@
 			isa = PBXGroup;
 			children = (
 				AF0048 /* prompts.json */,
+				AF0096 /* exchange-rates-bundled.json */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -539,6 +548,7 @@
 			files = (
 				AA0008 /* Assets.xcassets in Resources */,
 				AA0047 /* prompts.json in Resources */,
+				AA0095 /* exchange-rates-bundled.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -608,6 +618,8 @@
 				AA0086 /* AppLaunchView.swift in Sources */,
 				AA0087 /* AppLaunchController.swift in Sources */,
 				AA0088 /* ExpressionEvaluator.swift in Sources */,
+				AA0093 /* UnitConversionService.swift in Sources */,
+				AA0094 /* CurrencyService.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
