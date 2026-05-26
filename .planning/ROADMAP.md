@@ -25,6 +25,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 9: Favorites** - Pin clippings as favorites with dedicated view and hotkey; favorites survive history clearing
 - [x] **Phase 10: Lemon Squeezy Licensing & Monetization** - License key validation, periodic nag dialog, License settings tab, PolyForm Noncommercial license (completed 2026-03-20)
 - [ ] **Phase 11: App Launcher** - Keyboard-driven app launcher bezel that fuzzy-searches installed apps and launches them via NSWorkspace, as a Spotlight alternative
+- [ ] **Phase 12: Launcher Command Palette** - Math evaluation, unit conversion, and currency conversion inline in the App Launcher bezel via a configurable prefix character
 
 ## Phase Details
 
@@ -276,7 +277,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11
+Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9 -> 10 -> 11 -> 12
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -292,13 +293,28 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 3.1 -> 4 -> 5 -> 6 -> 7 -> 8 -> 
 | 9. Favorites | 0/TBD | Not started | - |
 | 10. Licensing & Monetization | 2/2 | Complete    | 2026-03-20 |
 | 11. App Launcher | 2/3 | In Progress|  |
+| 12. Launcher Command Palette | 0/4 | Planned | - |
 
 ### Phase 12: Launcher Command Palette — math expression evaluation, currency conversion, and unit conversion inline in the app launcher bezel
 
-**Goal:** [To be planned]
-**Requirements**: TBD
+**Goal:** Extend the App Launcher bezel into a lightweight command palette: typing a configurable prefix character (default `=`) switches the bezel from app search to inline math (NSExpression), unit conversion (Foundation Measurement), and currency conversion (open.er-api.com + bundled JSON fallback). Pressing Enter copies the result to the clipboard without polluting clipboard history. All gated behind a `commandPaletteEnabled` feature flag with prefix configurable via Settings.
+**Requirements**: D-01, D-02, D-03, D-04, D-05, D-06, D-07, D-08, D-09, D-10, D-11, D-12, D-13, D-14
 **Depends on:** Phase 11
-**Plans:** 0 plans
+**Plans:** 4 plans
 
 Plans:
-- [ ] TBD (run /gsd-plan-phase 12 to break down)
+**Wave 1**
+
+- [ ] 12-01-PLAN.md — AppSettingsKeys + UserDefaults defaults + Wave 0 test scaffolds (4 files) + ExpressionEvaluator with safe-chars regex gate + pbxproj registration (D-02, D-03, D-04, D-05, D-06)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 12-02-PLAN.md — UnitConversionService (Foundation Measurement + manual alias table) + CurrencyService (@MainActor @Observable, bundled JSON + open.er-api.com refresh) + exchange-rates-bundled.json + pbxproj registration (D-07, D-08, D-09, D-10, D-11)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 12-03-PLAN.md — CommandResult + CommandPaletteService dispatch layer + AppLaunchViewModel extension (isCommandPaletteMode, commandResult, showCopiedToast) + CommandPaletteView + AppLaunchView branch + pbxproj registration (D-01, D-03, D-06, D-12, D-14)
+
+**Wave 4** *(blocked on Wave 3 completion, has human-verify checkpoint)*
+
+- [ ] 12-04-PLAN.md — AppLaunchController.copyResult() + clipboardMonitor injection + AppDelegate wiring + Settings > Features UI (toggle, prefix field, Refresh button) + human verify (D-01, D-02, D-03, D-10, D-13, D-14)
