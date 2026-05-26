@@ -29,9 +29,9 @@ struct AppLaunchView: View {
     var body: some View {
         VStack(spacing: 0) {
 
-            // Header bar — no Tab-cycling hint (launcher has no category concept)
+            // Header bar — title switches to "Command Palette" in command palette mode
             HStack {
-                Text("App Launcher")
+                Text(viewModel.isCommandPaletteMode ? "Command Palette" : "App Launcher")
                     .font(.caption.bold())
                     .foregroundStyle(.primary)
                 Spacer()
@@ -42,8 +42,8 @@ struct AppLaunchView: View {
 
             Divider()
 
-            // Search field — always visible and focused (CONTEXT D-03)
-            TextField("Search apps...", text: $viewModel.searchText)
+            // Search field — placeholder adapts to command palette mode (D-03)
+            TextField(viewModel.isCommandPaletteMode ? "Math, units, currency..." : "Search apps...", text: $viewModel.searchText)
                 .textFieldStyle(.plain)
                 .focused($isSearchFieldFocused)
                 .padding(.horizontal, 16)
@@ -52,9 +52,11 @@ struct AppLaunchView: View {
 
             Divider()
 
-            // App list / loading / empty states
+            // App list / command palette / loading / empty states
             Group {
-                if viewModel.isLoading && viewModel.apps.isEmpty {
+                if viewModel.isCommandPaletteMode {
+                    CommandPaletteView(viewModel: viewModel)
+                } else if viewModel.isLoading && viewModel.apps.isEmpty {
                     ProgressView("Scanning apps...")
                         .foregroundStyle(.secondary)
                 } else if viewModel.displayedApps.isEmpty {
@@ -69,10 +71,10 @@ struct AppLaunchView: View {
 
             Divider()
 
-            // Navigation counter footer
+            // Navigation counter footer — hide in command palette mode (count is meaningless)
             HStack {
                 Spacer()
-                Text(viewModel.navigationLabel)
+                Text(viewModel.isCommandPaletteMode ? "" : viewModel.navigationLabel)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 16)
