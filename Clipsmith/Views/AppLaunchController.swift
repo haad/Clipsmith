@@ -116,9 +116,14 @@ final class AppLaunchController: NSPanel {
                     launchSelected()
                 }
                 return
-            case 125, 126, 123, 124,            // Arrow keys
+            case 123, 124:                      // Left, Right arrows
+                // In command palette mode let the text field handle cursor movement.
+                if !viewModel.isCommandPaletteMode {
+                    keyDown(with: event)
+                    return
+                }
+            case 125, 126,                      // Down, Up arrows
                  121, 116, 119, 115:            // Page Down/Up, End, Home
-                // Intercept before SwiftUI TextField consumes them for cursor movement.
                 keyDown(with: event)
                 return
             default:
