@@ -18,6 +18,10 @@ extension Notification.Name {
     static let clipsmithImportHistory = Notification.Name("clipsmithImportHistory")
     /// Posted by LicenseNagView "I Already Have a License" to open Settings > License tab.
     static let clipsmithOpenLicenseSettings = Notification.Name("clipsmithOpenLicenseSettings")
+    /// Posted by Settings > Features "Refresh exchange rates" on successful refresh (Phase 12).
+    /// AppDelegate observes this to reload its CurrencyService instance from disk so the live
+    /// bezel sees fresh rates without app restart.
+    static let clipsmithCurrencyRatesRefreshed = Notification.Name("clipsmithCurrencyRatesRefreshed")
 }
 
 struct MenuBarView: View {

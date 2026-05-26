@@ -45,6 +45,15 @@ struct GeneralSettingsTab: View {
     // Phase 11: App Launcher feature flag
     @AppStorage(AppSettingsKeys.appLauncherEnabled) private var appLauncherEnabled: Bool = false
 
+    // Phase 12: Command Palette feature flag + prefix character
+    @AppStorage(AppSettingsKeys.commandPaletteEnabled) private var commandPaletteEnabled: Bool = false
+    @AppStorage(AppSettingsKeys.commandPalettePrefix) private var commandPalettePrefix: String = "="
+
+    // Settings owns its own CurrencyService instance; on successful refresh we post
+    // .clipsmithCurrencyRatesRefreshed and AppDelegate's instance reloads from disk.
+    // Both instances stay in sync without a restart.
+    @State private var currencyService = CurrencyService()
+
     var body: some View {
         Form {
             // MARK: - History
@@ -161,7 +170,75 @@ struct GeneralSettingsTab: View {
                     .help("Enable the documentation browser. Requires app restart for hotkey to take effect.")
                 Toggle("App Launcher", isOn: $appLauncherEnabled)
                     .help("Enable keyboard-driven app launcher (no default hotkey — configure in Shortcuts tab).")
+
+                Toggle("Command Palette", isOn: $commandPaletteEnabled)
+                    .help("Type the prefix character (default \"=\") in the App Launcher to evaluate math, units, and currency. Requires App Launcher to be enabled.")
+
+                if commandPaletteEnabled {
+                    HStack {
+                        Text("Prefix character")
+                        TextField("", text: $commandPalettePrefix)
+                            .frame(width: 36)
+                            .multilineTextAlignment(.center)
+                            .onChange(of: commandPalettePrefix) { _, newValue in
+                                guard !newValue.isEmpty else { commandPalettePrefix = "="; return }
+                                let trimmed = String(newValue.prefix(1))
+                                if let c = trimmed.first, c.isLetter || c.isNumber {
+                                    commandPalettePrefix = "="
+                                } else {
+                                    commandPalettePrefix = trimmed
+                                }
+                            }
+                            .help("Single non-alphanumeric character. Alphanumeric input is rejected and the prefix resets to \"=\".")
+                    }
+
+                    HStack {
+                        Button {
+                            Task {
+                                await currencyService.refreshRates()
+                                // On successful refresh, notify AppDelegate to reload its CurrencyService
+                                // from disk so the live bezel picks up the new rates without app restart.
+                                if currencyService.lastError == nil {
+                                    NotificationCenter.default.post(name: .clipsmithCurrencyRatesRefreshed, object: nil)
+                                }
+                            }
+                        } label: {
+                            if currencyService.isRefreshing {
+                                HStack(spacing: 4) {
+                                    ProgressView().controlSize(.small)
+                                    Text("Refreshing…")
+                                }
+                            } else {
+                                Text("Refresh exchange rates")
+                            }
+                        }
+                        .disabled(currencyService.isRefreshing)
+
+                        Spacer()
+
+                        if let err = currencyService.lastError {
+                            Text(err)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                        } else if let last = currencyService.lastUpdated {
+                            Text("Last updated \(last.formatted(.relative(presentation: .named)))")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Text("Using bundled rates")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    Text("Rates by [Exchange Rate API](https://www.exchangerate-api.com)")
+                        .font(.caption2)
+                        .foregroundStyle(.tertiary)
+                }
             }
+            .task { currencyService.loadRates() }
 
             // MARK: - Launch
 

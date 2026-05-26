@@ -50,6 +50,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var appScannerService: AppScannerService!
     var appLaunchController: AppLaunchController!
 
+    // Phase 12 — Launcher Command Palette
+    var currencyService: CurrencyService!
+    var commandPaletteService: CommandPaletteService!
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // CRITICAL: Both LSUIElement=YES and setActivationPolicy(.accessory) are
         // required. LSUIElement suppresses the dock icon at cold launch, but
@@ -185,6 +189,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         appLaunchController.appScannerService = appScannerService
         Task { await appScannerService.loadInitially() }
 
+        // 10. Initialize Launcher Command Palette components (Phase 12).
+        currencyService = CurrencyService()
+        currencyService.loadRates()   // bundled-first; later replaced by downloaded file when present
+        commandPaletteService = CommandPaletteService(currencyService: currencyService)
+        appLaunchController.viewModel.commandPaletteService = commandPaletteService
+        appLaunchController.clipboardMonitor = clipboardMonitor   // T-12-02: prevent self-capture of results
+
         // 8. Initialize License Service and Nag Controller (Phase 10).
         licenseService = LicenseService()
 
@@ -276,6 +287,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self,
             selector: #selector(openAppLauncherFromMenu),
             name: .clipsmithOpenAppLauncher,
+            object: nil
+        )
+
+        // Reload AppDelegate's CurrencyService rates when Settings finishes a refresh.
+        // This bridges the dual-instance gap: Settings owns its own CurrencyService
+        // for UI binding, AppDelegate owns the one the bezel uses. Both write to/read from
+        // the same on-disk file at ~/Library/Application Support/Clipsmith/exchange-rates.json.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleCurrencyRatesRefreshed),
+            name: .clipsmithCurrencyRatesRefreshed,
             object: nil
         )
 
@@ -421,6 +443,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openAppLauncherFromMenu() {
         appLaunchController?.show()
+    }
+
+    // MARK: - Currency rates refreshed (from Settings)
+
+    @objc private func handleCurrencyRatesRefreshed() {
+        // Settings just wrote a fresh exchange-rates.json to disk. Reload the
+        // live bezel CurrencyService so the next "10 USD to EUR" query uses
+        // the new rates without requiring an app restart.
+        currencyService?.loadRates()
+        logger.info("CurrencyService rates reloaded after Settings refresh")
     }
 
     // MARK: - License Settings (Phase 10)
