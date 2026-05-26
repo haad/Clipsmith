@@ -88,7 +88,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             "saveToLocation": NSHomeDirectory() + "/Desktop",
             "clipboardPollingInterval": 1.0,
             // Phase 11 — App Launcher feature flag
-            AppSettingsKeys.appLauncherEnabled: false
+            AppSettingsKeys.appLauncherEnabled: false,
+            // Phase 12 — Command Palette feature flag and prefix
+            AppSettingsKeys.commandPaletteEnabled: false,
+            AppSettingsKeys.commandPalettePrefix: "="
         ])
 
         accessibilityMonitor.start()

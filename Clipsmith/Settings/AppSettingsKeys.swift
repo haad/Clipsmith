@@ -51,6 +51,10 @@ enum AppSettingsKeys {
     static let appLauncherEnabled = "appLauncherEnabled"
     static let recentAppBundleIDs = "recentAppBundleIDs"
 
+    // Phase 12 additions (Command Palette)
+    static let commandPaletteEnabled = "commandPaletteEnabled"
+    static let commandPalettePrefix = "commandPalettePrefix"
+
     // Claude Toolkit browser
     static let toolkitPath = "toolkitPath"
     static let toolkitPathDefault = "~/.claude/plugins/claude-code-toolkit"
