@@ -43,6 +43,13 @@ nonisolated struct ExpressionEvaluator {
         pattern: #"/\s*0(?![.\d])"#
     )
 
+    /// Matches bare integer literals not adjacent to a decimal point.
+    /// Used to inject `.0` so NSExpression uses floating-point arithmetic.
+    /// e.g. `70000/640` → `70000.0/640.0` → 109.375 instead of 109.
+    private static let bareIntRegex: NSRegularExpression = try! NSRegularExpression(
+        pattern: #"(?<![.\d])(\d+)(?![.\d])"#
+    )
+
     /// NSExpression built-in function names accepted in expressions (D-05).
     /// These names are stripped from the expression before the safe-chars regex
     /// is applied so that e.g. `sqrt(16)` passes the gate.
@@ -106,9 +113,18 @@ nonisolated struct ExpressionEvaluator {
             return nil
         }
 
+        // 3d. Promote bare integer literals to doubles so NSExpression uses
+        //     floating-point arithmetic. Without this, `70000/640` evaluates as
+        //     integer division (= 109) instead of 109.375.
+        let floatExpr = bareIntRegex.stringByReplacingMatches(
+            in: expr,
+            range: NSRange(expr.startIndex..., in: expr),
+            withTemplate: "$1.0"
+        )
+
         // 4. Evaluate with NSExpression.
         //    The safe-chars gate above ensures we never reach here with untrusted input.
-        let nsExpr = NSExpression(format: expr)
+        let nsExpr = NSExpression(format: floatExpr)
         guard let nsNumber = nsExpr.expressionValue(with: nil, context: nil) as? NSNumber else {
             return nil
         }

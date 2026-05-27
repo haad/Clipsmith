@@ -43,6 +43,20 @@ final class ExpressionEvaluatorTests: XCTestCase {
         XCTAssertNil(ExpressionEvaluator.evaluate("10.0 / 0.0"))
     }
 
+    // MARK: - Float division (integer-literal promotion)
+
+    /// NSExpression performs integer division when both operands are integer literals.
+    /// ExpressionEvaluator must promote bare integers to doubles so 70000/640 = 109.375.
+    func testIntegerDivisionProducesFractionalResult() {
+        let result = ExpressionEvaluator.evaluate("70000/640")
+        XCTAssertEqual(result ?? 0, 109.375, accuracy: 1e-9)
+    }
+
+    func testMixedIntFloatDivisionPreservesDecimals() {
+        XCTAssertEqual(ExpressionEvaluator.evaluate("1/3") ?? 0, 1.0/3.0, accuracy: 1e-9)
+        XCTAssertEqual(ExpressionEvaluator.evaluate("7/2") ?? 0, 3.5, accuracy: 1e-9)
+    }
+
     // MARK: - Trailing-operator gate (T-12-01 extension)
 
     /// Incomplete expressions ending with a dangling operator must return nil
