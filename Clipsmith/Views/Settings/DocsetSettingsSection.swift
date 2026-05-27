@@ -79,43 +79,47 @@ struct DocsetSettingsSection: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Documentation (DevDocs)")
-                .font(.headline)
+        VStack(spacing: 0) {
+            // Fixed header — always measured, never stretched
+            VStack(alignment: .leading, spacing: 8) {
+                Text("Documentation (DevDocs)")
+                    .font(.headline)
 
-            Text("Download offline documentation for quick lookup via hotkey. Powered by devdocs.io.")
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                Text("Download offline documentation for quick lookup via hotkey. Powered by devdocs.io.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
 
-            if let error = managerService.lastError {
-                Text(error)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-            }
-
-            HStack {
-                TextField("Filter docs...", text: $searchFilter)
-                    .textFieldStyle(.roundedBorder)
-                    .frame(maxWidth: 200)
-
-                Toggle("Downloaded only", isOn: $showDownloadedOnly)
-
-                Spacer()
-
-                Button {
-                    Task { await managerService.fetchCatalog() }
-                } label: {
-                    if managerService.isFetchingCatalog {
-                        ProgressView()
-                            .controlSize(.small)
-                    } else {
-                        Label("Refresh Catalog", systemImage: "arrow.clockwise")
-                    }
+                if let error = managerService.lastError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
                 }
-                .controlSize(.small)
-                .disabled(managerService.isFetchingCatalog)
-            }
 
+                HStack {
+                    TextField("Filter docs...", text: $searchFilter)
+                        .textFieldStyle(.roundedBorder)
+                        .frame(maxWidth: 200)
+
+                    Toggle("Downloaded only", isOn: $showDownloadedOnly)
+
+                    Spacer()
+
+                    Button {
+                        Task { await managerService.fetchCatalog() }
+                    } label: {
+                        if managerService.isFetchingCatalog {
+                            ProgressView().controlSize(.small)
+                        } else {
+                            Label("Refresh Catalog", systemImage: "arrow.clockwise")
+                        }
+                    }
+                    .controlSize(.small)
+                    .disabled(managerService.isFetchingCatalog)
+                }
+            }
+            .padding()
+
+            // Split view fills all remaining vertical space
             HSplitView {
                 // Doc list
                 List(selection: $selectedDocset) {
@@ -213,7 +217,6 @@ struct DocsetSettingsSection: View {
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .padding()
         .frame(minWidth: 550, maxWidth: .infinity, minHeight: 350, maxHeight: .infinity)
         .onAppear {
             managerService.loadMetadata()
