@@ -216,6 +216,7 @@ struct DocsetSettingsSection: View {
                 .frame(minWidth: 220, maxWidth: 300)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .layoutPriority(1)
         }
         .frame(minWidth: 550, maxWidth: .infinity, minHeight: 350, maxHeight: .infinity)
         .onAppear {
