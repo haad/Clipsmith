@@ -61,8 +61,7 @@ struct SettingsView: View {
                 }
                 .tag(SettingsTab.help.rawValue)
         }
-        .frame(minWidth: 480, idealWidth: 600, maxWidth: .infinity,
-               minHeight: 400, idealHeight: 560, maxHeight: .infinity)
+        .frame(width: 600, height: 560)
         .onDisappear {
             // Restore accessory policy when the settings window closes,
             // but only if no other regular windows remain visible.

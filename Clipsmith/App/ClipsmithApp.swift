@@ -59,7 +59,6 @@ struct ClipsmithApp: App {
                 .environment(appDelegate.appTracker)
                 .environment(appSettings)
         }
-        .windowResizability(.contentSize)
 
         WindowGroup(id: "snippets") {
             SnippetWindowView()
