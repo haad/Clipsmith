@@ -78,48 +78,55 @@ struct DocsetSettingsSection: View {
         return groups.sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
     }
 
+    @State private var headerHeight: CGFloat = 120
+
     var body: some View {
-        VStack(spacing: 0) {
-            // Fixed header — always measured, never stretched
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Documentation (DevDocs)")
-                    .font(.headline)
+        GeometryReader { geo in
+            VStack(spacing: 0) {
+                // Fixed header — height measured so HSplitView gets explicit pixels
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Documentation (DevDocs)")
+                        .font(.headline)
 
-                Text("Download offline documentation for quick lookup via hotkey. Powered by devdocs.io.")
-                    .font(.subheadline)
-                    .foregroundStyle(.secondary)
+                    Text("Download offline documentation for quick lookup via hotkey. Powered by devdocs.io.")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
 
-                if let error = managerService.lastError {
-                    Text(error)
-                        .font(.caption)
-                        .foregroundStyle(.red)
-                }
-
-                HStack {
-                    TextField("Filter docs...", text: $searchFilter)
-                        .textFieldStyle(.roundedBorder)
-                        .frame(maxWidth: 200)
-
-                    Toggle("Downloaded only", isOn: $showDownloadedOnly)
-
-                    Spacer()
-
-                    Button {
-                        Task { await managerService.fetchCatalog() }
-                    } label: {
-                        if managerService.isFetchingCatalog {
-                            ProgressView().controlSize(.small)
-                        } else {
-                            Label("Refresh Catalog", systemImage: "arrow.clockwise")
-                        }
+                    if let error = managerService.lastError {
+                        Text(error)
+                            .font(.caption)
+                            .foregroundStyle(.red)
                     }
-                    .controlSize(.small)
-                    .disabled(managerService.isFetchingCatalog)
-                }
-            }
-            .padding()
 
-            // Split view fills all remaining vertical space
+                    HStack {
+                        TextField("Filter docs...", text: $searchFilter)
+                            .textFieldStyle(.roundedBorder)
+                            .frame(maxWidth: 200)
+
+                        Toggle("Downloaded only", isOn: $showDownloadedOnly)
+
+                        Spacer()
+
+                        Button {
+                            Task { await managerService.fetchCatalog() }
+                        } label: {
+                            if managerService.isFetchingCatalog {
+                                ProgressView().controlSize(.small)
+                            } else {
+                                Label("Refresh Catalog", systemImage: "arrow.clockwise")
+                            }
+                        }
+                        .controlSize(.small)
+                        .disabled(managerService.isFetchingCatalog)
+                    }
+                }
+                .padding()
+                .background(GeometryReader { h in
+                    Color.clear.onAppear { headerHeight = h.size.height }
+                               .onChange(of: h.size.height) { _, v in headerHeight = v }
+                })
+
+                // Explicit height forces HSplitView to fill on first render
             HSplitView {
                 // Doc list
                 List(selection: $selectedDocset) {
@@ -215,9 +222,10 @@ struct DocsetSettingsSection: View {
                 )
                 .frame(minWidth: 220, maxWidth: 300)
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .layoutPriority(1)
-        }
+            .frame(width: geo.size.width,
+                   height: max(200, geo.size.height - headerHeight))
+        }  // VStack
+        }  // GeometryReader
         .frame(minWidth: 550, maxWidth: .infinity, minHeight: 350, maxHeight: .infinity)
         .onAppear {
             managerService.loadMetadata()
