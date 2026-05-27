@@ -67,7 +67,7 @@ final class AppLaunchController: NSPanel {
         // Setting window.styleMask afterwards does not update the WindowServer tag,
         // so the panel would still steal focus.
         super.init(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 320),
+            contentRect: NSRect(x: 0, y: 0, width: 640, height: 480),
             styleMask: [.nonactivatingPanel, .borderless, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -206,9 +206,13 @@ final class AppLaunchController: NSPanel {
             } else {
                 launchSelected()
             }
-        case 125, 124:                  // Down arrow, Right arrow
+        case 125:                       // Down arrow — next row in grid
+            viewModel.navigateDownRow()
+        case 126:                       // Up arrow — previous row in grid
+            viewModel.navigateUpRow()
+        case 124:                       // Right arrow — next item
             viewModel.navigateDown()
-        case 126, 123:                  // Up arrow, Left arrow
+        case 123:                       // Left arrow — previous item
             viewModel.navigateUp()
         case 121:                       // Page Down
             viewModel.navigateDownTen()

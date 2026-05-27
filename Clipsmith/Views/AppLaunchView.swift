@@ -45,9 +45,10 @@ struct AppLaunchView: View {
             // Search field — placeholder adapts to command palette mode (D-03)
             TextField(viewModel.isCommandPaletteMode ? "Math, units, currency..." : "Search apps...", text: $viewModel.searchText)
                 .textFieldStyle(.plain)
+                .font(.title3)
                 .focused($isSearchFieldFocused)
                 .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                .padding(.vertical, 14)
                 .background(.regularMaterial)
 
             Divider()
@@ -100,18 +101,22 @@ struct AppLaunchView: View {
 
     // MARK: - Sub-views
 
+    private let gridColumns = Array(repeating: GridItem(.flexible(), spacing: 8), count: 5)
+
     private var appListView: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(spacing: 0) {
+                LazyVGrid(columns: gridColumns, spacing: 8) {
                     ForEach(Array(viewModel.displayedApps.enumerated()), id: \.element.id) { index, entry in
-                        appRow(entry: entry, index: index)
+                        appGridCell(entry: entry, index: index)
                             .id(entry.id)
                             .onTapGesture {
                                 viewModel.navigateTo(index: index)
                             }
                     }
                 }
+                .padding(.horizontal, 16)
+                .padding(.vertical, 12)
             }
             .onChange(of: viewModel.selectedIndex) { _, newIndex in
                 let apps = viewModel.displayedApps
@@ -123,33 +128,36 @@ struct AppLaunchView: View {
         }
     }
 
-    /// Renders a single app row: icon (24×24) + app name with selection highlight.
-    /// CONTEXT D-06: icon ~24pt square plus app name for visual scanning.
-    private func appRow(entry: AppEntry, index: Int) -> some View {
+    /// Renders a single app grid cell: large icon + app name below, with selection highlight.
+    private func appGridCell(entry: AppEntry, index: Int) -> some View {
         let isSelected = index == viewModel.selectedIndex
 
-        return HStack(spacing: 10) {
-            // Icon: show loaded NSImage or placeholder system image
+        return VStack(spacing: 6) {
             if let icon = entry.icon {
                 Image(nsImage: icon)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 24, height: 24)
+                    .frame(width: 60, height: 60)
             } else {
                 Image(systemName: "app.dashed")
-                    .frame(width: 24, height: 24)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 60, height: 60)
                     .foregroundStyle(.secondary)
             }
 
             Text(entry.name)
-                .font(.body)
+                .font(.caption)
                 .foregroundStyle(.primary)
-                .lineLimit(1)
-
-            Spacer()
+                .lineLimit(2)
+                .multilineTextAlignment(.center)
+                .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
-        .background(isSelected ? Color.accentColor.opacity(0.3) : Color.clear)
+        .padding(.vertical, 10)
+        .padding(.horizontal, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 10)
+                .fill(isSelected ? Color.accentColor.opacity(0.3) : Color.clear)
+        )
     }
 }

@@ -146,9 +146,15 @@ final class AppLaunchViewModel {
         let q = searchText.trimmingCharacters(in: .whitespaces)
         guard !q.isEmpty else {
             let recents = recentApps()
-            displayedApps = recents.isEmpty
-                ? Array(apps.sorted { $0.name.lowercased() < $1.name.lowercased() }.prefix(9))
-                : recents
+            if recents.isEmpty {
+                displayedApps = Array(apps.sorted { $0.name.lowercased() < $1.name.lowercased() }.prefix(20))
+            } else {
+                let recentIDs = Set(recents.compactMap(\.bundleID))
+                let others = apps
+                    .filter { app in app.bundleID.map { !recentIDs.contains($0) } ?? true }
+                    .sorted { $0.name.lowercased() < $1.name.lowercased() }
+                displayedApps = Array((recents + others).prefix(20))
+            }
             return
         }
 
@@ -171,7 +177,7 @@ final class AppLaunchViewModel {
     /// Apps whose bundle ID is not in `apps` are dropped.
     private func recentApps() -> [AppEntry] {
         var result: [AppEntry] = []
-        for id in recentBundleIDs.prefix(5) {
+        for id in recentBundleIDs.prefix(10) {
             if let app = apps.first(where: { $0.bundleID == id }) {
                 result.append(app)
             }
@@ -239,6 +245,27 @@ final class AppLaunchViewModel {
     func navigateDownTen() {
         let last = max(0, displayedApps.count - 1)
         selectedIndex = min(last, selectedIndex + 10)
+    }
+
+    /// Decrements selectedIndex by one grid row (5 columns), clamped at 0.
+    func navigateUpRow(columns: Int = 5) {
+        if wraparoundBezel {
+            selectedIndex = selectedIndex >= columns
+                ? selectedIndex - columns
+                : max(0, displayedApps.count - 1)
+        } else {
+            selectedIndex = max(0, selectedIndex - columns)
+        }
+    }
+
+    /// Increments selectedIndex by one grid row (5 columns), clamped at last index.
+    func navigateDownRow(columns: Int = 5) {
+        let last = max(0, displayedApps.count - 1)
+        if wraparoundBezel {
+            selectedIndex = selectedIndex + columns <= last ? selectedIndex + columns : 0
+        } else {
+            selectedIndex = min(last, selectedIndex + columns)
+        }
     }
 
     /// Jumps to the given index, clamped to [0, displayedApps.count - 1].
