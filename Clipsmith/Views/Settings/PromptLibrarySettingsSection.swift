@@ -34,10 +34,16 @@ struct PromptLibrarySettingsSection: View {
     // MARK: - Body
 
     var body: some View {
-        Form {
-            syncSection
-            templateVariablesSection
-            securitySection
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                syncSection
+                Divider()
+                templateVariablesSection
+                Divider()
+                securitySection
+            }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
         .onAppear {
             loadVariables()
@@ -47,44 +53,47 @@ struct PromptLibrarySettingsSection: View {
     // MARK: - Sections
 
     private var syncSection: some View {
-        Section("Sync") {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Sync")
+                .font(.title2).bold()
+
             VStack(alignment: .leading, spacing: 4) {
                 Text("JSON URL")
-                    .font(.subheadline).fontWeight(.medium)
+                    .font(.headline)
                 TextField("", text: $promptLibraryURL)
                     .textFieldStyle(.roundedBorder)
             }
 
-            HStack {
-                Button(syncService.isSyncing ? "Syncing..." : "Sync Now") {
+            HStack(spacing: 12) {
+                Button(syncService.isSyncing ? "Syncing…" : "Sync Now") {
                     Task {
                         let store = PromptLibraryStore(modelContainer: modelContext.container)
                         do {
                             try await syncService.syncFromURL(promptLibraryURL, store: store)
-                        } catch {
-                            // Error is already captured in syncService.lastError
-                        }
+                        } catch {}
                     }
                 }
                 .disabled(syncService.isSyncing || promptLibraryURL.isEmpty)
-            }
 
-            if let errorText = syncService.lastError {
-                Text(errorText)
-                    .font(.caption)
-                    .foregroundStyle(.red)
-            }
-
-            if !lastSyncISO.isEmpty, let lastSyncDate = ISO8601DateFormatter().date(from: lastSyncISO) {
-                Text("Last synced \(lastSyncDate.formatted(.relative(presentation: .named)))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let errorText = syncService.lastError {
+                    Text(errorText)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .lineLimit(1)
+                } else if !lastSyncISO.isEmpty, let date = ISO8601DateFormatter().date(from: lastSyncISO) {
+                    Text("Last synced \(date.formatted(.relative(presentation: .named)))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
     }
 
     private var templateVariablesSection: some View {
-        Section("Template Variables") {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Template Variables")
+                .font(.headline)
+
             Text("Define custom variables for use in prompts. Variables like {{name}} in prompt content will be replaced with the value you set here.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -127,7 +136,9 @@ struct PromptLibrarySettingsSection: View {
     }
 
     private var securitySection: some View {
-        Section("Security") {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Security")
+                .font(.headline)
             Text("Prompts containing {{clipboard}} will include whatever is on your clipboard when pasted, including passwords or sensitive data.")
                 .font(.caption)
                 .foregroundStyle(.orange)
