@@ -5,6 +5,29 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.1.0] - 2026-05-27
+
+### Added
+- **App Launcher** — keyboard-driven app launcher with Launchpad-style 5-column grid, 60×60 icons, fuzzy search, and recency boost
+- **Command Palette** — type the prefix character (default `=`) in the App Launcher to evaluate math, unit conversions, and live currency rates; Return copies the result
+- **Help tab in Settings** — quick-reference keyboard shortcuts for all features
+
+### Changed
+- App Launcher grid fills with recents first then remaining apps alphabetically — no longer shows a single app after first launch
+- Settings window enlarged to 600×560; Navigation section merged into Paste Behavior; Launch at Login moved into Advanced
+- Prompts and Gist tabs redesigned with horizontal padding and h1/h2 typography
+- Docsets tab: split view now fills available height correctly on first open
+- License tab hidden from Settings UI
+
+### Fixed
+- App Launcher window no longer inherits clipboard bezel size from UserDefaults
+- Up/Down arrows in App Launcher navigate by grid row (±5); Left/Right step one item
+- Command Palette: unbalanced parentheses (e.g. `(20`) no longer crash NSExpression
+- Command Palette: integer division now returns float (`70000/640` → `109.375`)
+- Command Palette: trailing operators (`2+`, `250/`) no longer crash the evaluator
+- Command Palette: 300ms debounce prevents crashes on partial expressions while typing
+- Command Palette: Left/Right arrows move text cursor instead of navigating list items
+
 ## [5.0.2] - 2026-03-22
 
 ### Added
