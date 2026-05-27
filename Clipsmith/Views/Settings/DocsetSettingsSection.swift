@@ -119,6 +119,7 @@ struct DocsetSettingsSection: View {
             HSplitView {
                 // Doc list
                 List(selection: $selectedDocset) {
+
                     ForEach(groupedDocsets) { group in
                         if group.isMultiVersion {
                             // Grouped entry — header represents latest version
@@ -210,9 +211,10 @@ struct DocsetSettingsSection: View {
                 )
                 .frame(minWidth: 220, maxWidth: 300)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .padding()
-        .frame(minWidth: 550, minHeight: 350)
+        .frame(minWidth: 550, maxWidth: .infinity, minHeight: 350, maxHeight: .infinity)
         .onAppear {
             managerService.loadMetadata()
         }

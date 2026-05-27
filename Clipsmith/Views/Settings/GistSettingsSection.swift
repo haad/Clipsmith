@@ -14,8 +14,11 @@ struct GistSettingsSection: View {
     private let tokenStore = TokenStore()
 
     var body: some View {
-        Form {
-            Section("GitHub Gist") {
+        ScrollView {
+            VStack(alignment: .leading, spacing: 20) {
+                Text("GitHub Gist")
+                    .font(.title2).bold()
+
                 if hasToken {
                     HStack {
                         Label("Token saved", systemImage: "checkmark.circle.fill")
@@ -29,22 +32,29 @@ struct GistSettingsSection: View {
                 } else {
                     VStack(alignment: .leading, spacing: 4) {
                         Text("Personal Access Token")
-                            .font(.subheadline).fontWeight(.medium)
+                            .font(.headline)
                         SecureField("", text: $tokenInput)
+                            .textFieldStyle(.roundedBorder)
                     }
-                    Button("Save Token") {
-                        tokenStore.saveToken(tokenInput)
-                        tokenInput = ""
-                        hasToken = true
+                    HStack(spacing: 12) {
+                        Button("Save Token") {
+                            tokenStore.saveToken(tokenInput)
+                            tokenInput = ""
+                            hasToken = true
+                        }
+                        .disabled(tokenInput.isEmpty)
+                        Text("Create a token at github.com/settings/tokens with the 'gist' scope.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
                     }
-                    .disabled(tokenInput.isEmpty)
-                    Text("Create a token at github.com/settings/tokens with the 'gist' scope.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
                 }
+
+                Divider()
 
                 Toggle("Public gists by default", isOn: $gistDefaultPublic)
             }
+            .padding(.horizontal, 20)
+            .padding(.vertical, 16)
         }
         .onAppear {
             hasToken = tokenStore.loadToken() != nil
