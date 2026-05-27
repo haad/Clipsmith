@@ -113,7 +113,18 @@ nonisolated struct ExpressionEvaluator {
             return nil
         }
 
-        // 3d. Promote bare integer literals to doubles so NSExpression uses
+        // 3d. Reject expressions with unbalanced parentheses — NSExpression appends
+        //     "== 1" internally when validating, turning "(20.0" into "(20.0 == 1"
+        //     which throws an uncaught ObjC exception (T-12-01).
+        var depth = 0
+        for ch in expr {
+            if ch == "(" { depth += 1 }
+            else if ch == ")" { depth -= 1 }
+            if depth < 0 { return nil }
+        }
+        guard depth == 0 else { return nil }
+
+        // 3e. Promote bare integer literals to doubles so NSExpression uses
         //     floating-point arithmetic. Without this, `70000/640` evaluates as
         //     integer division (= 109) instead of 109.375.
         let floatExpr = bareIntRegex.stringByReplacingMatches(
