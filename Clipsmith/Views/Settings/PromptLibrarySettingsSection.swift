@@ -48,8 +48,12 @@ struct PromptLibrarySettingsSection: View {
 
     private var syncSection: some View {
         Section("Sync") {
-            TextField("JSON URL", text: $promptLibraryURL)
-                .textFieldStyle(.roundedBorder)
+            VStack(alignment: .leading, spacing: 4) {
+                Text("JSON URL")
+                    .font(.subheadline).fontWeight(.medium)
+                TextField("", text: $promptLibraryURL)
+                    .textFieldStyle(.roundedBorder)
+            }
 
             HStack {
                 Button(syncService.isSyncing ? "Syncing..." : "Sync Now") {

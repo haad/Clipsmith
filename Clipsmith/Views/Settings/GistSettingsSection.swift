@@ -27,7 +27,11 @@ struct GistSettingsSection: View {
                         }
                     }
                 } else {
-                    SecureField("Personal Access Token", text: $tokenInput)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Personal Access Token")
+                            .font(.subheadline).fontWeight(.medium)
+                        SecureField("", text: $tokenInput)
+                    }
                     Button("Save Token") {
                         tokenStore.saveToken(tokenInput)
                         tokenInput = ""
