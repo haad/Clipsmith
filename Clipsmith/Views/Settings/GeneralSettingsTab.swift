@@ -82,11 +82,6 @@ struct GeneralSettingsTab: View {
                 Toggle("Always paste as plain text", isOn: $plainTextPaste)
                 Toggle("Play sound on paste", isOn: $pasteSound)
                 Toggle("Sticky bezel (stay open until Enter/Escape)", isOn: $stickyBezel)
-            }
-
-            // MARK: - Navigation (Bug #8)
-
-            Section("Navigation") {
                 Toggle("Wraparound navigation", isOn: $wraparoundBezel)
             }
 
@@ -161,6 +156,13 @@ struct GeneralSettingsTab: View {
                     TextField("Path", text: $saveToLocation)
                         .textFieldStyle(.roundedBorder)
                 }
+                Toggle("Launch Clipsmith at login", isOn: $launchAtLogin)
+                    .onChange(of: launchAtLogin) { _, newValue in
+                        setLaunchAtLogin(enabled: newValue)
+                    }
+                    .onAppear {
+                        syncLaunchAtLogin()
+                    }
             }
 
             // MARK: - Features
@@ -239,18 +241,6 @@ struct GeneralSettingsTab: View {
                 }
             }
             .task { currencyService.loadRates() }
-
-            // MARK: - Launch
-
-            Section("Startup") {
-                Toggle("Launch Clipsmith at login", isOn: $launchAtLogin)
-                    .onChange(of: launchAtLogin) { _, newValue in
-                        setLaunchAtLogin(enabled: newValue)
-                    }
-                    .onAppear {
-                        syncLaunchAtLogin()
-                    }
-            }
 
             // MARK: - Accessibility
 

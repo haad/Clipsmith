@@ -10,7 +10,8 @@ enum SettingsTab: Int {
     case prompts = 2
     case gist = 3
     case docsets = 4
-    case license = 5
+    case help = 5
+    case license = 6  // hidden from UI; kept for AppDelegate navigation
 }
 
 /// Root preferences window — a tabbed view with all settings sections.
@@ -54,13 +55,14 @@ struct SettingsView: View {
                 }
                 .tag(SettingsTab.docsets.rawValue)
 
-            LicenseSettingsSection()
+            HelpSettingsTab()
                 .tabItem {
-                    Label("License", systemImage: "key")
+                    Label("Help", systemImage: "questionmark.circle")
                 }
-                .tag(SettingsTab.license.rawValue)
+                .tag(SettingsTab.help.rawValue)
         }
-        .frame(minWidth: 420, minHeight: 300)
+        .frame(minWidth: 480, idealWidth: 600, maxWidth: .infinity,
+               minHeight: 400, idealHeight: 560, maxHeight: .infinity)
         .onDisappear {
             // Restore accessory policy when the settings window closes,
             // but only if no other regular windows remain visible.

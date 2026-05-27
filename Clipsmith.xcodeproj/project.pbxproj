@@ -101,6 +101,7 @@
 		AA0095 /* exchange-rates-bundled.json in Resources */ = {isa = PBXBuildFile; fileRef = AF0096 /* exchange-rates-bundled.json */; };
 		AA0096 /* CommandPaletteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0097 /* CommandPaletteService.swift */; };
 		AA0097 /* CommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0098 /* CommandPaletteView.swift */; };
+		AA0099 /* HelpSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0099 /* HelpSettingsTab.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -210,6 +211,7 @@
 		AF0096 /* exchange-rates-bundled.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "exchange-rates-bundled.json"; sourceTree = "<group>"; };
 		AF0097 /* CommandPaletteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteService.swift; sourceTree = "<group>"; };
 		AF0098 /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
+		AF0099 /* HelpSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSettingsTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -373,6 +375,7 @@
 				AF0053 /* PromptLibrarySettingsSection.swift */,
 				AF0075 /* DocsetSettingsSection.swift */,
 				AF0080 /* LicenseSettingsSection.swift */,
+				AF0099 /* HelpSettingsTab.swift */,
 			);
 			path = Settings;
 			sourceTree = "<group>";
@@ -628,6 +631,7 @@
 				AA0094 /* CurrencyService.swift in Sources */,
 				AA0096 /* CommandPaletteService.swift in Sources */,
 				AA0097 /* CommandPaletteView.swift in Sources */,
+				AA0099 /* HelpSettingsTab.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
