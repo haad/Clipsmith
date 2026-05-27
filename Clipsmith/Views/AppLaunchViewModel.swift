@@ -67,6 +67,10 @@ final class AppLaunchViewModel {
     /// existing tests and previews continue to work without it.
     var commandPaletteService: CommandPaletteService? = nil
 
+    /// Pending debounced evaluation — cancelled on every keystroke so NSExpression
+    /// is never called on a half-typed expression.
+    private var evaluationTask: Task<Void, Never>?
+
     // MARK: - Command palette mode
 
     /// Returns `true` when the command-palette feature flag is enabled AND the current
@@ -111,13 +115,28 @@ final class AppLaunchViewModel {
     ///   whose bundleID is in `recentBundleIDs`. Sorted score-descending, then
     ///   name-ascending for equal scores.
     func recomputeDisplayedApps() {
-        // Phase 12 short-circuit: when in command palette mode, evaluate the query
-        // and hide the app list entirely (D-01).
+        // Phase 12 short-circuit: when in command palette mode, debounce evaluation
+        // so NSExpression never sees a half-typed expression (D-01).
         if isCommandPaletteMode {
             let prefix = currentPrefix
             let queryPayload = String(searchText.dropFirst(prefix.count))
-            commandResult = commandPaletteService?.evaluate(queryPayload)
-            displayedApps = []   // hide app list (D-01)
+            displayedApps = []
+
+            evaluationTask?.cancel()
+
+            guard !queryPayload.isEmpty else {
+                commandResult = nil
+                return
+            }
+
+            let service = commandPaletteService
+            evaluationTask = Task { @MainActor [weak self] in
+                guard let self else { return }
+                do { try await Task.sleep(nanoseconds: 300_000_000) } catch { return }
+                let result = service?.evaluate(queryPayload)
+                // Show valid results immediately; nil (invalid) only after the pause.
+                self.commandResult = result
+            }
             return
         }
         // When leaving command palette mode, clear any stale result so the view
