@@ -144,9 +144,24 @@ final class AppScannerService {
 
     // MARK: - Private Scan
 
-    /// Enumerates the five whitelisted search paths one level deep, builds
-    /// `AppEntry` values, deduplicates by bundle ID (fallback: resolved URL path),
-    /// and returns entries sorted alphabetically by lowercased name.
+    /// Enumerates the five whitelisted search paths, builds `AppEntry` values,
+    /// deduplicates by resolved URL path, and returns entries sorted
+    /// alphabetically by lowercased name.
+    ///
+    /// Top-level `.app` bundles are picked up directly. Non-`.app` sub-folders
+    /// (e.g. game installers like
+    /// `/Applications/Baldur's Gate Enhanced Edition/Baldur's Gate - Enhanced Edition.app`)
+    /// are descended one level so apps nested inside a container folder are
+    /// discovered. When the container holds exactly one `.app`, the container
+    /// folder name is used as the display name — these installers often set a
+    /// generic `CFBundleName` like `BaldursGate-macOS`, and the folder name is
+    /// what the user thinks of as the app.
+    ///
+    /// Dedup is by resolved URL path (not bundle ID) so that distinct installs
+    /// which happen to share a `CFBundleIdentifier` — e.g. Beamdog's Baldur's
+    /// Gate and Baldur's Gate II both ship as
+    /// `com.beamdog.baldursgateenhancededition` — both survive. Symlinked
+    /// duplicates across search paths still collapse correctly.
     ///
     /// Marked `nonisolated` so it can be called from `Task.detached` without
     /// compiler warnings about capturing `self` across actor isolation.
@@ -163,8 +178,33 @@ final class AppScannerService {
             homeApps,
         ]
 
+        // Search paths reachable as one-level subdirectories of another search
+        // path (e.g. `/Applications/Utilities`). We must not descend into these
+        // during container-folder scanning — the dedicated iteration handles
+        // them with the right display-name semantics (no folder-name override).
+        let searchPathSet: Set<String> = Set(searchPaths.map { $0.standardizedFileURL.path })
+
         var seen: Set<String> = []
         var result: [AppEntry] = []
+
+        func appendIfApp(_ url: URL, displayNameOverride: String? = nil) {
+            guard url.pathExtension == "app" else { return }
+
+            let dedupeKey = url.resolvingSymlinksInPath().path
+            guard !seen.contains(dedupeKey) else { return }
+            seen.insert(dedupeKey)
+
+            let bundle = Bundle(url: url)
+            let bundleID = bundle?.bundleIdentifier
+
+            // Prefer caller-supplied override (container folder name) over
+            // CFBundleName, with filename sans .app as final fallback.
+            let name = displayNameOverride
+                ?? (bundle?.infoDictionary?["CFBundleName"] as? String)
+                ?? url.deletingPathExtension().lastPathComponent
+
+            result.append(AppEntry(name: name, url: url, bundleID: bundleID, icon: nil))
+        }
 
         for dirURL in searchPaths {
             guard let contents = try? FileManager.default.contentsOfDirectory(
@@ -173,21 +213,26 @@ final class AppScannerService {
                 options: [.skipsHiddenFiles]
             ) else { continue }
 
-            for url in contents where url.pathExtension == "app" {
-                let bundle = Bundle(url: url)
-                let bundleID = bundle?.bundleIdentifier
+            for url in contents {
+                if url.pathExtension == "app" {
+                    appendIfApp(url)
+                } else if (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true,
+                          !searchPathSet.contains(url.standardizedFileURL.path) {
+                    guard let subContents = try? FileManager.default.contentsOfDirectory(
+                        at: url,
+                        includingPropertiesForKeys: [.isDirectoryKey],
+                        options: [.skipsHiddenFiles]
+                    ) else { continue }
 
-                // Deduplicate by bundle ID; fall back to resolved URL path (Pitfall 7)
-                let dedupeKey = bundleID ?? url.resolvingSymlinksInPath().path
-
-                guard !seen.contains(dedupeKey) else { continue }
-                seen.insert(dedupeKey)
-
-                // Prefer CFBundleName; fall back to filename sans .app (Pitfall 5)
-                let name = (bundle?.infoDictionary?["CFBundleName"] as? String)
-                    ?? url.deletingPathExtension().lastPathComponent
-
-                result.append(AppEntry(name: name, url: url, bundleID: bundleID, icon: nil))
+                    let nestedApps = subContents.filter { $0.pathExtension == "app" }
+                    // Use the container folder name only when it unambiguously
+                    // represents a single app. Multi-app containers fall back
+                    // to each .app's own CFBundleName.
+                    let override = nestedApps.count == 1 ? url.lastPathComponent : nil
+                    for subURL in nestedApps {
+                        appendIfApp(subURL, displayNameOverride: override)
+                    }
+                }
             }
         }
 
