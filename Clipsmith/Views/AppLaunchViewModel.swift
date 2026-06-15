@@ -14,8 +14,8 @@ import Observation
 /// Tie-break rule (for Plan 03 human-verify predictability): when two apps have
 /// the same boosted FuzzyMatcher score, they are sorted by `name.lowercased()`
 /// ascending. This ensures deterministic ordering for repeated queries.
-@Observable @MainActor
-final class AppLaunchViewModel {
+@Observable
+final class AppLaunchViewModel: @unchecked Sendable {
 
     // MARK: - State
 
