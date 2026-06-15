@@ -113,6 +113,10 @@ struct AppLaunchView: View {
                             .onTapGesture {
                                 viewModel.navigateTo(index: index)
                             }
+                            .simultaneousGesture(TapGesture(count: 2).onEnded {
+                                viewModel.navigateTo(index: index)
+                                viewModel.onLaunch?(entry)
+                            })
                     }
                 }
                 .padding(.horizontal, 16)

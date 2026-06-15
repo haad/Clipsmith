@@ -87,6 +87,8 @@ final class AppLaunchController: NSPanel {
         hostingView.sizingOptions = []   // CRITICAL: prevents infinite constraint update loop crash
         contentView = hostingView
 
+        viewModel.onLaunch = { [weak self] _ in self?.launchSelected() }
+
         logger.debug("AppLaunchController initialised — level: \(self.level.rawValue, privacy: .public)")
     }
 

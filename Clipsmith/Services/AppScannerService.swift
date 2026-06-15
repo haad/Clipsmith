@@ -207,13 +207,18 @@ final class AppScannerService {
         }
 
         for dirURL in searchPaths {
+            // Do not use .skipsHiddenFiles — Apple marks symlink stubs like
+            // /Applications/Safari.app with kIsInvisible, which that option
+            // treats as hidden even though the app is perfectly usable.
+            // Filter dot-prefixed names manually instead.
             guard let contents = try? FileManager.default.contentsOfDirectory(
                 at: dirURL,
                 includingPropertiesForKeys: [.isDirectoryKey],
-                options: [.skipsHiddenFiles]
+                options: []
             ) else { continue }
 
             for url in contents {
+                guard !url.lastPathComponent.hasPrefix(".") else { continue }
                 if url.pathExtension == "app" {
                     appendIfApp(url)
                 } else if (try? url.resourceValues(forKeys: [.isDirectoryKey]))?.isDirectory == true,
@@ -221,10 +226,10 @@ final class AppScannerService {
                     guard let subContents = try? FileManager.default.contentsOfDirectory(
                         at: url,
                         includingPropertiesForKeys: [.isDirectoryKey],
-                        options: [.skipsHiddenFiles]
+                        options: []
                     ) else { continue }
 
-                    let nestedApps = subContents.filter { $0.pathExtension == "app" }
+                    let nestedApps = subContents.filter { !$0.lastPathComponent.hasPrefix(".") && $0.pathExtension == "app" }
                     // Use the container folder name only when it unambiguously
                     // represents a single app. Multi-app containers fall back
                     // to each .app's own CFBundleName.

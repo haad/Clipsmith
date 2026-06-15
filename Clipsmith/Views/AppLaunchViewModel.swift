@@ -67,6 +67,9 @@ final class AppLaunchViewModel {
     /// existing tests and previews continue to work without it.
     var commandPaletteService: CommandPaletteService? = nil
 
+    /// Called by the view when the user clicks an app cell. Wired by AppLaunchController.
+    var onLaunch: ((AppEntry) -> Void)? = nil
+
     /// Pending debounced evaluation — cancelled on every keystroke so NSExpression
     /// is never called on a half-typed expression.
     private var evaluationTask: Task<Void, Never>?
