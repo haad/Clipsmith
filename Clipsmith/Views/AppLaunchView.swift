@@ -18,6 +18,7 @@ struct AppLaunchView: View {
     // MARK: - Dependencies
 
     @Bindable var viewModel: AppLaunchViewModel
+    var onLaunch: (AppEntry) -> Void
 
     @AppStorage(AppSettingsKeys.bezelAlpha) private var bezelAlpha: Double = 0.25
 
@@ -115,7 +116,7 @@ struct AppLaunchView: View {
                             }
                             .simultaneousGesture(TapGesture(count: 2).onEnded {
                                 viewModel.navigateTo(index: index)
-                                viewModel.onLaunch?(entry)
+                                onLaunch(entry)
                             })
                     }
                 }

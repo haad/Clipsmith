@@ -83,11 +83,9 @@ final class AppLaunchController: NSPanel {
         isReleasedWhenClosed = false
 
         // Content view — no model container needed (launcher has no SwiftData dependency)
-        let hostingView = NSHostingView(rootView: AppLaunchView(viewModel: viewModel))
+        let hostingView = NSHostingView(rootView: AppLaunchView(viewModel: viewModel, onLaunch: { [weak self] _ in self?.launchSelected() }))
         hostingView.sizingOptions = []   // CRITICAL: prevents infinite constraint update loop crash
         contentView = hostingView
-
-        viewModel.onLaunch = { [weak self] _ in self?.launchSelected() }
 
         logger.debug("AppLaunchController initialised — level: \(self.level.rawValue, privacy: .public)")
     }
