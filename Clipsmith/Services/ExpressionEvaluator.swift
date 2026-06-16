@@ -109,7 +109,7 @@ nonisolated struct ExpressionEvaluator {
         // 3c. Reject incomplete expressions ending with a dangling operator or open paren.
         //     NSExpression(format:) throws an uncaught ObjC exception for these (T-12-01).
         //     e.g. "2+" → NSExpression tries to parse "2+ == 1" and crashes.
-        if let last = expr.last(where: { !$0.isWhitespace }), "+-*/,(".contains(last) {
+        if let last = expr.last(where: { !$0.isWhitespace }), "+-*/,(.".contains(last) {
             return nil
         }
 
