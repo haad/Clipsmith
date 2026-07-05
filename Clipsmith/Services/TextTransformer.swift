@@ -131,6 +131,57 @@ enum TextTransformer {
         return result
     }
 
+    // MARK: - Line operations
+
+    /// Sorts lines alphabetically (ascending, case-sensitive).
+    static func sortLines(_ s: String) -> String {
+        s.components(separatedBy: "\n").sorted().joined(separator: "\n")
+    }
+
+    /// Removes duplicate lines, keeping the first occurrence and original order.
+    static func dedupeLines(_ s: String) -> String {
+        var seen = Set<String>()
+        return s.components(separatedBy: "\n")
+            .filter { seen.insert($0).inserted }
+            .joined(separator: "\n")
+    }
+
+    /// Reverses line order.
+    static func reverseLines(_ s: String) -> String {
+        s.components(separatedBy: "\n").reversed().joined(separator: "\n")
+    }
+
+    // MARK: - Slugify
+
+    /// Converts to a lowercase URL slug: diacritics folded, non-alphanumerics
+    /// collapsed into single hyphens.
+    static func slugify(_ s: String) -> String {
+        s.folding(options: .diacriticInsensitive, locale: Locale(identifier: "en_US"))
+            .lowercased()
+            .components(separatedBy: CharacterSet.alphanumerics.inverted)
+            .filter { !$0.isEmpty }
+            .joined(separator: "-")
+    }
+
+    // MARK: - Escape / Unescape
+
+    /// Escapes backslashes, double quotes, newlines, and tabs (C/JSON string style).
+    static func escape(_ s: String) -> String {
+        s.replacingOccurrences(of: "\\", with: "\\\\")
+            .replacingOccurrences(of: "\"", with: "\\\"")
+            .replacingOccurrences(of: "\n", with: "\\n")
+            .replacingOccurrences(of: "\t", with: "\\t")
+    }
+
+    /// Reverses `escape(_:)`. Replacement order matters: backslashes last so
+    /// escaped sequences are not double-processed.
+    static func unescape(_ s: String) -> String {
+        s.replacingOccurrences(of: "\\n", with: "\n")
+            .replacingOccurrences(of: "\\t", with: "\t")
+            .replacingOccurrences(of: "\\\"", with: "\"")
+            .replacingOccurrences(of: "\\\\", with: "\\")
+    }
+
     // MARK: - RTF
 
     /// Renders the string as RTF data using a monospaced system font.

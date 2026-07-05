@@ -117,4 +117,36 @@ final class TextTransformerTests: XCTestCase {
         XCTAssertEqual(TextTransformer.snakeCase(""), "")
         XCTAssertEqual(TextTransformer.camelCase("!!!"), "!!!")
     }
+
+    // MARK: - Line operations (transform picker)
+
+    func testSortLines() {
+        XCTAssertEqual(TextTransformer.sortLines("banana\napple\ncherry"), "apple\nbanana\ncherry")
+    }
+
+    func testDedupeLines() {
+        XCTAssertEqual(TextTransformer.dedupeLines("a\nb\na\nc\nb"), "a\nb\nc")
+    }
+
+    func testReverseLines() {
+        XCTAssertEqual(TextTransformer.reverseLines("1\n2\n3"), "3\n2\n1")
+    }
+
+    // MARK: - Slugify
+
+    func testSlugify() {
+        XCTAssertEqual(TextTransformer.slugify("Hello World!"), "hello-world")
+        XCTAssertEqual(TextTransformer.slugify("Čaučí, díky"), "cauci-diky")
+    }
+
+    // MARK: - Escape / Unescape
+
+    func testEscape() {
+        XCTAssertEqual(TextTransformer.escape("say \"hi\"\nnew line"), "say \\\"hi\\\"\\nnew line")
+    }
+
+    func testUnescapeRoundTrip() {
+        let original = "say \"hi\"\nnew\tline \\ backslash"
+        XCTAssertEqual(TextTransformer.unescape(TextTransformer.escape(original)), original)
+    }
 }
