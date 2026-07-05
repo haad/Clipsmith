@@ -314,7 +314,7 @@ struct BezelView: View {
     /// One-line preview of the transform applied to (a 200-char sample of)
     /// the current clipping. "—" when the transform does not apply.
     private func transformPreview(_ transform: TextTransform) -> String {
-        guard let content = viewModel.currentClipping else { return "" }
+        guard let content = viewModel.currentClipping else { return "—" }
         let sample = String(content.prefix(200))
         guard let result = transform.apply(sample) else { return "—" }
         return String(result.replacingOccurrences(of: "\n", with: " ⏎ ").prefix(60))
