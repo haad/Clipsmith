@@ -360,55 +360,17 @@ final class BezelController: NSPanel {
 
         let menu = NSMenu(title: "Quick Actions")
 
-        // MARK: Transform submenu (QACT-01)
+        // MARK: Transform submenu — built from TransformRegistry (QACT-01, QACT-02)
         let transformMenu = NSMenu(title: "Transform")
-
-        let uppercaseItem = NSMenuItem(title: "UPPERCASE", action: #selector(actionUppercase), keyEquivalent: "")
-        uppercaseItem.target = self
-        transformMenu.addItem(uppercaseItem)
-
-        let lowercaseItem = NSMenuItem(title: "lowercase", action: #selector(actionLowercase), keyEquivalent: "")
-        lowercaseItem.target = self
-        transformMenu.addItem(lowercaseItem)
-
-        let titleCaseItem = NSMenuItem(title: "Title Case", action: #selector(actionTitleCase), keyEquivalent: "")
-        titleCaseItem.target = self
-        transformMenu.addItem(titleCaseItem)
-
-        let trimItem = NSMenuItem(title: "Trim Whitespace", action: #selector(actionTrimWhitespace), keyEquivalent: "")
-        trimItem.target = self
-        transformMenu.addItem(trimItem)
-
-        let urlEncodeItem = NSMenuItem(title: "URL Encode", action: #selector(actionUrlEncode), keyEquivalent: "")
-        urlEncodeItem.target = self
-        transformMenu.addItem(urlEncodeItem)
-
-        let urlDecodeItem = NSMenuItem(title: "URL Decode", action: #selector(actionUrlDecode), keyEquivalent: "")
-        urlDecodeItem.target = self
-        transformMenu.addItem(urlDecodeItem)
-
+        for transform in TransformRegistry.all {
+            let item = NSMenuItem(title: transform.displayName, action: #selector(actionMenuTransform(_:)), keyEquivalent: "")
+            item.target = self
+            item.representedObject = transform.id
+            transformMenu.addItem(item)
+        }
         let transformParent = NSMenuItem(title: "Transform", action: nil, keyEquivalent: "")
         transformParent.submenu = transformMenu
         menu.addItem(transformParent)
-
-        // MARK: Format submenu (QACT-02)
-        let formatMenu = NSMenu(title: "Format")
-
-        let quotesItem = NSMenuItem(title: "Wrap in Quotes", action: #selector(actionWrapInQuotes), keyEquivalent: "")
-        quotesItem.target = self
-        formatMenu.addItem(quotesItem)
-
-        let codeBlockItem = NSMenuItem(title: "Markdown Code Block", action: #selector(actionMarkdownCodeBlock), keyEquivalent: "")
-        codeBlockItem.target = self
-        formatMenu.addItem(codeBlockItem)
-
-        let jsonItem = NSMenuItem(title: "JSON Pretty Print", action: #selector(actionJsonPrettyPrint), keyEquivalent: "")
-        jsonItem.target = self
-        formatMenu.addItem(jsonItem)
-
-        let formatParent = NSMenuItem(title: "Format", action: nil, keyEquivalent: "")
-        formatParent.submenu = formatMenu
-        menu.addItem(formatParent)
 
         // MARK: Share submenu (QACT-03)
         let shareMenu = NSMenu(title: "Share")
@@ -512,73 +474,21 @@ final class BezelController: NSPanel {
         logger.info("Applied transform \(transform.id, privacy: .public) and pasted")
     }
 
-    // MARK: - Transform action handlers
+    // MARK: - Transform menu action
 
-    /// Shared helper: applies a text transform to the current clipping, writes result
-    /// to pasteboard, sets blockedChangeCount to prevent self-capture, and inserts
-    /// the transformed content into clipboard history.
-    ///
-    /// Does NOT auto-paste — user reviews the transformed result and presses Enter.
-    private func applyTransform(_ transform: (String) -> String) {
-        guard let content = viewModel.currentClipping else { return }
-        let result = transform(content)
-
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-        pasteboard.setString(result, forType: .string)
-
-        // Prevent self-capture: set blockedChangeCount so ClipboardMonitor skips this write.
-        clipboardMonitor?.blockedChangeCount = pasteboard.changeCount
-
-        // Insert transformed content into history with "Clipsmith (transformed)" source.
-        let rememberNum = UserDefaults.standard.integer(forKey: AppSettingsKeys.rememberNum)
-        Task {
-            try? await clipboardStore?.insert(
-                content: result,
-                sourceAppName: "Clipsmith (transformed)",
-                rememberNum: rememberNum
-            )
+    /// Shared handler for all registry-built menu items. The transform id
+    /// travels in representedObject. Applies transform-and-paste — same path
+    /// as the picker. On failure, beeps (no overlay is visible from the menu).
+    @objc private func actionMenuTransform(_ sender: NSMenuItem) {
+        guard
+            let id = sender.representedObject as? String,
+            let transform = TransformRegistry.transform(withID: id)
+        else { return }
+        guard let content = viewModel.currentClipping, transform.apply(content) != nil else {
+            NSSound.beep()
+            return
         }
-
-        logger.info("Applied transform — result written to pasteboard")
-    }
-
-    @objc private func actionUppercase() {
-        applyTransform(TextTransformer.uppercase)
-    }
-
-    @objc private func actionLowercase() {
-        applyTransform(TextTransformer.lowercase)
-    }
-
-    @objc private func actionTitleCase() {
-        applyTransform(TextTransformer.titleCase)
-    }
-
-    @objc private func actionTrimWhitespace() {
-        applyTransform(TextTransformer.trimWhitespace)
-    }
-
-    @objc private func actionUrlEncode() {
-        applyTransform(TextTransformer.urlEncode)
-    }
-
-    @objc private func actionUrlDecode() {
-        applyTransform { TextTransformer.urlDecode($0) ?? $0 }
-    }
-
-    // MARK: - Format action handlers
-
-    @objc private func actionWrapInQuotes() {
-        applyTransform(TextTransformer.wrapInQuotes)
-    }
-
-    @objc private func actionMarkdownCodeBlock() {
-        applyTransform(TextTransformer.markdownCodeBlock)
-    }
-
-    @objc private func actionJsonPrettyPrint() {
-        applyTransform { TextTransformer.jsonPrettyPrint($0) ?? $0 }
+        Task { @MainActor in await self.applyTransformAndPaste(transform) }
     }
 
     // MARK: - Share action handlers
