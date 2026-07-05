@@ -87,4 +87,34 @@ final class TextTransformerTests: XCTestCase {
         XCTAssertNotNil(result, "copyAsRTF should return non-nil Data")
         XCTAssertFalse(result!.isEmpty, "RTF data should not be empty")
     }
+
+    // MARK: - Case conversions (transform picker)
+
+    func testCamelCase() {
+        XCTAssertEqual(TextTransformer.camelCase("user name"), "userName")
+        XCTAssertEqual(TextTransformer.camelCase("user_id"), "userId")
+        XCTAssertEqual(TextTransformer.camelCase("some-long-name"), "someLongName")
+        XCTAssertEqual(TextTransformer.camelCase("alreadyCamel"), "alreadyCamel")
+    }
+
+    func testPascalCase() {
+        XCTAssertEqual(TextTransformer.pascalCase("user name"), "UserName")
+        XCTAssertEqual(TextTransformer.pascalCase("user_id"), "UserId")
+    }
+
+    func testSnakeCase() {
+        XCTAssertEqual(TextTransformer.snakeCase("user name"), "user_name")
+        XCTAssertEqual(TextTransformer.snakeCase("userId"), "user_id")
+        XCTAssertEqual(TextTransformer.snakeCase("some-long-name"), "some_long_name")
+    }
+
+    func testKebabCase() {
+        XCTAssertEqual(TextTransformer.kebabCase("user name"), "user-name")
+        XCTAssertEqual(TextTransformer.kebabCase("userId"), "user-id")
+    }
+
+    func testCaseConversionEmptyAndSymbolsOnly() {
+        XCTAssertEqual(TextTransformer.snakeCase(""), "")
+        XCTAssertEqual(TextTransformer.camelCase("!!!"), "!!!")
+    }
 }

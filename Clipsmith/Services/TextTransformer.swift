@@ -27,6 +27,57 @@ enum TextTransformer {
         s.capitalized
     }
 
+    // MARK: - Identifier case conversions
+
+    /// Splits a string into lowercase word tokens on whitespace, punctuation
+    /// (`-`, `_`, etc.), and lower→Upper camelCase boundaries.
+    ///
+    /// Simple boundary rule only: "userId" → ["user", "id"]. Consecutive
+    /// capitals are NOT split ("HTTPServer" → ["httpserver"]) — acceptable.
+    private static func words(_ s: String) -> [String] {
+        var separated = ""
+        var prev: Character?
+        for c in s {
+            if let p = prev, c.isUppercase, (p.isLowercase || p.isNumber) {
+                separated.append(" ")
+            }
+            separated.append(c)
+            prev = c
+        }
+        return separated
+            .components(separatedBy: CharacterSet.alphanumerics.inverted)
+            .filter { !$0.isEmpty }
+            .map { $0.lowercased() }
+    }
+
+    /// Converts to camelCase. Returns input unchanged if it contains no words.
+    static func camelCase(_ s: String) -> String {
+        let w = words(s)
+        guard let first = w.first else { return s }
+        return first + w.dropFirst().map(\.capitalized).joined()
+    }
+
+    /// Converts to PascalCase. Returns input unchanged if it contains no words.
+    static func pascalCase(_ s: String) -> String {
+        let w = words(s)
+        guard !w.isEmpty else { return s }
+        return w.map(\.capitalized).joined()
+    }
+
+    /// Converts to snake_case. Returns input unchanged if it contains no words.
+    static func snakeCase(_ s: String) -> String {
+        let w = words(s)
+        guard !w.isEmpty else { return s }
+        return w.joined(separator: "_")
+    }
+
+    /// Converts to kebab-case. Returns input unchanged if it contains no words.
+    static func kebabCase(_ s: String) -> String {
+        let w = words(s)
+        guard !w.isEmpty else { return s }
+        return w.joined(separator: "-")
+    }
+
     // MARK: - Whitespace
 
     /// Removes leading and trailing whitespace and newlines.
