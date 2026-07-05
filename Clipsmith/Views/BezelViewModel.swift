@@ -126,12 +126,11 @@ final class BezelViewModel {
     }
 
     /// Closes the picker and resets all its state. Called on hide() and Escape.
+    /// Setting transformFilterText last is deliberate: its didSet resets the
+    /// selection, clears the error, and recomputes filteredTransforms.
     func resetTransformPicker() {
         isShowingTransformPicker = false
         transformFilterText = ""
-        transformSelectedIndex = 0
-        transformError = nil
-        filteredTransforms = TransformRegistry.all
     }
 
     // MARK: - Filtered cache

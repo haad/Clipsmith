@@ -371,7 +371,7 @@ final class BezelViewModelTests: XCTestCase {
         let vm = BezelViewModel()
         vm.isShowingTransformPicker = true
         vm.transformFilterText = "json"
-        vm.transformSelectedIndex = 0
+        vm.transformSelectedIndex = 2
         vm.transformError = "x"
         vm.resetTransformPicker()
         XCTAssertFalse(vm.isShowingTransformPicker)
