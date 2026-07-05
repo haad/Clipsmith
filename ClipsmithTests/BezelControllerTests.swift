@@ -185,6 +185,32 @@ final class BezelControllerTests: XCTestCase {
         XCTAssertFalse(controller.viewModel.isShowingTransformPicker)
     }
 
+    func testApplyTransformDoesNotInsertHistoryWhenBezelNotVisible() async throws {
+        let controller = try makeControllerWithClipping("hello")
+        let container = try makeTestContainer()
+        let store = ClipboardStore(modelContainer: container)
+        controller.clipboardStore = store
+        controller.toggleTransformPicker()
+
+        guard let upper = TransformRegistry.transform(withID: "case.upper") else {
+            return XCTFail("case.upper missing from registry")
+        }
+        // Set rememberNum so trimToLimit doesn't silently delete the insert
+        // (UserDefaults returns 0 in tests which would trim everything, masking the bug).
+        UserDefaults.standard.set(100, forKey: AppSettingsKeys.rememberNum)
+        defer { UserDefaults.standard.removeObject(forKey: AppSettingsKeys.rememberNum) }
+
+        // Panel was never shown — isVisible is false, simulating the bezel
+        // having been dismissed while the Enter task was queued.
+        await controller.applyTransformAndPaste(upper)
+
+        // Give any fire-and-forget Task spawned inside applyTransformAndPaste time to complete.
+        try await Task.sleep(nanoseconds: 100_000_000) // 0.1s
+
+        let ids = try await store.fetchAll()
+        XCTAssertTrue(ids.isEmpty, "No phantom history insert when the bezel is not visible")
+    }
+
     func testPickerEnterOnFailableTransformShowsErrorAndStaysOpen() async throws {
         let controller = try makeControllerWithClipping("not valid json { at all")
         controller.toggleTransformPicker()

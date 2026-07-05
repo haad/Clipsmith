@@ -11,8 +11,7 @@ final class TransformRegistryTests: XCTestCase {
     }
 
     func testRegistryContainsExpectedCount() {
-        // 10 original-era transforms (minus copyAsRTF which is Data, not text,
-        // so 9 make it into the registry) + 16 new + extraction = 26 total:
+        // 9 original text transforms (copyAsRTF excluded — Data, not text) + 17 new = 26:
         // 7 case + 4 trim/lines + 6 encode/escape + 4 format + 3 dev + 2 extract.
         XCTAssertEqual(TransformRegistry.all.count, 26)
     }

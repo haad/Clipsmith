@@ -9,7 +9,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Added
 - **Transform picker in the clipboard bezel** — press Tab in the Cmd-Shift-V bezel to fuzzy-search 26 text transforms and apply-and-paste in one motion; failable transforms (JSON, Base64, JWT…) show an inline error instead of pasting
-- 16 new text transforms: camelCase/PascalCase/snake_case/kebab-case, Base64 encode/decode, sort/dedupe/reverse lines, extract URLs/emails, JWT decode, Unix timestamp ↔ ISO 8601, slugify, escape/unescape
+- 17 new text transforms: camelCase/PascalCase/snake_case/kebab-case, Base64 encode/decode, sort/dedupe/reverse lines, extract URLs/emails, JWT decode, Unix timestamp ↔ ISO 8601, slugify, escape/unescape
 
 ### Changed
 - Bundled prompt catalog refreshed from v1 (11 prompts) to v4 (85 prompts across 8 categories)

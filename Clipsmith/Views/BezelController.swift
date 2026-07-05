@@ -298,6 +298,7 @@ final class BezelController: NSPanel {
     // MARK: - Scroll wheel navigation (Bug #12)
 
     override func scrollWheel(with event: NSEvent) {
+        if viewModel.isShowingTransformPicker { return }
         // Ignore momentum (inertial) scrolling — only respond to direct user input.
         if event.momentumPhase != [] { return }
 
@@ -333,6 +334,7 @@ final class BezelController: NSPanel {
     // MARK: - Double-click paste (Bug #13)
 
     override func mouseDown(with event: NSEvent) {
+        if viewModel.isShowingTransformPicker { return }
         if event.clickCount == 2 {
             Task { @MainActor in await pasteAndHide() }
         } else {
@@ -459,6 +461,11 @@ final class BezelController: NSPanel {
             viewModel.transformError = transform.failureMessage
             return
         }
+
+        // Bail if the bezel was dismissed while this task was queued (double-Enter,
+        // Escape race, hold-release race) — prevents phantom history inserts for a
+        // paste that pasteAndHide will skip anyway.
+        guard isVisible else { return }
 
         // Insert transformed content into history with "Clipsmith (transformed)" source.
         let rememberNum = UserDefaults.standard.integer(forKey: AppSettingsKeys.rememberNum)

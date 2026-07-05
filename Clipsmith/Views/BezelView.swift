@@ -316,7 +316,12 @@ struct BezelView: View {
     private func transformPreview(_ transform: TextTransform) -> String {
         guard let content = viewModel.currentClipping else { return "—" }
         let sample = String(content.prefix(200))
-        guard let result = transform.apply(sample) else { return "—" }
+        guard let result = transform.apply(sample) else {
+            // "—" is only authoritative when the sample IS the full content;
+            // a truncated sample can fail (e.g. cut-off JSON) where the full
+            // clipping would succeed.
+            return content.count > 200 ? "…" : "—"
+        }
         return String(result.replacingOccurrences(of: "\n", with: " ⏎ ").prefix(60))
     }
 
