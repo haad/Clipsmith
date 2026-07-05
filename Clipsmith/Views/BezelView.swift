@@ -64,6 +64,10 @@ struct BezelView: View {
 
             // Navigation counter footer
             HStack {
+                Text("⇥ transform")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .padding(.leading, 16)
                 Spacer()
                 Text(viewModel.navigationLabel)
                     .font(.caption)
@@ -87,7 +91,9 @@ struct BezelView: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: 16))
         .overlay {
-            if viewModel.isShowingCheatSheet {
+            if viewModel.isShowingTransformPicker {
+                transformPickerOverlay
+            } else if viewModel.isShowingCheatSheet {
                 cheatSheetOverlay
             }
         }
@@ -193,7 +199,8 @@ struct BezelView: View {
                         ("Enter", "Paste and close"),
                         ("Escape", "Close"),
                         ("Delete", "Remove clipping"),
-                        ("Tab  or  Right-click", "Quick actions menu"),
+                        ("Tab", "Transform picker"),
+                        ("Right-click", "Quick actions menu"),
                         ("Double-click", "Paste and close"),
                         ("s", "Save to file"),
                         ("S", "Save and delete"),
@@ -215,6 +222,102 @@ struct BezelView: View {
             }
         }
         .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    // MARK: - Transform picker overlay
+
+    private var transformPickerOverlay: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 16)
+                .fill(.ultraThickMaterial)
+
+            VStack(spacing: 0) {
+                // Filter line — no TextField; BezelController routes raw keys
+                // into viewModel.transformFilterText.
+                HStack(spacing: 8) {
+                    Image(systemName: "wand.and.stars")
+                        .foregroundStyle(.secondary)
+                    Text(viewModel.transformFilterText.isEmpty
+                         ? "Type to filter transforms…"
+                         : viewModel.transformFilterText)
+                        .foregroundStyle(viewModel.transformFilterText.isEmpty ? .secondary : .primary)
+                    Spacer()
+                }
+                .font(.body)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+
+                Divider()
+
+                if let error = viewModel.transformError {
+                    Text(error)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 4)
+                    Divider()
+                }
+
+                if viewModel.filteredTransforms.isEmpty {
+                    Text("No matches")
+                        .foregroundStyle(.secondary)
+                        .font(.body)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                } else {
+                    ScrollViewReader { proxy in
+                        ScrollView {
+                            VStack(spacing: 0) {
+                                ForEach(Array(viewModel.filteredTransforms.enumerated()), id: \.element.id) { index, transform in
+                                    transformRow(transform, isSelected: index == viewModel.transformSelectedIndex)
+                                        .id(transform.id)
+                                }
+                            }
+                        }
+                        .onChange(of: viewModel.transformSelectedIndex) {
+                            if let current = viewModel.currentTransform {
+                                proxy.scrollTo(current.id, anchor: .center)
+                            }
+                        }
+                    }
+                }
+
+                Divider()
+
+                Text("↑↓ navigate · ⏎ transform & paste · esc close")
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .padding(.vertical, 6)
+            }
+        }
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+    }
+
+    private func transformRow(_ transform: TextTransform, isSelected: Bool) -> some View {
+        HStack {
+            Text(transform.displayName)
+                .font(.body)
+            Spacer()
+            Text(transformPreview(transform))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .truncationMode(.tail)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 5)
+        .background(isSelected ? Color.accentColor.opacity(0.2) : Color.clear)
+        .contentShape(Rectangle())
+    }
+
+    /// One-line preview of the transform applied to (a 200-char sample of)
+    /// the current clipping. "—" when the transform does not apply.
+    private func transformPreview(_ transform: TextTransform) -> String {
+        guard let content = viewModel.currentClipping else { return "" }
+        let sample = String(content.prefix(200))
+        guard let result = transform.apply(sample) else { return "—" }
+        return String(result.replacingOccurrences(of: "\n", with: " ⏎ ").prefix(60))
     }
 
     private func shortcutSection(_ title: String, shortcuts: [(String, String)]) -> some View {
