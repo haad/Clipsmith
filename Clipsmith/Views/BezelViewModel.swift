@@ -69,6 +69,71 @@ final class BezelViewModel {
     /// so that lookups from the view body do not mutate SwiftUI state mid-render.
     var iconCache: [String: NSImage] = [:]
 
+    // MARK: - Transform picker state
+
+    /// Whether the transform picker overlay is visible. Toggled by Tab.
+    var isShowingTransformPicker: Bool = false
+
+    /// Filter text typed while the picker is open. Managed by BezelController
+    /// key routing (the overlay has no TextField — the non-activating panel
+    /// routes raw keys). Setting it resets selection and clears any error.
+    var transformFilterText: String = "" {
+        didSet {
+            transformSelectedIndex = 0
+            transformError = nil
+            recomputeFilteredTransforms()
+        }
+    }
+
+    /// Selection index within filteredTransforms.
+    var transformSelectedIndex: Int = 0
+
+    /// Failure message shown inline when the selected transform returns nil.
+    var transformError: String? = nil
+
+    /// Transforms matching transformFilterText, ranked by fuzzy score.
+    private(set) var filteredTransforms: [TextTransform] = TransformRegistry.all
+
+    /// The transform at transformSelectedIndex, or nil when the list is empty.
+    var currentTransform: TextTransform? {
+        let filtered = filteredTransforms
+        guard !filtered.isEmpty, transformSelectedIndex >= 0, transformSelectedIndex < filtered.count else { return nil }
+        return filtered[transformSelectedIndex]
+    }
+
+    /// Recomputes filteredTransforms — mirrors recomputeFilteredClippings().
+    private func recomputeFilteredTransforms() {
+        guard !transformFilterText.isEmpty else {
+            filteredTransforms = TransformRegistry.all
+            return
+        }
+        let q = transformFilterText
+        let scored: [(TextTransform, Double)] = TransformRegistry.all.compactMap { t in
+            guard let s = FuzzyMatcher.score(t.displayName + " " + t.keywords, query: q) else { return nil }
+            return (t, s)
+        }
+        filteredTransforms = scored.sorted { $0.1 > $1.1 }.map(\.0)
+    }
+
+    /// Moves picker selection up one, clamped at 0.
+    func transformNavigateUp() {
+        transformSelectedIndex = max(0, transformSelectedIndex - 1)
+    }
+
+    /// Moves picker selection down one, clamped at the last index.
+    func transformNavigateDown() {
+        transformSelectedIndex = min(max(0, filteredTransforms.count - 1), transformSelectedIndex + 1)
+    }
+
+    /// Closes the picker and resets all its state. Called on hide() and Escape.
+    func resetTransformPicker() {
+        isShowingTransformPicker = false
+        transformFilterText = ""
+        transformSelectedIndex = 0
+        transformError = nil
+        filteredTransforms = TransformRegistry.all
+    }
+
     // MARK: - Filtered cache
 
     /// Cached result of filtering clippings by searchText.

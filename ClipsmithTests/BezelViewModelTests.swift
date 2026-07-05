@@ -319,4 +319,65 @@ final class BezelViewModelTests: XCTestCase {
         vm.navigateUp()
         XCTAssertEqual(vm.selectedIndex, 0, "navigateUp at first with wraparound=false should clamp")
     }
+
+    // MARK: - Transform picker
+
+    @MainActor
+    func testTransformFilterFuzzyMatches() {
+        let vm = BezelViewModel()
+        vm.transformFilterText = "up"
+        XCTAssertTrue(vm.filteredTransforms.contains { $0.id == "case.upper" })
+        XCTAssertFalse(vm.filteredTransforms.contains { $0.id == "lines.sort" })
+    }
+
+    @MainActor
+    func testTransformFilterEmptyShowsAll() {
+        let vm = BezelViewModel()
+        vm.transformFilterText = ""
+        XCTAssertEqual(vm.filteredTransforms.count, TransformRegistry.all.count)
+    }
+
+    @MainActor
+    func testTransformFilterResetsSelectionAndError() {
+        let vm = BezelViewModel()
+        vm.transformSelectedIndex = 3
+        vm.transformError = "Not valid JSON"
+        vm.transformFilterText = "case"
+        XCTAssertEqual(vm.transformSelectedIndex, 0)
+        XCTAssertNil(vm.transformError)
+    }
+
+    @MainActor
+    func testTransformNavigationClamps() {
+        let vm = BezelViewModel()
+        vm.transformNavigateUp()
+        XCTAssertEqual(vm.transformSelectedIndex, 0, "Up at top must clamp at 0")
+        for _ in 0..<1000 { vm.transformNavigateDown() }
+        XCTAssertEqual(vm.transformSelectedIndex, vm.filteredTransforms.count - 1, "Down must clamp at last")
+    }
+
+    @MainActor
+    func testCurrentTransform() {
+        let vm = BezelViewModel()
+        vm.transformFilterText = "b64"
+        XCTAssertNotNil(vm.currentTransform)
+        vm.transformFilterText = "zzzzzzqqqq"
+        XCTAssertTrue(vm.filteredTransforms.isEmpty)
+        XCTAssertNil(vm.currentTransform)
+    }
+
+    @MainActor
+    func testResetTransformPicker() {
+        let vm = BezelViewModel()
+        vm.isShowingTransformPicker = true
+        vm.transformFilterText = "json"
+        vm.transformSelectedIndex = 0
+        vm.transformError = "x"
+        vm.resetTransformPicker()
+        XCTAssertFalse(vm.isShowingTransformPicker)
+        XCTAssertEqual(vm.transformFilterText, "")
+        XCTAssertEqual(vm.transformSelectedIndex, 0)
+        XCTAssertNil(vm.transformError)
+        XCTAssertEqual(vm.filteredTransforms.count, TransformRegistry.all.count)
+    }
 }
