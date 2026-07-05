@@ -597,6 +597,12 @@ final class BezelController: NSPanel {
 
     /// Pastes the selected clipping and hides the bezel.
     ///
+    func pasteAndHide() async {
+        await pasteAndHide(content: viewModel.currentClipping)
+    }
+
+    /// Pastes the given content and hides the bezel.
+    ///
     /// Follows the original Flycut timing pattern:
     ///   1. Write content to pasteboard immediately
     ///   2. Hide the bezel immediately (so it's gone before Cmd-V fires)
@@ -604,7 +610,7 @@ final class BezelController: NSPanel {
     ///
     /// The bezel MUST be hidden before the synthetic Cmd-V is posted — otherwise
     /// the panel (canBecomeKey) can intercept the keystroke.
-    func pasteAndHide() async {
+    func pasteAndHide(content: String?) async {
         // If the bezel was already dismissed (e.g. user pressed Escape after modifier
         // release but before this Task ran), skip the paste entirely.
         logger.info("pasteAndHide() entered — isVisible=\(self.isVisible) isHotkeyHold=\(self.isHotkeyHold)")
@@ -612,7 +618,7 @@ final class BezelController: NSPanel {
             logger.info("pasteAndHide() skipped — bezel not visible")
             return
         }
-        guard let content = viewModel.currentClipping else {
+        guard let content else {
             hide()
             return
         }
