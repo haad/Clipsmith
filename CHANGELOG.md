@@ -5,6 +5,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-07-06
+
 ### Added
 - **Transform picker in the clipboard bezel** — press Tab in the Cmd-Shift-V bezel to fuzzy-search 26 text transforms and apply-and-paste in one motion; failable transforms (JSON, Base64, JWT…) show an inline error instead of pasting
 - 16 new text transforms: camelCase/PascalCase/snake_case/kebab-case, Base64 encode/decode, sort/dedupe/reverse lines, extract URLs/emails, JWT decode, Unix timestamp ↔ ISO 8601, slugify, escape/unescape
@@ -13,6 +15,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Bundled prompt catalog refreshed from v1 (11 prompts) to v4 (85 prompts across 8 categories)
 - Bundled prompts now load whenever the shipped catalog version is newer than the last loaded one — catalog updates reach existing installs without a manual sync; user-customized and user-deleted prompts are preserved
 - Right-click quick-action menu transforms now paste the transformed result immediately (previously required a second Enter)
+- App bundle version (MARKETING_VERSION) corrected from stale 3.0.0 to match release versioning
 
 ## [5.1.0] - 2026-05-27
 
@@ -121,7 +124,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Syntax-highlighted snippet editor (20+ languages)
 - Menu bar app with configurable hotkeys
 
-[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.0.2...HEAD
+[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.2.0...HEAD
+[5.2.0]: https://github.com/haad/Clipsmith/compare/v5.1.0...v5.2.0
+[5.1.0]: https://github.com/haad/Clipsmith/compare/v5.0.2...v5.1.0
 [5.0.2]: https://github.com/haad/Clipsmith/compare/v5.0.1...v5.0.2
 [5.0.1]: https://github.com/haad/Clipsmith/compare/v5.0.0...v5.0.1
 [5.0.0]: https://github.com/haad/Clipsmith/compare/v4.2.0...v5.0.0
