@@ -5,6 +5,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- Bundled prompt catalog refreshed from v1 (11 prompts) to v4 (85 prompts across 8 categories)
+- Bundled prompts now load whenever the shipped catalog version is newer than the last loaded one — catalog updates reach existing installs without a manual sync; user-customized and user-deleted prompts are preserved
+
 ## [5.1.0] - 2026-05-27
 
 ### Added

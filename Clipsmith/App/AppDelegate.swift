@@ -157,15 +157,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         promptLibraryStore = PromptLibraryStore(modelContainer: ClipsmithApp.sharedModelContainer)
         promptSyncService = PromptSyncService()
 
-        // Load bundled prompts on first launch if no prompts exist yet.
+        // Load bundled prompts whenever the bundled catalog version is newer than the
+        // last loaded one (covers first launch AND catalog updates shipped in app updates).
         // Also deduplicate to clean up any duplicate entries.
         Task {
             try? await promptLibraryStore.deduplicate()
-            let existing = try? await promptLibraryStore.fetchAll()
-            if existing?.isEmpty ?? true {
-                try? await promptSyncService.loadBundledPrompts(store: promptLibraryStore)
-                logger.info("Loaded bundled default prompts")
-            }
+            try? await promptSyncService.loadBundledPromptsIfNeeded(store: promptLibraryStore)
         }
 
         // Create PromptBezelController and inject service dependencies.

@@ -98,6 +98,40 @@ final class PromptSyncService {
         logger.info("loadBundledPrompts: loaded \(catalog.prompts.count, privacy: .public) prompts from bundle")
     }
 
+    /// Loads bundled prompts only when the bundled catalog version is newer than
+    /// the last loaded one (persisted in UserDefaults).
+    ///
+    /// Version-gated so prompts a user deleted are NOT resurrected on every launch —
+    /// they only return when the bundled catalog itself is updated, matching the
+    /// semantics of a manual remote sync. `upsert` still protects user-customized
+    /// prompts and skips non-newer per-prompt versions.
+    func loadBundledPromptsIfNeeded(store: PromptLibraryStore, defaults: UserDefaults = .standard) async throws {
+        guard let url = Bundle.main.url(forResource: "prompts", withExtension: "json") else {
+            logger.error("loadBundledPromptsIfNeeded: prompts.json not found in bundle")
+            throw PromptSyncError.bundleNotFound
+        }
+
+        let catalog: PromptCatalog
+        do {
+            catalog = try JSONDecoder().decode(PromptCatalog.self, from: Data(contentsOf: url))
+        } catch {
+            throw PromptSyncError.decodingError(error)
+        }
+
+        let loadedVersion = defaults.integer(forKey: AppSettingsKeys.bundledPromptsVersion)
+        guard catalog.version > loadedVersion else {
+            logger.debug("loadBundledPromptsIfNeeded: catalog version \(catalog.version, privacy: .public) already loaded")
+            return
+        }
+
+        for prompt in catalog.prompts {
+            try await store.upsert(remote: prompt)
+        }
+        defaults.set(catalog.version, forKey: AppSettingsKeys.bundledPromptsVersion)
+
+        logger.info("loadBundledPromptsIfNeeded: loaded catalog version \(catalog.version, privacy: .public) (\(catalog.prompts.count, privacy: .public) prompts)")
+    }
+
     // MARK: - Remote Sync
 
     /// Fetches prompts from a remote JSON URL and upserts them into the store.

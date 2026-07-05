@@ -95,6 +95,7 @@
 		AA0089 /* ExpressionEvaluatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0090 /* ExpressionEvaluatorTests.swift */; };
 		AA0090 /* UnitConversionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0091 /* UnitConversionServiceTests.swift */; };
 		AA0091 /* CurrencyServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0092 /* CurrencyServiceTests.swift */; };
+		AA0100 /* PromptSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0100 /* PromptSyncServiceTests.swift */; };
 		AA0092 /* CommandPaletteServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0093 /* CommandPaletteServiceTests.swift */; };
 		AA0093 /* UnitConversionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0094 /* UnitConversionService.swift */; };
 		AA0094 /* CurrencyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0095 /* CurrencyService.swift */; };
@@ -205,6 +206,7 @@
 		AF0090 /* ExpressionEvaluatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionEvaluatorTests.swift; sourceTree = "<group>"; };
 		AF0091 /* UnitConversionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionServiceTests.swift; sourceTree = "<group>"; };
 		AF0092 /* CurrencyServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyServiceTests.swift; sourceTree = "<group>"; };
+		AF0100 /* PromptSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSyncServiceTests.swift; sourceTree = "<group>"; };
 		AF0093 /* CommandPaletteServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteServiceTests.swift; sourceTree = "<group>"; };
 		AF0094 /* UnitConversionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionService.swift; sourceTree = "<group>"; };
 		AF0095 /* CurrencyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
@@ -408,6 +410,7 @@
 				AF0090 /* ExpressionEvaluatorTests.swift */,
 				AF0091 /* UnitConversionServiceTests.swift */,
 				AF0092 /* CurrencyServiceTests.swift */,
+				AF0100 /* PromptSyncServiceTests.swift */,
 				AF0093 /* CommandPaletteServiceTests.swift */,
 				GG0015 /* Fixtures */,
 			);
@@ -664,6 +667,7 @@
 				AA0089 /* ExpressionEvaluatorTests.swift in Sources */,
 				AA0090 /* UnitConversionServiceTests.swift in Sources */,
 				AA0091 /* CurrencyServiceTests.swift in Sources */,
+				AA0100 /* PromptSyncServiceTests.swift in Sources */,
 				AA0092 /* CommandPaletteServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
