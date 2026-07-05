@@ -136,12 +136,18 @@ final class BezelController: NSPanel {
     // Escape before it reaches any hosted view.
     override func sendEvent(_ event: NSEvent) {
         if event.type == .keyDown {
+            // Transform picker intercepts ALL keys — including printable characters
+            // that would otherwise reach the search TextField.
+            if viewModel.isShowingTransformPicker {
+                handleTransformPickerKey(event)
+                return
+            }
             switch event.keyCode {
             case 53:                            // Escape
                 hide()
                 return
-            case 48:                            // Tab — show quick action menu
-                showQuickActionMenu()
+            case 48:                            // Tab — toggle transform picker
+                toggleTransformPicker()
                 return
             case 36, 76:                        // Return, Enter (numpad)
                 // Intercept before SwiftUI TextField consumes Return in search mode.
@@ -215,6 +221,7 @@ final class BezelController: NSPanel {
         viewModel.searchText = ""
         viewModel.isSearchMode = false
         viewModel.isShowingCheatSheet = false
+        viewModel.resetTransformPicker()
         isHotkeyHold = false
         orderOut(nil)
         logger.info("BezelController hidden")
@@ -426,6 +433,83 @@ final class BezelController: NSPanel {
             let localCenter = NSPoint(x: view.bounds.midX, y: view.bounds.midY)
             menu.popUp(positioning: nil, at: localCenter, in: view)
         }
+    }
+
+    // MARK: - Transform picker (Tab)
+
+    /// Toggles the transform picker overlay. No-op when there is no clipping
+    /// to transform (same guard as the quick action menu).
+    func toggleTransformPicker() {
+        guard viewModel.currentClipping != nil else { return }
+        if viewModel.isShowingTransformPicker {
+            viewModel.resetTransformPicker()
+        } else {
+            viewModel.isShowingTransformPicker = true
+        }
+    }
+
+    /// Routes a keyDown event while the picker is open.
+    /// Filter text is managed here directly — the overlay has no TextField
+    /// (focus juggling in a non-activating panel is unreliable; raw key
+    /// routing matches how the rest of the bezel works).
+    func handleTransformPickerKey(_ event: NSEvent) {
+        switch event.keyCode {
+        case 53:                        // Escape — close picker only
+            viewModel.resetTransformPicker()
+        case 48:                        // Tab — toggle closed
+            viewModel.resetTransformPicker()
+        case 36, 76:                    // Return, Enter — apply + paste
+            if let transform = viewModel.currentTransform {
+                Task { @MainActor in await self.applyTransformAndPaste(transform) }
+            }
+        case 125:                       // Down arrow
+            viewModel.transformNavigateDown()
+        case 126:                       // Up arrow
+            viewModel.transformNavigateUp()
+        case 51:                        // Backspace — edit filter
+            if !viewModel.transformFilterText.isEmpty {
+                viewModel.transformFilterText.removeLast()
+            }
+        default:
+            let chars = event.charactersIgnoringModifiers ?? ""
+            // j/k navigate only while the filter is empty — once the user types,
+            // every letter belongs to the filter.
+            if viewModel.transformFilterText.isEmpty, chars == "j" {
+                viewModel.transformNavigateDown()
+            } else if viewModel.transformFilterText.isEmpty, chars == "k" {
+                viewModel.transformNavigateUp()
+            } else if let typed = event.characters,
+                      !typed.isEmpty,
+                      !event.modifierFlags.contains(.command),
+                      typed.rangeOfCharacter(from: .controlCharacters) == nil {
+                viewModel.transformFilterText += typed
+            }
+        }
+    }
+
+    /// Applies a transform to the current clipping and pastes the result.
+    /// On failure (nil result) shows the transform's failure message inline
+    /// and keeps the picker open. On success, inserts the transformed content
+    /// into history and pastes via the shared paste path.
+    func applyTransformAndPaste(_ transform: TextTransform) async {
+        guard let content = viewModel.currentClipping else { return }
+        guard let result = transform.apply(content) else {
+            viewModel.transformError = transform.failureMessage
+            return
+        }
+
+        // Insert transformed content into history with "Clipsmith (transformed)" source.
+        let rememberNum = UserDefaults.standard.integer(forKey: AppSettingsKeys.rememberNum)
+        Task {
+            try? await clipboardStore?.insert(
+                content: result,
+                sourceAppName: "Clipsmith (transformed)",
+                rememberNum: rememberNum
+            )
+        }
+
+        await pasteAndHide(content: result)
+        logger.info("Applied transform \(transform.id, privacy: .public) and pasted")
     }
 
     // MARK: - Transform action handlers
