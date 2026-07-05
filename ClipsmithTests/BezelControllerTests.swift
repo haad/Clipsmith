@@ -174,6 +174,8 @@ final class BezelControllerTests: XCTestCase {
         // Backspace edits the filter.
         controller.handleTransformPickerKey(makeKeyEvent(characters: "\u{7F}", keyCode: 51))
         XCTAssertEqual(controller.viewModel.transformFilterText, "b")
+
+        XCTAssertTrue(controller.viewModel.isShowingTransformPicker, "Picker stays open through navigation and filtering")
     }
 
     func testPickerEscapeClosesPickerOnly() throws {

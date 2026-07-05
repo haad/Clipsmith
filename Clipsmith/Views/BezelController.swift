@@ -500,7 +500,7 @@ final class BezelController: NSPanel {
 
         // Insert transformed content into history with "Clipsmith (transformed)" source.
         let rememberNum = UserDefaults.standard.integer(forKey: AppSettingsKeys.rememberNum)
-        Task {
+        Task { @MainActor in
             try? await clipboardStore?.insert(
                 content: result,
                 sourceAppName: "Clipsmith (transformed)",
