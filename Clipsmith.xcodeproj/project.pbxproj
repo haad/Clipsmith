@@ -101,6 +101,8 @@
 		AA0094 /* CurrencyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0095 /* CurrencyService.swift */; };
 		AA0095 /* exchange-rates-bundled.json in Resources */ = {isa = PBXBuildFile; fileRef = AF0096 /* exchange-rates-bundled.json */; };
 		AA0096 /* CommandPaletteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0097 /* CommandPaletteService.swift */; };
+		AA0101 /* TransformRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0101 /* TransformRegistry.swift */; };
+		AA0102 /* TransformRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0102 /* TransformRegistryTests.swift */; };
 		AA0097 /* CommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0098 /* CommandPaletteView.swift */; };
 		AA0099 /* HelpSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0099 /* HelpSettingsTab.swift */; };
 /* End PBXBuildFile section */
@@ -212,6 +214,8 @@
 		AF0095 /* CurrencyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
 		AF0096 /* exchange-rates-bundled.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "exchange-rates-bundled.json"; sourceTree = "<group>"; };
 		AF0097 /* CommandPaletteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteService.swift; sourceTree = "<group>"; };
+		AF0101 /* TransformRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRegistry.swift; sourceTree = "<group>"; };
+		AF0102 /* TransformRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRegistryTests.swift; sourceTree = "<group>"; };
 		AF0098 /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
 		AF0099 /* HelpSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSettingsTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -305,6 +309,7 @@
 				AF0094 /* UnitConversionService.swift */,
 				AF0095 /* CurrencyService.swift */,
 				AF0097 /* CommandPaletteService.swift */,
+				AF0101 /* TransformRegistry.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -399,6 +404,7 @@
 				AF0050 /* PromptLibraryStoreTests.swift */,
 				AF0051 /* TemplateSubstitutorTests.swift */,
 				AF0059 /* TextTransformerTests.swift */,
+				AF0102 /* TransformRegistryTests.swift */,
 				AF0061 /* ClipboardExportServiceTests.swift */,
 				AF0063 /* FuzzyMatcherTests.swift */,
 				AF0067 /* DocsetSearchServiceTests.swift */,
@@ -633,6 +639,7 @@
 				AA0093 /* UnitConversionService.swift in Sources */,
 				AA0094 /* CurrencyService.swift in Sources */,
 				AA0096 /* CommandPaletteService.swift in Sources */,
+				AA0101 /* TransformRegistry.swift in Sources */,
 				AA0097 /* CommandPaletteView.swift in Sources */,
 				AA0099 /* HelpSettingsTab.swift in Sources */,
 			);
@@ -656,6 +663,7 @@
 				AA0049 /* PromptLibraryStoreTests.swift in Sources */,
 				AA0050 /* TemplateSubstitutorTests.swift in Sources */,
 				AA0058 /* TextTransformerTests.swift in Sources */,
+				AA0102 /* TransformRegistryTests.swift in Sources */,
 				AA0060 /* ClipboardExportServiceTests.swift in Sources */,
 				AA0062 /* FuzzyMatcherTests.swift in Sources */,
 				AA0068 /* DocsetSearchServiceTests.swift in Sources */,
