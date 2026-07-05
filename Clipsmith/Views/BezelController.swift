@@ -480,7 +480,7 @@ final class BezelController: NSPanel {
     }
 
     @objc private func actionUrlDecode() {
-        applyTransform(TextTransformer.urlDecode)
+        applyTransform { TextTransformer.urlDecode($0) ?? $0 }
     }
 
     // MARK: - Format action handlers
@@ -494,7 +494,7 @@ final class BezelController: NSPanel {
     }
 
     @objc private func actionJsonPrettyPrint() {
-        applyTransform(TextTransformer.jsonPrettyPrint)
+        applyTransform { TextTransformer.jsonPrettyPrint($0) ?? $0 }
     }
 
     // MARK: - Share action handlers

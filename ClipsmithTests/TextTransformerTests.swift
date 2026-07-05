@@ -45,8 +45,11 @@ final class TextTransformerTests: XCTestCase {
     // MARK: - testUrlDecodeNonEncoded
 
     func testUrlDecodeNonEncoded() {
-        let input = "hello world"
-        XCTAssertEqual(TextTransformer.urlDecode(input), input)
+        XCTAssertEqual(TextTransformer.urlDecode("hello world"), "hello world")
+    }
+
+    func testUrlDecodeMalformedReturnsNil() {
+        XCTAssertNil(TextTransformer.urlDecode("bad%zzencoding"))
     }
 
     // MARK: - testWrapInQuotes
@@ -64,20 +67,14 @@ final class TextTransformerTests: XCTestCase {
     // MARK: - testJsonPrettyPrintValid
 
     func testJsonPrettyPrintValid() {
-        let input = "{\"key\":\"value\"}"
-        let result = TextTransformer.jsonPrettyPrint(input)
-        // Should produce indented output
-        XCTAssertTrue(result.contains("\n"), "Pretty-printed JSON should contain newlines")
-        XCTAssertTrue(result.contains("key"), "Pretty-printed JSON should contain the key")
-        XCTAssertTrue(result.contains("value"), "Pretty-printed JSON should contain the value")
+        let result = TextTransformer.jsonPrettyPrint("{\"key\":\"value\"}")
+        XCTAssertNotNil(result)
+        XCTAssertTrue(result?.contains("\n") ?? false, "Pretty-printed JSON should contain newlines")
+        XCTAssertTrue(result?.contains("key") ?? false)
     }
 
-    // MARK: - testJsonPrettyPrintInvalid
-
-    func testJsonPrettyPrintInvalid() {
-        let input = "not valid json { at all"
-        let result = TextTransformer.jsonPrettyPrint(input)
-        XCTAssertEqual(result, input, "Invalid JSON should be returned unchanged")
+    func testJsonPrettyPrintInvalidReturnsNil() {
+        XCTAssertNil(TextTransformer.jsonPrettyPrint("not valid json { at all"))
     }
 
     // MARK: - testCopyAsRTFProducesData
@@ -148,5 +145,72 @@ final class TextTransformerTests: XCTestCase {
     func testUnescapeRoundTrip() {
         let original = "say \"hi\"\nnew\tline \\ backslash"
         XCTAssertEqual(TextTransformer.unescape(TextTransformer.escape(original)), original)
+    }
+
+    // MARK: - Base64
+
+    func testBase64RoundTrip() {
+        XCTAssertEqual(TextTransformer.base64Encode("hello"), "aGVsbG8=")
+        XCTAssertEqual(TextTransformer.base64Decode("aGVsbG8="), "hello")
+    }
+
+    func testBase64DecodeInvalidReturnsNil() {
+        XCTAssertNil(TextTransformer.base64Decode("!!! not base64 !!!"))
+    }
+
+    // MARK: - JWT decode
+
+    func testJwtDecode() {
+        // {"alg":"HS256","typ":"JWT"} . {"sub":"1234567890","name":"John Doe"} . fake-sig
+        let jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
+            + "eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIn0."
+            + "SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+        let result = TextTransformer.jwtDecode(jwt)
+        XCTAssertNotNil(result)
+        XCTAssertTrue(result?.contains("HS256") ?? false, "Decoded JWT should contain header alg")
+        XCTAssertTrue(result?.contains("John Doe") ?? false, "Decoded JWT should contain payload claim")
+    }
+
+    func testJwtDecodeInvalidReturnsNil() {
+        XCTAssertNil(TextTransformer.jwtDecode("not.a-jwt"))
+        XCTAssertNil(TextTransformer.jwtDecode("plain text"))
+    }
+
+    // MARK: - Timestamp conversions
+
+    func testTimestampToISO() {
+        XCTAssertEqual(TextTransformer.timestampToISO("0"), "1970-01-01T00:00:00Z")
+        // Milliseconds heuristic: 13-digit values are treated as ms.
+        XCTAssertEqual(TextTransformer.timestampToISO("1700000000000"),
+                       TextTransformer.timestampToISO("1700000000"))
+        XCTAssertNil(TextTransformer.timestampToISO("not a number"))
+    }
+
+    func testISOToTimestamp() {
+        XCTAssertEqual(TextTransformer.isoToTimestamp("1970-01-01T00:00:00Z"), "0")
+        XCTAssertEqual(TextTransformer.isoToTimestamp("2023-11-14T22:13:20Z"), "1700000000")
+        XCTAssertNil(TextTransformer.isoToTimestamp("14.11.2023"))
+    }
+
+    // MARK: - Extract URLs / emails
+
+    func testExtractURLs() {
+        let text = "see https://example.com/docs and http://foo.bar, mail me at a@b.com"
+        let result = TextTransformer.extractURLs(text)
+        XCTAssertEqual(result, "https://example.com/docs\nhttp://foo.bar")
+    }
+
+    func testExtractURLsNoneReturnsNil() {
+        XCTAssertNil(TextTransformer.extractURLs("no links here"))
+    }
+
+    func testExtractEmails() {
+        let text = "contact adam@lablabs.io or support@example.com via https://example.com"
+        let result = TextTransformer.extractEmails(text)
+        XCTAssertEqual(result, "adam@lablabs.io\nsupport@example.com")
+    }
+
+    func testExtractEmailsNoneReturnsNil() {
+        XCTAssertNil(TextTransformer.extractEmails("no emails here"))
     }
 }

@@ -94,11 +94,9 @@ enum TextTransformer {
         s.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? s
     }
 
-    /// Decodes percent-encoded characters in the string.
-    ///
-    /// Returns the original string unchanged if decoding fails.
-    static func urlDecode(_ s: String) -> String {
-        s.removingPercentEncoding ?? s
+    /// Decodes percent-encoded characters. Returns nil if the encoding is malformed.
+    static func urlDecode(_ s: String) -> String? {
+        s.removingPercentEncoding
     }
 
     // MARK: - Formatting
@@ -114,9 +112,8 @@ enum TextTransformer {
     }
 
     /// Pretty-prints a JSON string with 2-space indentation.
-    ///
-    /// Returns the original string unchanged if it is not valid JSON.
-    static func jsonPrettyPrint(_ s: String) -> String {
+    /// Returns nil if the input is not valid JSON.
+    static func jsonPrettyPrint(_ s: String) -> String? {
         guard
             let data = s.data(using: .utf8),
             let object = try? JSONSerialization.jsonObject(with: data),
@@ -126,7 +123,7 @@ enum TextTransformer {
             ),
             let result = String(data: pretty, encoding: .utf8)
         else {
-            return s
+            return nil
         }
         return result
     }
@@ -180,6 +177,98 @@ enum TextTransformer {
             .replacingOccurrences(of: "\\t", with: "\t")
             .replacingOccurrences(of: "\\\"", with: "\"")
             .replacingOccurrences(of: "\\\\", with: "\\")
+    }
+
+    // MARK: - Base64
+
+    /// Base64-encodes the UTF-8 bytes of the string. Nil only if UTF-8 encoding fails.
+    static func base64Encode(_ s: String) -> String? {
+        s.data(using: .utf8)?.base64EncodedString()
+    }
+
+    /// Decodes a Base64 string to UTF-8 text. Returns nil for invalid Base64
+    /// or non-UTF-8 payloads. Surrounding whitespace is tolerated.
+    static func base64Decode(_ s: String) -> String? {
+        guard
+            let data = Data(base64Encoded: s.trimmingCharacters(in: .whitespacesAndNewlines)),
+            let text = String(data: data, encoding: .utf8)
+        else { return nil }
+        return text
+    }
+
+    // MARK: - JWT
+
+    /// Decodes a JWT's header and payload segments (base64url) and pretty-prints
+    /// both as JSON, separated by a blank line. Returns nil for malformed tokens.
+    /// Does NOT verify the signature — display only.
+    static func jwtDecode(_ s: String) -> String? {
+        let parts = s.trimmingCharacters(in: .whitespacesAndNewlines).components(separatedBy: ".")
+        guard parts.count == 3 else { return nil }
+
+        func decodeSegment(_ segment: String) -> String? {
+            var b64 = segment
+                .replacingOccurrences(of: "-", with: "+")
+                .replacingOccurrences(of: "_", with: "/")
+            while b64.count % 4 != 0 { b64 += "=" }
+            guard
+                let data = Data(base64Encoded: b64),
+                let json = String(data: data, encoding: .utf8)
+            else { return nil }
+            return jsonPrettyPrint(json)
+        }
+
+        guard
+            let header = decodeSegment(parts[0]),
+            let payload = decodeSegment(parts[1])
+        else { return nil }
+        return header + "\n\n" + payload
+    }
+
+    // MARK: - Timestamps
+
+    /// Converts a Unix timestamp (seconds, or milliseconds for 13+ digit values)
+    /// to an ISO 8601 UTC string. Returns nil for non-numeric input.
+    static func timestampToISO(_ s: String) -> String? {
+        guard let value = Double(s.trimmingCharacters(in: .whitespacesAndNewlines)) else { return nil }
+        let seconds = value >= 1_000_000_000_000 ? value / 1000 : value
+        return ISO8601DateFormatter().string(from: Date(timeIntervalSince1970: seconds))
+    }
+
+    /// Converts an ISO 8601 date string to a Unix timestamp (seconds).
+    /// Returns nil if the input does not parse as ISO 8601.
+    static func isoToTimestamp(_ s: String) -> String? {
+        let trimmed = s.trimmingCharacters(in: .whitespacesAndNewlines)
+        let formatter = ISO8601DateFormatter()
+        if let date = formatter.date(from: trimmed) {
+            return String(Int(date.timeIntervalSince1970))
+        }
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = formatter.date(from: trimmed) else { return nil }
+        return String(Int(date.timeIntervalSince1970))
+    }
+
+    // MARK: - Extraction
+
+    /// Extracts all non-mailto URLs, one per line. Returns nil when none found.
+    static func extractURLs(_ s: String) -> String? {
+        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else { return nil }
+        let matches = detector.matches(in: s, range: NSRange(s.startIndex..., in: s))
+        let urls = matches
+            .compactMap { $0.url }
+            .filter { $0.scheme != "mailto" }
+            .map(\.absoluteString)
+        return urls.isEmpty ? nil : urls.joined(separator: "\n")
+    }
+
+    /// Extracts all email addresses, one per line. Returns nil when none found.
+    static func extractEmails(_ s: String) -> String? {
+        guard let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue) else { return nil }
+        let matches = detector.matches(in: s, range: NSRange(s.startIndex..., in: s))
+        let emails = matches
+            .compactMap { $0.url }
+            .filter { $0.scheme == "mailto" }
+            .map { $0.absoluteString.replacingOccurrences(of: "mailto:", with: "") }
+        return emails.isEmpty ? nil : emails.joined(separator: "\n")
     }
 
     // MARK: - RTF
