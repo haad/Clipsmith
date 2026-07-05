@@ -231,7 +231,9 @@ enum TextTransformer {
     static func timestampToISO(_ s: String) -> String? {
         guard let value = Double(s.trimmingCharacters(in: .whitespacesAndNewlines)) else { return nil }
         let seconds = value >= 1_000_000_000_000 ? value / 1000 : value
-        return ISO8601DateFormatter().string(from: Date(timeIntervalSince1970: seconds))
+        let formatter = ISO8601DateFormatter()
+        formatter.timeZone = TimeZone(secondsFromGMT: 0)
+        return formatter.string(from: Date(timeIntervalSince1970: seconds))
     }
 
     /// Converts an ISO 8601 date string to a Unix timestamp (seconds).
