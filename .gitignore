@@ -23,4 +23,5 @@ Package.resolved
 
 # Misc
 *.orig
-.claude/
+.claude/*
+!.claude/commands/
