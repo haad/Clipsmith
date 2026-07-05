@@ -103,16 +103,16 @@ final class AppLaunchViewModelTests: XCTestCase {
             "TextEdit must rank above Terminal due to +0.1 recency boost")
     }
 
-    /// D-04: Empty query shows up to 5 most recently launched apps in recency order.
+    /// D-04 (5.1.0): Empty query fills the grid with recents first (in recency order) then
+    /// remaining apps alphabetically — no longer shows only the recents subset.
     func testEmptyQueryShowsRecentApps() {
-        // Create 10 apps
+        // Create 10 base apps (alphabetically App1…App10)
         var tenApps: [AppEntry] = []
         for i in 1...10 {
             tenApps.append(makeEntry(name: "App\(i)", bundleID: "com.test.app\(i)"))
         }
-        viewModel.apps = tenApps
 
-        // Test with 3 recents: displayedApps == [Safari, Terminal, Calendar] in recency order
+        // Test with 3 recents: grid = [Safari, Terminal, Calendar] ++ remaining 10 apps alpha
         let safariEntry = makeEntry(name: "Safari", bundleID: "com.apple.Safari")
         let terminalEntry = makeEntry(name: "Terminal", bundleID: "com.apple.Terminal")
         let calendarEntry = makeEntry(name: "Calendar", bundleID: "com.apple.Calendar")
@@ -120,16 +120,25 @@ final class AppLaunchViewModelTests: XCTestCase {
         viewModel.recentBundleIDs = ["com.apple.Safari", "com.apple.Terminal", "com.apple.Calendar"]
         viewModel.searchText = ""
 
-        XCTAssertEqual(viewModel.displayedApps.count, 3,
-            "Empty query with 3 recents should show exactly 3 apps")
+        // The first 3 entries must be the 3 recents in recency order
+        XCTAssertGreaterThanOrEqual(viewModel.displayedApps.count, 3,
+            "Empty query with 3 recents must show at least the 3 recents")
         XCTAssertEqual(viewModel.displayedApps[0].name, "Safari",
-            "First recent should be Safari (most recent)")
+            "First entry must be Safari (most recent)")
         XCTAssertEqual(viewModel.displayedApps[1].name, "Terminal",
-            "Second recent should be Terminal")
+            "Second entry must be Terminal")
         XCTAssertEqual(viewModel.displayedApps[2].name, "Calendar",
-            "Third recent should be Calendar")
+            "Third entry must be Calendar")
+        // Total = 3 recents + 10 non-recent apps = 13 (capped at 20 by the VM)
+        XCTAssertEqual(viewModel.displayedApps.count, 13,
+            "Empty query: recents prefix + all remaining apps, total = all seeded apps")
+        // Remaining entries after the recents prefix must not include the recents
+        let recentNames = Set(["Safari", "Terminal", "Calendar"])
+        let tail = viewModel.displayedApps.dropFirst(3)
+        XCTAssertTrue(tail.allSatisfy { !recentNames.contains($0.name) },
+            "Apps after the recents prefix must not include any recent app")
 
-        // Test with 7 recents: only first 5 should appear
+        // Test with 7 recents out of 7 total apps: all 7 appear, recents prefix in order
         var sevenRecents: [AppEntry] = []
         for i in 1...7 {
             let entry = makeEntry(name: "Recent\(i)", bundleID: "com.test.recent\(i)")
@@ -139,12 +148,13 @@ final class AppLaunchViewModelTests: XCTestCase {
         viewModel.recentBundleIDs = sevenRecents.map { $0.bundleID! }
         viewModel.searchText = ""
 
-        XCTAssertEqual(viewModel.displayedApps.count, 5,
-            "Empty query with 7 recents should show only first 5 (D-04 cap)")
+        // All 7 apps are recents; recentApps() iterates recentBundleIDs.prefix(10) so all 7 appear
+        XCTAssertEqual(viewModel.displayedApps.count, 7,
+            "Empty query with 7 recents (all apps are recent): all 7 must appear")
         XCTAssertEqual(viewModel.displayedApps[0].bundleID, "com.test.recent1",
             "Most recent app must be first")
-        XCTAssertEqual(viewModel.displayedApps[4].bundleID, "com.test.recent5",
-            "Fifth most recent must be last in the capped list")
+        XCTAssertEqual(viewModel.displayedApps[6].bundleID, "com.test.recent7",
+            "Seventh (least recent) must be last")
     }
 
     // MARK: - Phase 12: Command Palette State Tests
@@ -179,7 +189,8 @@ final class AppLaunchViewModelTests: XCTestCase {
     }
 
     /// D-01: Entering command palette mode clears displayedApps and populates commandResult.
-    func testEnteringCommandPaletteModeClearsDisplayedApps() {
+    /// The evaluation is debounced ~300ms (5.1.0), so this test is async and waits 500ms.
+    func testEnteringCommandPaletteModeClearsDisplayedApps() async throws {
         UserDefaults.standard.set(true, forKey: AppSettingsKeys.commandPaletteEnabled)
         UserDefaults.standard.set("=", forKey: AppSettingsKeys.commandPalettePrefix)
 
@@ -188,10 +199,15 @@ final class AppLaunchViewModelTests: XCTestCase {
         viewModel.commandPaletteService = CommandPaletteService()
         viewModel.searchText = "=2+2"
 
+        // displayedApps is cleared synchronously when entering command palette mode
         XCTAssertTrue(viewModel.displayedApps.isEmpty,
             "displayedApps must be empty when in command palette mode (D-01)")
+
+        // commandResult is populated only after the 300ms debounce — wait 500ms to be safe
+        try await Task.sleep(nanoseconds: 500_000_000)
+
         XCTAssertNotNil(viewModel.commandResult,
-            "commandResult must be non-nil when query evaluates successfully")
+            "commandResult must be non-nil after debounce when query evaluates successfully")
         XCTAssertEqual(viewModel.commandResult?.displayValue, "4",
             "commandResult.displayValue must be '4' for expression '2+2'")
     }
