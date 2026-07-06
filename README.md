@@ -4,6 +4,8 @@ A keyboard-first clipboard, snippet, prompt library, and documentation manager f
 
 Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline documentation one shortcut away. Built natively in Swift for macOS 15+.
 
+**[⬇ Download the latest release](https://github.com/haad/Clipsmith/releases/latest)** · **[Website](https://haad.github.io/Clipsmith/)** · **[Changelog](https://haad.github.io/Clipsmith/#changelog)** · **[Prompt Library](https://haad.github.io/Clipsmith/prompts/)**
+
 ![Clipsmith](site/clipsmith-logo.png)
 
 ## Features
@@ -32,9 +34,10 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 - HTML documentation rendered in a split-view panel with dark/light mode support
 - Download and manage docs in Settings > Docsets
 
-### Quick Actions
-- Transform text: uppercase, lowercase, trim whitespace, sort lines, URL encode, and more
-- Available via `Tab` key in the clipboard bezel
+### Text Transforms
+- 26 transforms: case conversions (camelCase, snake_case…), Base64, JSON pretty print, JWT decode, sort/dedupe lines, extract URLs/emails, timestamps, and more
+- Press `Tab` in the clipboard bezel (or `t` while holding the hotkey) to fuzzy-search transforms with live previews — `⏎` transforms and pastes in one motion
+- Also available from the right-click quick-actions menu
 
 ### GitHub Gist Sharing
 - Share any clipping or snippet as a GitHub Gist
@@ -65,7 +68,8 @@ All shortcuts are configurable in Settings > Shortcuts.
 | Page up / down | `PageUp` `PageDn` |
 | Jump to first / last | `Home` `End` |
 | Dismiss | `Esc` |
-| Quick actions | `Tab` |
+| Transform picker | `Tab` (or `t` while holding the hotkey) |
+| Quick actions menu | Right-click |
 
 ### Documentation Browser
 
@@ -119,32 +123,7 @@ All data stays on your Mac. No cloud sync, no analytics, no tracking. GitHub Gis
 
 ## Changelog
 
-### v4.2.0
-- Fuzzy search in documentation browser (FuzzyMatcher subsequence matching)
-- Doc-scoped search with prefix filter (`python:map`, `go:fmt`)
-- Documentation catalog detail panel with homepage/source links
-- Fix j/k key interception in doc search field
-- Fix bezel auto-closing and reopen issues
-- Fix empty content for docs with fragment anchors (bash, CSS, etc.)
-
-### v4.1.0
-- Rework documentation backend from Kapeli docsets to devdocs.io
-- 789 documentation sets available (was 28)
-- Remove GRDB dependency (JSON-based search)
-- Documentation Lookup menu bar item with feature flag
-- Disable App Sandbox (incompatible with WKWebView + accessibility)
-- Resizable, movable doc bezel with persistent frame size
-- Dark/light mode CSS for documentation rendering
-
-### v3.0.0
-- Fuzzy search in clipboard bezel (Phase 7)
-- Quick actions and performance optimizations (Phase 6)
-- Prompt library with template variables and remote sync (Phase 5)
-- Code snippets with GitHub Gist sharing (Phase 4)
-- Full ObjC Flycut parity bug fixes (Phase 3.1)
-- SwiftUI bezel overlay with keyboard navigation (Phase 3)
-- Core clipboard engine with adaptive polling (Phase 2)
-- Foundation: SwiftData schema, accessibility, settings (Phase 1)
+See [CHANGELOG.md](CHANGELOG.md) for the full history, or browse it on the [website](https://haad.github.io/Clipsmith/#changelog). Release builds are on the [releases page](https://github.com/haad/Clipsmith/releases).
 
 ## Contributing Prompts
 
@@ -198,7 +177,7 @@ The Clipsmith Prompt Library is community-driven. There are two ways to contribu
 
 ## License
 
-MIT
+[PolyForm Noncommercial 1.0.0](LICENSE) — free for personal and noncommercial use. Commercial use requires a [license](https://haad.github.io/Clipsmith/).
 
 ## Credits
 
