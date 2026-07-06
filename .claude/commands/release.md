@@ -6,6 +6,25 @@ Cut a Clipsmith release. Optional argument overrides the version: `$ARGUMENTS` (
 
 Execute the steps in order. **Stop at the first failure and report it — never skip a step, never work around a failing check.** Tagging and pushing publishes a release; it is not reversible in practice.
 
+## 0. Documentation freshness
+
+Determine `VERSION` now (same rule as step 2: the argument, or the newest section heading in CHANGELOG.md). Then verify the docs describe this release — commit any fixes before moving on (preflight requires a clean tree):
+
+- **CHANGELOG.md** — all three must hold, mechanically:
+  ```bash
+  # a) the section for VERSION exists and has content
+  awk -v v="$VERSION" '$0 ~ "^## \\[" v "\\]"{f=1; next} /^## \[/{f=0} f && NF' CHANGELOG.md | head -3   # must print at least one line
+  # b) the compare link exists
+  grep -c "^\[$VERSION\]:" CHANGELOG.md                                                                   # must print 1
+  # c) [Unreleased] is empty — shipped work must be documented under VERSION
+  awk '/^## \[Unreleased\]/{f=1; next} /^## \[/{f=0} f && NF' CHANGELOG.md | head -3                      # must print nothing
+  ```
+  If (c) fails, move the `[Unreleased]` items into the `[VERSION]` section (they are shipping in this release) and commit.
+- **README.md** — read the `[VERSION]` changelog section and check each user-facing change is reflected where the README covers that area (features list, shortcut tables, requirements). Update and commit if not.
+- **Website (`site/index.html`)** — same review against the changelog section: feature copy, hero tagline, counts (transforms, prompts, docs). The site changelog itself regenerates from CHANGELOG.md on deploy — only static copy needs review. Update and commit if not.
+
+New commits made here ship with the release push — that is the point.
+
 ## 1. Preflight
 
 - Current branch must be `main`: `git rev-parse --abbrev-ref HEAD`. On any other branch, stop — releases are cut from main after the feature branch merges.
