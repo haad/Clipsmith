@@ -109,7 +109,7 @@ Behind feature flag `docLookupEnabled` (Settings > Features). Uses devdocs.io as
 - `LicenseSettingsSection` — Settings > License tab with key entry and validation feedback
 - Store ID and Product ID are in `LicenseService.swift` (`expectedStoreId`, `expectedProductId`)
 - Purchase URL is in `LicenseNagController.swift`, `LicenseSettingsSection.swift`, and `.github/FUNDING.yml`
-- License: PolyForm Noncommercial 1.0.0 (`LICENSE` file)
+- License: MIT (`LICENSE` file); Lemon Squeezy license purchase is voluntary support, not a legal requirement
 
 ## Files to Watch
 
