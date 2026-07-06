@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.2.1] - 2026-07-06
+
+### Fixed
+- Transform picker now works in hotkey-hold mode: press `t` while holding the hotkey — the bezel stays open when you release the keys so you can filter and transform (Tab is unreachable during a hold because ⌘Tab is the macOS app switcher)
+
+### Changed
+- Bezel footer, cheat sheet, and Settings > Help now document the transform picker shortcuts (Tab / t)
+
 ## [5.2.0] - 2026-07-06
 
 ### Added
@@ -124,7 +132,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Syntax-highlighted snippet editor (20+ languages)
 - Menu bar app with configurable hotkeys
 
-[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.2.0...HEAD
+[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.2.1...HEAD
+[5.2.1]: https://github.com/haad/Clipsmith/compare/v5.2.0...v5.2.1
 [5.2.0]: https://github.com/haad/Clipsmith/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/haad/Clipsmith/compare/v5.0.2...v5.1.0
 [5.0.2]: https://github.com/haad/Clipsmith/compare/v5.0.1...v5.0.2

@@ -273,6 +273,16 @@ final class BezelController: NSPanel {
                     viewModel.navigateDown()
                 case "k":
                     viewModel.navigateUp()
+                case "t":
+                    // Cmd-Tab is system-owned (app switcher), so Tab is unreachable
+                    // during a hotkey hold — t is the hold-mode path to the picker.
+                    toggleTransformPicker()
+                    // Opening the picker converts the hold session to interactive:
+                    // releasing the modifiers must hand the bezel over, not paste
+                    // (see handleModifierFlagsChanged).
+                    if viewModel.isShowingTransformPicker {
+                        isHotkeyHold = false
+                    }
                 case "0":
                     viewModel.navigateTo(index: 9)   // Key "0" jumps to position 10 (0-indexed = 9)
                 case "1"..."9":
@@ -544,21 +554,32 @@ final class BezelController: NSPanel {
         setFrameOrigin(origin)
     }
 
+    /// Handles a modifier-flags change during a hotkey hold: releasing all
+    /// modifiers ends the hold and pastes — unless the transform picker is open
+    /// (opened via t during the hold), in which case the bezel is handed to the
+    /// user for filtering instead of pasting.
+    /// Internal (not private) so tests can drive it directly.
+    func handleModifierFlagsChanged(_ event: NSEvent) {
+        guard isHotkeyHold else { return }
+        let modifiers: NSEvent.ModifierFlags = [.command, .option, .control, .shift]
+        guard event.modifierFlags.intersection(modifiers).isEmpty else { return }
+        // Set immediately (before Task) to prevent both global and local
+        // monitors from each firing pasteAndHide() for the same release.
+        isHotkeyHold = false
+        // Picker open = the user opted into an interactive session (t key
+        // races with the physical release): keep the bezel up, skip the paste.
+        guard !viewModel.isShowingTransformPicker else { return }
+        Task { @MainActor in
+            await self.pasteAndHide()
+        }
+    }
+
     private func registerFlagsMonitor() {
         removeFlagsMonitor()
 
         // Handler shared by both monitors.
         let handleFlags: (NSEvent) -> Void = { [weak self] event in
-            guard let self, self.isHotkeyHold else { return }
-            let modifiers: NSEvent.ModifierFlags = [.command, .option, .control, .shift]
-            if event.modifierFlags.intersection(modifiers).isEmpty {
-                // Set immediately (before Task) to prevent both global and local
-                // monitors from each firing pasteAndHide() for the same release.
-                self.isHotkeyHold = false
-                Task { @MainActor in
-                    await self.pasteAndHide()
-                }
-            }
+            self?.handleModifierFlagsChanged(event)
         }
 
         // Global monitor catches modifier release when another app has focus.

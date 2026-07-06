@@ -12,6 +12,8 @@ struct HelpSettingsTab: View {
                     HelpRow(keys: "⌘ Return", action: "Copy without pasting")
                     HelpRow(keys: "↑ / ↓", action: "Navigate items")
                     HelpRow(keys: "Type", action: "Instant fuzzy search")
+                    HelpRow(keys: "Tab / t", action: "Transform picker — fuzzy-search 26 transforms, Return transforms and pastes")
+                    HelpRow(keys: "t (holding hotkey)", action: "Opens the picker and keeps the bezel up when you release the keys")
                     HelpRow(keys: "Escape", action: "Dismiss")
                 }
 

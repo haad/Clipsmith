@@ -224,4 +224,56 @@ final class BezelControllerTests: XCTestCase {
         XCTAssertEqual(controller.viewModel.transformError, "Not valid JSON")
         XCTAssertTrue(controller.viewModel.isShowingTransformPicker, "Picker stays open on failure")
     }
+
+    // MARK: - Hold-mode transform picker (t key)
+
+    func testTKeyOpensPickerAndReleasesHold() throws {
+        let controller = try makeControllerWithClipping()
+        controller.isHotkeyHold = true
+
+        controller.keyDown(with: makeKeyEvent(characters: "t", keyCode: 17))
+
+        XCTAssertTrue(controller.viewModel.isShowingTransformPicker, "t opens the transform picker")
+        XCTAssertFalse(controller.isHotkeyHold, "Opening the picker converts the hold session to interactive")
+    }
+
+    func testTKeyOpensPickerInNormalMode() throws {
+        let controller = try makeControllerWithClipping()
+
+        controller.keyDown(with: makeKeyEvent(characters: "t", keyCode: 17))
+
+        XCTAssertTrue(controller.viewModel.isShowingTransformPicker)
+        XCTAssertFalse(controller.isHotkeyHold)
+    }
+
+    func testModifierReleaseHandsOverSessionWhenPickerOpen() throws {
+        let controller = try makeControllerWithClipping()
+        controller.toggleTransformPicker()
+        // Simulate the race: release event arrives while the picker is open
+        // and the hold flag has not been cleared yet.
+        controller.isHotkeyHold = true
+
+        controller.handleModifierFlagsChanged(makeFlagsEvent(modifiers: []))
+
+        XCTAssertFalse(controller.isHotkeyHold, "Release always ends the hold")
+        XCTAssertTrue(controller.viewModel.isShowingTransformPicker, "Picker survives the release — no paste, bezel handed to the user")
+    }
+
+    func testModifierReleaseStillEndsHoldWithoutPicker() throws {
+        let controller = try makeControllerWithClipping()
+        controller.isHotkeyHold = true
+
+        controller.handleModifierFlagsChanged(makeFlagsEvent(modifiers: []))
+
+        XCTAssertFalse(controller.isHotkeyHold)
+    }
+
+    /// Builds a synthetic flagsChanged NSEvent with the given modifiers.
+    private func makeFlagsEvent(modifiers: NSEvent.ModifierFlags) -> NSEvent {
+        NSEvent.keyEvent(
+            with: .flagsChanged, location: .zero, modifierFlags: modifiers, timestamp: 0,
+            windowNumber: 0, context: nil, characters: "",
+            charactersIgnoringModifiers: "", isARepeat: false, keyCode: 0
+        )!
+    }
 }

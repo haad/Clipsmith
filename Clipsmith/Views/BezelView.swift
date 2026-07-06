@@ -64,7 +64,7 @@ struct BezelView: View {
 
             // Navigation counter footer
             HStack {
-                Text("⇥ transform")
+                Text("⇥ / t transform")
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .padding(.leading, 16)
@@ -199,7 +199,7 @@ struct BezelView: View {
                         ("Enter", "Paste and close"),
                         ("Escape", "Close"),
                         ("Delete", "Remove clipping"),
-                        ("Tab", "Transform picker"),
+                        ("Tab  or  t", "Transform picker (t works while holding the hotkey)"),
                         ("Right-click", "Quick actions menu"),
                         ("Double-click", "Paste and close"),
                         ("s", "Save to file"),
