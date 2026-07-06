@@ -37,9 +37,9 @@ xcodebuild test -scheme Clipsmith -destination 'platform=macOS' 2>&1 | tail -20
 
 Must end with `** TEST SUCCEEDED **`. If ANY test fails, stop and report the failing test names — do not exclude suites, do not re-run with `-only-testing`, do not release on a red suite even if the failures look unrelated. The user decides what to do with failures.
 
-## 4. Confirm with the user
+## 4. Summarize, then proceed
 
-Show: the version, `git log --oneline -1`, and the number of unpushed commits (`git rev-list --count origin/main..HEAD`). Ask explicitly whether to tag `v$VERSION` and push. **Do not proceed without a yes in this session** — pushing the tag triggers the public release build (`.github/workflows/release-signed.yml`, tag pattern `v*`).
+Print (no question, do not pause): the version, `git log --oneline -1`, and the number of unpushed commits (`git rev-list --count origin/main..HEAD`). The user's decision to release IS the `/release` invocation — the gates above (main branch, clean tree, version consistency, fresh tag, green full suite) are the safety net. Pushing the tag triggers the public release build (`.github/workflows/release-signed.yml`, tag pattern `v*`).
 
 ## 5. Tag and push
 
