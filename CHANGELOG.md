@@ -5,6 +5,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- License changed from PolyForm Noncommercial 1.0.0 to MIT
+- README: download/website/changelog links, transform picker docs, changelog section now links to CHANGELOG.md
+- Website: added App Launcher & Command Palette section, updated transform picker and prompt library (85 prompts) copy
+
 ## [5.2.1] - 2026-07-06
 
 ### Fixed

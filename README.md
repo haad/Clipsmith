@@ -177,7 +177,7 @@ The Clipsmith Prompt Library is community-driven. There are two ways to contribu
 
 ## License
 
-[PolyForm Noncommercial 1.0.0](LICENSE) — free for personal and noncommercial use. Commercial use requires a [license](https://haad.github.io/Clipsmith/).
+[MIT](LICENSE). If Clipsmith is useful to you, consider [sponsoring development](https://github.com/sponsors/haad).
 
 ## Credits
 

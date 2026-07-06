@@ -347,7 +347,7 @@
   <section class="hero">
     <img src="clipsmith-logo.png" alt="Clipsmith app icon" class="hero-icon" width="120" height="120" />
     <h1>Clipsmith</h1>
-    <p class="hero-tagline">Clipboard history, code snippets, AI prompts, and documentation &mdash; one shortcut away. Native macOS, no Electron.</p>
+    <p class="hero-tagline">Clipboard history, code snippets, AI prompts, documentation, and an app launcher &mdash; one shortcut away. Native macOS, no Electron.</p>
     <p class="hero-meta">
       <span>Keyboard-first</span>
       <span>Native Swift &amp; SwiftUI</span>
@@ -372,7 +372,7 @@
       </div>
       <p class="feature-row-tagline">Everything you copy, always one shortcut away. Adaptive polling keeps it responsive without draining your battery.</p>
       <ul class="feature-row-highlights">
-        <li class="highlight-item"><strong>Quick Actions</strong> <span>Press Tab to transform: uppercase, lowercase, title case, trim, URL encode/decode, JSON pretty print, Markdown code block</span></li>
+        <li class="highlight-item"><strong>Transform picker</strong> <span>press Tab (or t while holding the hotkey) to fuzzy-search 26 text transforms with live previews &mdash; case conversions, Base64, JSON pretty print, JWT decode, sort/dedupe lines, extract URLs/emails, timestamps. Enter transforms and pastes in one motion</span></li>
         <li class="highlight-item"><strong>Fuzzy search</strong> <span>subsequence matching with consecutive-bonus scoring finds what you need even with typos</span></li>
         <li class="highlight-item"><strong>Keyboard navigation</strong> <span>arrows, j/k, 0-9 numeric jump, Page Up/Down, Home/End. Paste with Return, never touch the mouse</span></li>
         <li class="highlight-item"><strong>Password filtering</strong> <span>auto-skips likely credentials from 1Password, LastPass, and configurable length heuristics</span></li>
@@ -407,7 +407,7 @@
         <span class="feature-row-icon" aria-hidden="true">&#128172;</span>
         <h3 class="feature-row-title">Prompt Library</h3>
       </div>
-      <p class="feature-row-tagline">40+ curated AI prompts for coding, analysis, research, and DevOps &mdash; with template variables that auto-fill from your clipboard.</p>
+      <p class="feature-row-tagline">85 curated AI prompts across coding, analysis, research, DevOps, product, and writing &mdash; with template variables that auto-fill from your clipboard.</p>
       <ul class="feature-row-highlights">
         <li class="highlight-item"><strong>Template variables</strong> <span>use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{clipboard}}</code>, <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">{{selected_text}}</code>, and custom variables. Auto-substituted on paste</span></li>
         <li class="highlight-item"><strong>Category filtering</strong> <span>Tab to cycle categories, or type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#coding review</code> to search within a category. Use <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">#my</code> for your own prompts</span></li>
@@ -433,6 +433,22 @@
         <li class="highlight-item"><strong>Dark &amp; light themes</strong> <span>documentation renders in WKWebView with custom CSS matching your system appearance</span></li>
         <li class="highlight-item"><strong>Split-pane UI</strong> <span>search results on the left, rendered HTML on the right. Resizable, with position remembered across sessions</span></li>
         <li class="highlight-item"><strong>Fuzzy matching</strong> <span>same scoring engine as clipboard search. Top 100 results ranked by relevance, then by name length</span></li>
+      </ul>
+    </article>
+
+    <!-- App Launcher & Command Palette -->
+    <article class="feature-row">
+      <div class="feature-row-header">
+        <span class="feature-row-icon" aria-hidden="true">&#128640;</span>
+        <h3 class="feature-row-title">App Launcher &amp; Command Palette</h3>
+      </div>
+      <p class="feature-row-tagline">Launch any app from a Launchpad-style grid &mdash; and evaluate math, unit conversions, and live currency rates without leaving the keyboard.</p>
+      <ul class="feature-row-highlights">
+        <li class="highlight-item"><strong>Fuzzy app search</strong> <span>type a few characters, hit Return. Recently launched apps fill the grid first, the rest follow alphabetically</span></li>
+        <li class="highlight-item"><strong>Inline math</strong> <span>type <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">=2+2</code> or <code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">=sqrt(144)</code> &mdash; the result appears live as you type, Return copies it</span></li>
+        <li class="highlight-item"><strong>Unit conversion</strong> <span><code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">=5 kg to lbs</code> &mdash; length, mass, temperature, and volume</span></li>
+        <li class="highlight-item"><strong>Currency conversion</strong> <span><code style="font-size:0.75rem;background:var(--bg-page);padding:1px 4px;border-radius:3px;border:1px solid var(--border-color);">=1000 HUF to EUR</code> with live exchange rates and offline fallback</span></li>
+        <li class="highlight-item"><strong>Keyboard grid navigation</strong> <span>arrows move by row and column across the 5-column grid, exactly like Launchpad &mdash; without the mouse</span></li>
       </ul>
     </article>
 
