@@ -29,7 +29,12 @@ struct TodoSettingsSection: View {
                 HStack {
                     Button("Choose…") { chooseFile() }
                     Button("Reveal in Finder") {
-                        NSWorkspace.shared.activateFileViewerSelecting([effectiveURL])
+                        if FileManager.default.fileExists(atPath: effectiveURL.path) {
+                            NSWorkspace.shared.activateFileViewerSelecting([effectiveURL])
+                        } else {
+                            // File not created yet (store writes it on first save) — show its folder.
+                            NSWorkspace.shared.activateFileViewerSelecting([effectiveURL.deletingLastPathComponent()])
+                        }
                     }
                     Button("Reset to Default") {
                         todoFilePath = ""
