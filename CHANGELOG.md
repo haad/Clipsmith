@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Todo Tracking (experimental, Settings > General > Features): keyboard-first todos
+  backed by a plain-text TaskPaper file you own (`~/Library/Application
+  Support/Clipsmith/todos.taskpaper` by default, changeable in Settings > Todos).
+  Tabbed todo window (Today view, per-project tabs, fuzzy search, `@tag` search
+  terms, show/hide completed) and a global quick-add bezel with inline
+  `#project @tag(value)` syntax. External edits to the file are picked up live.
+
 ### Changed
 - License changed from PolyForm Noncommercial 1.0.0 to MIT
 - README: download/website/changelog links, transform picker docs, changelog section now links to CHANGELOG.md
