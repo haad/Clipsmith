@@ -12,6 +12,7 @@ enum SettingsTab: Int {
     case docsets = 4
     case help = 5
     case license = 6  // hidden from UI; kept for AppDelegate navigation
+    case todos = 7
 }
 
 /// Root preferences window — a tabbed view with all settings sections.
@@ -54,6 +55,12 @@ struct SettingsView: View {
                     Label("Docsets", systemImage: "book")
                 }
                 .tag(SettingsTab.docsets.rawValue)
+
+            TodoSettingsSection()
+                .tabItem {
+                    Label("Todos", systemImage: "checklist")
+                }
+                .tag(SettingsTab.todos.rawValue)
 
             HelpSettingsTab()
                 .tabItem {

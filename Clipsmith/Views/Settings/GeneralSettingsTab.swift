@@ -49,6 +49,9 @@ struct GeneralSettingsTab: View {
     @AppStorage(AppSettingsKeys.commandPaletteEnabled) private var commandPaletteEnabled: Bool = false
     @AppStorage(AppSettingsKeys.commandPalettePrefix) private var commandPalettePrefix: String = "="
 
+    // Phase 13: Todo Tracking feature flag
+    @AppStorage(AppSettingsKeys.todoTrackingEnabled) private var todoTrackingEnabled: Bool = false
+
     // Settings owns its own CurrencyService instance; on successful refresh we post
     // .clipsmithCurrencyRatesRefreshed and AppDelegate's instance reloads from disk.
     // Both instances stay in sync without a restart.
@@ -172,6 +175,8 @@ struct GeneralSettingsTab: View {
                     .help("Enable the documentation browser. Requires app restart for hotkey to take effect.")
                 Toggle("App Launcher", isOn: $appLauncherEnabled)
                     .help("Enable keyboard-driven app launcher (no default hotkey — configure in Shortcuts tab).")
+                Toggle("Todo Tracking", isOn: $todoTrackingEnabled)
+                    .help("Keyboard-first todos backed by a plain-text TaskPaper file. Configure the file location in the Todos tab.")
 
                 Toggle("Command Palette", isOn: $commandPaletteEnabled)
                     .help("Type the prefix character (default \"=\") in the App Launcher to evaluate math, units, and currency. Requires App Launcher to be enabled.")

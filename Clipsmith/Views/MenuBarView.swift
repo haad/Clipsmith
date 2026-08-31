@@ -22,6 +22,9 @@ extension Notification.Name {
     /// AppDelegate observes this to reload its CurrencyService instance from disk so the live
     /// bezel sees fresh rates without app restart.
     static let clipsmithCurrencyRatesRefreshed = Notification.Name("clipsmithCurrencyRatesRefreshed")
+    /// Posted by TodoSettingsSection when the todo file path changes;
+    /// AppDelegate observes it and re-points TodoStore at the new file.
+    static let clipsmithTodoFilePathChanged = Notification.Name("clipsmithTodoFilePathChanged")
 }
 
 struct MenuBarView: View {
