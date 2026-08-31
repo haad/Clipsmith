@@ -54,6 +54,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     var currencyService: CurrencyService!
     var commandPaletteService: CommandPaletteService!
 
+    // Phase 13 — Todo Tracking
+    var todoStore: TodoStore!
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         // CRITICAL: Both LSUIElement=YES and setActivationPolicy(.accessory) are
         // required. LSUIElement suppresses the dock icon at cold launch, but
@@ -192,6 +195,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         commandPaletteService = CommandPaletteService(currencyService: currencyService)
         appLaunchController.viewModel.commandPaletteService = commandPaletteService
         appLaunchController.clipboardMonitor = clipboardMonitor   // T-12-02: prevent self-capture of results
+
+        // 11. Initialize Todo Tracking store (Phase 13). Creation is
+        // unconditional (project convention); disk load is deferred until the
+        // feature is actually used (flag guarded at invocation sites).
+        todoStore = TodoStore()
+        if UserDefaults.standard.bool(forKey: AppSettingsKeys.todoTrackingEnabled) {
+            todoStore.loadIfNeeded()
+        }
 
         // 8. Initialize License Service and Nag Controller (Phase 10).
         licenseService = LicenseService()
@@ -737,6 +748,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         bezelController?.hide()
         promptBezelController?.hide()
         docBezelController?.hide()
+        todoStore?.saveNow()   // flush any pending debounced todo save
         clipboardMonitor.stop()
         appTracker.stop()
         accessibilityMonitor.stop()

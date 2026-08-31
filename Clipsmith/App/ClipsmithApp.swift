@@ -75,6 +75,13 @@ struct ClipsmithApp: App {
                 .frame(minWidth: 700, minHeight: 480)
         }
         .windowResizability(.contentSize)
+
+        WindowGroup(id: "todos") {
+            TodoWindowView()
+                .environment(appDelegate.todoStore)
+                .frame(minWidth: 640, minHeight: 420)
+        }
+        .windowResizability(.contentSize)
     }
 
     /// Returns the SF Symbol name for the current menu bar icon selection.

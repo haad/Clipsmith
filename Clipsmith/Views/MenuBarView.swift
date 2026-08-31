@@ -25,6 +25,9 @@ extension Notification.Name {
     /// Posted by TodoSettingsSection when the todo file path changes;
     /// AppDelegate observes it and re-points TodoStore at the new file.
     static let clipsmithTodoFilePathChanged = Notification.Name("clipsmithTodoFilePathChanged")
+    /// Posted by the .openTodos hotkey (AppDelegate) to open the todo window —
+    /// AppDelegate cannot use @Environment(\.openWindow), MenuBarView can.
+    static let clipsmithOpenTodos = Notification.Name("clipsmithOpenTodos")
 }
 
 struct MenuBarView: View {
@@ -46,6 +49,7 @@ struct MenuBarView: View {
     @AppStorage(AppSettingsKeys.menuSelectionPastes) private var menuSelectionPastes: Bool = true
     @AppStorage(AppSettingsKeys.docLookupEnabled) private var docLookupEnabled: Bool = false
     @AppStorage(AppSettingsKeys.appLauncherEnabled) private var appLauncherEnabled: Bool = false
+    @AppStorage(AppSettingsKeys.todoTrackingEnabled) private var todoTrackingEnabled: Bool = false
 
     private var modelContext: ModelContext {
         ClipsmithApp.sharedModelContainer.mainContext
@@ -115,6 +119,12 @@ struct MenuBarView: View {
             }
         }
 
+        if todoTrackingEnabled {
+            Button("Todos...") {
+                openTodoWindow()
+            }
+        }
+
         Button("Claude Toolkit...") {
             openClaudeToolkitWindow()
         }
@@ -175,6 +185,9 @@ struct MenuBarView: View {
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenSnippets)) { _ in
             openSnippetWindow()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenTodos)) { _ in
+            openTodoWindow()
+        }
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenGistSettings)) { _ in
             NSApp.activate()
             openSettings()
@@ -210,6 +223,15 @@ struct MenuBarView: View {
             activateAsRegularApp()
             try? await Task.sleep(for: .milliseconds(100))
             openWindow(id: "snippets")
+        }
+    }
+
+    /// Opens the todo window with the same activation-policy dance as snippets.
+    private func openTodoWindow() {
+        Task { @MainActor in
+            activateAsRegularApp()
+            try? await Task.sleep(for: .milliseconds(100))
+            openWindow(id: "todos")
         }
     }
 
