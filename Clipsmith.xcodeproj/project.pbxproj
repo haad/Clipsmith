@@ -103,6 +103,8 @@
 		AA0096 /* CommandPaletteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0097 /* CommandPaletteService.swift */; };
 		AA0101 /* TransformRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0101 /* TransformRegistry.swift */; };
 		AA0102 /* TransformRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0102 /* TransformRegistryTests.swift */; };
+		AA0103 /* TaskPaperParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0103 /* TaskPaperParser.swift */; };
+		AA0104 /* TaskPaperParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0104 /* TaskPaperParserTests.swift */; };
 		AA0097 /* CommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0098 /* CommandPaletteView.swift */; };
 		AA0099 /* HelpSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0099 /* HelpSettingsTab.swift */; };
 /* End PBXBuildFile section */
@@ -216,6 +218,8 @@
 		AF0097 /* CommandPaletteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteService.swift; sourceTree = "<group>"; };
 		AF0101 /* TransformRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRegistry.swift; sourceTree = "<group>"; };
 		AF0102 /* TransformRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRegistryTests.swift; sourceTree = "<group>"; };
+		AF0103 /* TaskPaperParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParser.swift; sourceTree = "<group>"; };
+		AF0104 /* TaskPaperParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParserTests.swift; sourceTree = "<group>"; };
 		AF0098 /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
 		AF0099 /* HelpSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSettingsTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -310,6 +314,7 @@
 				AF0095 /* CurrencyService.swift */,
 				AF0097 /* CommandPaletteService.swift */,
 				AF0101 /* TransformRegistry.swift */,
+				AF0103 /* TaskPaperParser.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -418,6 +423,7 @@
 				AF0092 /* CurrencyServiceTests.swift */,
 				AF0100 /* PromptSyncServiceTests.swift */,
 				AF0093 /* CommandPaletteServiceTests.swift */,
+				AF0104 /* TaskPaperParserTests.swift */,
 				GG0015 /* Fixtures */,
 			);
 			path = ClipsmithTests;
@@ -642,6 +648,7 @@
 				AA0101 /* TransformRegistry.swift in Sources */,
 				AA0097 /* CommandPaletteView.swift in Sources */,
 				AA0099 /* HelpSettingsTab.swift in Sources */,
+				AA0103 /* TaskPaperParser.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -677,6 +684,7 @@
 				AA0091 /* CurrencyServiceTests.swift in Sources */,
 				AA0100 /* PromptSyncServiceTests.swift in Sources */,
 				AA0092 /* CommandPaletteServiceTests.swift in Sources */,
+				AA0104 /* TaskPaperParserTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
