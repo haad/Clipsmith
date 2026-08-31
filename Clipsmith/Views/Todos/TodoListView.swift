@@ -46,7 +46,8 @@ struct TodoListView: View {
                 }
             }
             .onKeyPress(.space) {
-                guard let id = viewModel.selectedItemID else { return .ignored }
+                guard !searchFocused && !draftFocused,
+                      let id = viewModel.selectedItemID else { return .ignored }
                 store.toggleDone(id: id)
                 return .handled
             }
