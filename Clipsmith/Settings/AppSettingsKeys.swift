@@ -59,4 +59,9 @@ enum AppSettingsKeys {
     // Claude Toolkit browser
     static let toolkitPath = "toolkitPath"
     static let toolkitPathDefault = "~/.claude/plugins/claude-code-toolkit"
+
+    // Phase 13 additions (Todo Tracking)
+    static let todoTrackingEnabled = "todoTrackingEnabled"
+    static let todoFilePath = "todoFilePath"
+    static let todoShowCompleted = "todoShowCompleted"
 }

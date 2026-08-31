@@ -105,6 +105,8 @@
 		AA0102 /* TransformRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0102 /* TransformRegistryTests.swift */; };
 		AA0103 /* TaskPaperParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0103 /* TaskPaperParser.swift */; };
 		AA0104 /* TaskPaperParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0104 /* TaskPaperParserTests.swift */; };
+		AA0105 /* TodoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0105 /* TodoStore.swift */; };
+		AA0106 /* TodoStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0106 /* TodoStoreTests.swift */; };
 		AA0097 /* CommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0098 /* CommandPaletteView.swift */; };
 		AA0099 /* HelpSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0099 /* HelpSettingsTab.swift */; };
 /* End PBXBuildFile section */
@@ -220,6 +222,8 @@
 		AF0102 /* TransformRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRegistryTests.swift; sourceTree = "<group>"; };
 		AF0103 /* TaskPaperParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParser.swift; sourceTree = "<group>"; };
 		AF0104 /* TaskPaperParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParserTests.swift; sourceTree = "<group>"; };
+		AF0105 /* TodoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStore.swift; sourceTree = "<group>"; };
+		AF0106 /* TodoStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStoreTests.swift; sourceTree = "<group>"; };
 		AF0098 /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
 		AF0099 /* HelpSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSettingsTab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -315,6 +319,7 @@
 				AF0097 /* CommandPaletteService.swift */,
 				AF0101 /* TransformRegistry.swift */,
 				AF0103 /* TaskPaperParser.swift */,
+				AF0105 /* TodoStore.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -424,6 +429,7 @@
 				AF0100 /* PromptSyncServiceTests.swift */,
 				AF0093 /* CommandPaletteServiceTests.swift */,
 				AF0104 /* TaskPaperParserTests.swift */,
+				AF0106 /* TodoStoreTests.swift */,
 				GG0015 /* Fixtures */,
 			);
 			path = ClipsmithTests;
@@ -649,6 +655,7 @@
 				AA0097 /* CommandPaletteView.swift in Sources */,
 				AA0099 /* HelpSettingsTab.swift in Sources */,
 				AA0103 /* TaskPaperParser.swift in Sources */,
+				AA0105 /* TodoStore.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -685,6 +692,7 @@
 				AA0100 /* PromptSyncServiceTests.swift in Sources */,
 				AA0092 /* CommandPaletteServiceTests.swift in Sources */,
 				AA0104 /* TaskPaperParserTests.swift in Sources */,
+				AA0106 /* TodoStoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
