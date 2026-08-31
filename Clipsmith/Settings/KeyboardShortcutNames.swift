@@ -26,4 +26,12 @@ extension KeyboardShortcuts.Name {
     /// D-07: No default binding — user must configure this in Settings > Shortcuts.
     /// The handler is registered at startup; an unset recorder means it never fires.
     static let appLauncher = Self("appLauncher")
+
+    /// Hotkey that opens the todo window (Phase 13).
+    /// No default binding — user must configure in Settings > Shortcuts.
+    static let openTodos = Self("openTodos")
+
+    /// Hotkey that shows the todo quick-add bezel (Phase 13).
+    /// No default binding — user must configure in Settings > Shortcuts.
+    static let todoQuickAdd = Self("todoQuickAdd")
 }

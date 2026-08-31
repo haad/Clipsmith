@@ -56,6 +56,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     // Phase 13 — Todo Tracking
     var todoStore: TodoStore!
+    var todoQuickAddController: TodoQuickAddController!
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // CRITICAL: Both LSUIElement=YES and setActivationPolicy(.accessory) are
@@ -98,7 +99,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             AppSettingsKeys.appLauncherEnabled: false,
             // Phase 12 — Command Palette feature flag and prefix
             AppSettingsKeys.commandPaletteEnabled: false,
-            AppSettingsKeys.commandPalettePrefix: "="
+            AppSettingsKeys.commandPalettePrefix: "=",
+            // Phase 13 — Todo Tracking feature flag + list preference
+            AppSettingsKeys.todoTrackingEnabled: false,
+            AppSettingsKeys.todoShowCompleted: false
         ])
 
         accessibilityMonitor.start()
@@ -203,6 +207,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if UserDefaults.standard.bool(forKey: AppSettingsKeys.todoTrackingEnabled) {
             todoStore.loadIfNeeded()
         }
+
+        todoQuickAddController = TodoQuickAddController()
+        todoQuickAddController.todoStore = todoStore
+
+        // Re-point TodoStore when Settings changes the todo file path.
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleTodoFilePathChanged),
+            name: .clipsmithTodoFilePathChanged,
+            object: nil
+        )
 
         // 8. Initialize License Service and Nag Controller (Phase 10).
         licenseService = LicenseService()
@@ -433,6 +448,30 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 }
             }
         }
+
+        // Register global hotkeys for todo tracking (Phase 13).
+        // Always registered, feature flag checked at invocation time so
+        // toggling the setting works without app restart.
+        KeyboardShortcuts.onKeyDown(for: .openTodos) {
+            Task { @MainActor in
+                guard UserDefaults.standard.bool(forKey: AppSettingsKeys.todoTrackingEnabled) else { return }
+                // MenuBarView observes this and performs the activation-policy
+                // dance + openWindow (AppDelegate has no openWindow env).
+                NotificationCenter.default.post(name: .clipsmithOpenTodos, object: nil)
+            }
+        }
+
+        KeyboardShortcuts.onKeyDown(for: .todoQuickAdd) { [weak self] in
+            Task { @MainActor in
+                guard let self else { return }
+                guard UserDefaults.standard.bool(forKey: AppSettingsKeys.todoTrackingEnabled) else { return }
+                if self.todoQuickAddController.isVisible {
+                    self.todoQuickAddController.hide()
+                } else {
+                    self.todoQuickAddController.show()
+                }
+            }
+        }
     }
 
     // MARK: - In-menu search (Bug #21)
@@ -451,6 +490,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc private func openAppLauncherFromMenu() {
         appLaunchController?.show()
+    }
+
+    // MARK: - Todo Tracking (Phase 13)
+
+    /// Settings changed the todo file path: flush pending changes to the old
+    /// file, then load the new one.
+    @objc private func handleTodoFilePathChanged() {
+        todoStore?.updateFileURL(TodoStore.resolveFileURL())
     }
 
     // MARK: - Currency rates refreshed (from Settings)
@@ -748,6 +795,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         bezelController?.hide()
         promptBezelController?.hide()
         docBezelController?.hide()
+        todoQuickAddController?.hide()
         todoStore?.saveNow()   // flush any pending debounced todo save
         clipboardMonitor.stop()
         appTracker.stop()

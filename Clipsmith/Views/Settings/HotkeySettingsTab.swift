@@ -7,6 +7,8 @@ import KeyboardShortcuts
 /// Phase 2 registers event taps. The recorder UI is functional now — users can
 /// assign shortcuts and they will persist across launches.
 struct HotkeySettingsTab: View {
+    @AppStorage(AppSettingsKeys.todoTrackingEnabled) private var todoTrackingEnabled: Bool = false
+
     var body: some View {
         Form {
             Section {
@@ -38,6 +40,16 @@ struct HotkeySettingsTab: View {
                     "Save Clipboard as Snippet",
                     name: .saveClipboardAsSnippet
                 )
+                if todoTrackingEnabled {
+                    KeyboardShortcuts.Recorder(
+                        "Open Todos",
+                        name: .openTodos
+                    )
+                    KeyboardShortcuts.Recorder(
+                        "Todo Quick-Add",
+                        name: .todoQuickAdd
+                    )
+                }
             } footer: {
                 Text("Assign hotkeys for clipboard, search, snippets, prompt library, documentation lookup, app launcher, and saving clipboard as a snippet.")
                     .font(.caption)
