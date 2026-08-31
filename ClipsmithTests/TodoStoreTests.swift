@@ -84,6 +84,13 @@ final class TodoStoreTests: XCTestCase {
         XCTAssertEqual(store.document.allTasks[0].rawLine, "- task one")
     }
 
+    func testToggleDoneOffPreservesEmailLikeSubstring() {
+        let store = makeStore(initialContent: "- check foo@done.io @done(2026-08-31)\n")
+        let id = store.document.allTasks[0].id
+        store.toggleDone(id: id)
+        XCTAssertEqual(store.document.allTasks[0].rawLine, "- check foo@done.io")
+    }
+
     func testEditTaskPreservesIndent() {
         let store = makeStore(initialContent: "Home:\n\t- old text @today\n")
         let id = store.document.allTasks[0].id

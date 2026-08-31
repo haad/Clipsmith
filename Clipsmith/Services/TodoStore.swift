@@ -27,6 +27,12 @@ final class TodoStore {
         self.saveDelay = saveDelay
     }
 
+    isolated deinit {
+        // A resumed DispatchSource that is deallocated without an explicit
+        // cancel() never runs its cancel handler, leaking the watched fd.
+        watcher?.cancel()
+    }
+
     // MARK: - Path resolution
 
     static func defaultFileURL() -> URL {
@@ -158,10 +164,10 @@ final class TodoStore {
         }) {
             document.projects[idx].nodes.append(.task(item))
         } else if let projectName {
+            // projectName == nil always matches the synthetic Inbox (index 0)
+            // above, so reaching here implies projectName is non-nil.
             document.projects.append(TodoProject(
                 name: projectName, rawLine: "\(projectName):", nodes: [.task(item)]))
-        } else {
-            document.projects[0].nodes.append(.task(item))
         }
         markDirty()
     }
@@ -169,8 +175,11 @@ final class TodoStore {
     func toggleDone(id: UUID) {
         mutateItem(id: id) { item in
             if item.isDone {
+                // Anchored to start-of-line/whitespace like
+                // TaskPaperParser.tagRegex, so an unrelated substring such as
+                // "foo@done.io" in the title is left untouched.
                 let cleaned = item.rawLine
-                    .replacing(/\s*@done(?:\([^()]*\))?/, with: "")
+                    .replacing(/(?:^|\s)@done(?:\([^()]*\))?/, with: "")
                 return TodoItem(rawLine: cleaned, id: item.id)
             } else {
                 return TodoItem(
