@@ -17,14 +17,18 @@ final class TodoStore {
     var lastError: String?
 
     private let saveDelay: Duration
+    private let missingFileRecheckDelay: Duration
     private var hasLoaded = false
     private var saveTask: Task<Void, Never>?
+    private var recheckTask: Task<Void, Never>?
     private var watcher: DispatchSourceFileSystemObject?
 
     init(fileURL: URL = TodoStore.resolveFileURL(),
-         saveDelay: Duration = .milliseconds(500)) {
+         saveDelay: Duration = .milliseconds(500),
+         missingFileRecheckDelay: Duration = .milliseconds(250)) {
         self.fileURL = fileURL
         self.saveDelay = saveDelay
+        self.missingFileRecheckDelay = missingFileRecheckDelay
     }
 
     isolated deinit {
@@ -79,6 +83,8 @@ final class TodoStore {
     func saveNow() {
         saveTask?.cancel()
         saveTask = nil
+        recheckTask?.cancel()
+        recheckTask = nil
         guard hasPendingChanges else { return }
         do {
             try FileManager.default.createDirectory(
@@ -101,7 +107,7 @@ final class TodoStore {
     }
 
     func updateFileURL(_ url: URL) {
-        saveNow()
+        saveNow() // also cancels any pending missing-file recheck
         watcher?.cancel()
         watcher = nil
         fileURL = url
@@ -140,14 +146,31 @@ final class TodoStore {
 
     /// Reload from disk unless there are unsaved in-app changes
     /// (last-write-wins: dirty in-app state overwrites on next save).
-    /// A deleted file keeps memory state and is recreated on next save.
+    ///
+    /// A deleted file is NOT re-created here: that would resurrect a
+    /// deliberately deleted file, and would clobber an editor's
+    /// delete-then-create save (the watcher dies at the delete, so the
+    /// create is never observed). Instead, keep memory state and schedule a
+    /// short re-check: if the file has reappeared (e.g. the create half of
+    /// a delete-then-create), pick it up; otherwise do nothing — the file
+    /// is recreated on the next real user mutation's save.
     func handleFileChanged() {
         guard !hasPendingChanges else { return }
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
-            markDirty() // schedule recreation with current memory state
+            scheduleMissingFileRecheck()
             return
         }
         load()
+    }
+
+    private func scheduleMissingFileRecheck() {
+        recheckTask?.cancel()
+        let delay = missingFileRecheckDelay
+        recheckTask = Task { [weak self] in
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled else { return }
+            self?.handleFileChanged()
+        }
     }
 
     // MARK: - Task CRUD

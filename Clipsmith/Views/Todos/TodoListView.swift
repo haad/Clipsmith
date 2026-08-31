@@ -94,7 +94,8 @@ struct TodoListView: View {
         let text = draftText.trimmingCharacters(in: .whitespaces)
         guard !text.isEmpty else { cancelDraft(); return }
         var tags: [TodoTag] = []
-        if viewModel.selectedTab == .today && !text.contains("@today") {
+        if viewModel.selectedTab == .today,
+           !TaskPaperParser.tags(in: text).contains(where: { $0.name == "today" }) {
             tags.append(TodoTag(name: "today", value: nil))
         }
         store.addTask(text: text, projectName: viewModel.currentProjectName(), tags: tags)

@@ -131,12 +131,20 @@ final class TodoQuickAddController: NSPanel {
 
     /// Enter: parse the inline syntax and save. Unmatched #project names
     /// create the project (TodoStore matches case-insensitively); no
-    /// #project → Inbox. Empty input just dismisses.
+    /// #project → Inbox. Empty input just dismisses. Project-only input
+    /// (e.g. "#lara", no title or tags) creates the project instead of
+    /// silently dropping the input.
     private func commit() {
         let input = model.text.trimmingCharacters(in: .whitespaces)
         guard !input.isEmpty else { hide(); return }
         let result = TodoQuickAddParser.parse(input)
-        guard !result.title.isEmpty || !result.tags.isEmpty else { hide(); return }
+        if result.title.isEmpty && result.tags.isEmpty {
+            if let projectName = result.projectName {
+                todoStore?.addProject(name: projectName)
+            }
+            hide()
+            return
+        }
         todoStore?.addTask(
             text: result.title,
             projectName: result.projectName,

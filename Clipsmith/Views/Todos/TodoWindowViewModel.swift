@@ -33,10 +33,14 @@ final class TodoWindowViewModel {
     // MARK: - Tabs
 
     /// Today first, then projects in file order. Inbox only when it has tasks.
+    /// Legal TaskPaper can have two projects with the same name; those
+    /// collapse into a single tab (first occurrence wins the position).
     func tabs(for document: TaskPaperDocument) -> [Tab] {
         var tabs: [Tab] = [.today]
+        var seenNames = Set<String>()
         for project in document.projects {
             if project.isInbox && project.tasks.isEmpty { continue }
+            guard seenNames.insert(project.name).inserted else { continue }
             tabs.append(.project(project.name))
         }
         return tabs
@@ -61,7 +65,10 @@ final class TodoWindowViewModel {
                 item.isToday || (item.dueDateString.map { $0 <= today } ?? false)
             }
         case .project(let name):
-            base = document.projects.first { $0.name == name }?.tasks ?? []
+            // Aggregate across ALL projects with this name (file order):
+            // legal TaskPaper can repeat a project name, and every one of
+            // them must stay reachable from its single tab.
+            base = document.projects.filter { $0.name == name }.flatMap(\.tasks)
         }
         return base
             .filter { showCompleted || !$0.isDone }

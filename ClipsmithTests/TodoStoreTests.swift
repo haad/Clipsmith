@@ -168,6 +168,18 @@ final class TodoStoreTests: XCTestCase {
         XCTAssertEqual(fileContent(of: store), "- a\n- b\n")
     }
 
+    func testFileDeletedThenRecreatedExternallyIsPickedUpNotClobbered() async throws {
+        let store = makeStore(initialContent: "- a\n")
+        try FileManager.default.removeItem(at: store.fileURL)
+        store.handleFileChanged() // file gone: schedules a short recheck, no markDirty
+        XCTAssertFalse(store.hasPendingChanges)
+        // Simulate an editor's delete-then-create save landing before the recheck fires.
+        try Data("- edited outside\n".utf8).write(to: store.fileURL)
+        try await Task.sleep(for: .milliseconds(400)) // past the 250ms recheck delay
+        XCTAssertEqual(store.document.allTasks.map(\.title), ["edited outside"])
+        XCTAssertFalse(store.hasPendingChanges)
+    }
+
     // MARK: - Path switching
 
     func testUpdateFileURLFlushesThenLoadsNewFile() throws {

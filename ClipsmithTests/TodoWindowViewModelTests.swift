@@ -37,6 +37,28 @@ final class TodoWindowViewModelTests: XCTestCase {
         XCTAssertEqual(vm.tabs(for: noInbox), [.today, .project("Home")])
     }
 
+    func testDuplicateProjectNamesCollapseToOneTab() {
+        let doc = TaskPaperParser.parse("""
+        Notes:
+        - first note
+        Notes:
+        - second note
+        """ + "\n")
+        XCTAssertEqual(vm.tabs(for: doc), [.today, .project("Notes")])
+    }
+
+    func testVisibleItemsAggregatesAcrossDuplicateProjectNames() {
+        let doc = TaskPaperParser.parse("""
+        Notes:
+        - first note
+        Notes:
+        - second note
+        """ + "\n")
+        vm.selectedTab = .project("Notes")
+        XCTAssertEqual(vm.visibleItems(in: doc, today: "2026-08-31").map(\.title),
+                       ["first note", "second note"])
+    }
+
     // MARK: - Today view
 
     func testTodayViewIncludesTodayTagAndOverdueDue() {
