@@ -5,6 +5,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-09-01
+
 ### Added
 
 - Todo Tracking (experimental, Settings > General > Features): keyboard-first todos
@@ -146,7 +148,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Syntax-highlighted snippet editor (20+ languages)
 - Menu bar app with configurable hotkeys
 
-[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.2.1...HEAD
+[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.3.0...HEAD
+[5.3.0]: https://github.com/haad/Clipsmith/compare/v5.2.1...v5.3.0
 [5.2.1]: https://github.com/haad/Clipsmith/compare/v5.2.0...v5.2.1
 [5.2.0]: https://github.com/haad/Clipsmith/compare/v5.1.0...v5.2.0
 [5.1.0]: https://github.com/haad/Clipsmith/compare/v5.0.2...v5.1.0
