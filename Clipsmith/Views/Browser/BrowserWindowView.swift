@@ -18,6 +18,9 @@ struct BrowserWindowView: View {
     let docsetManagerService: DocsetManagerService
 
     @State private var viewModel = BrowserWindowViewModel()
+    // Section view models live here so switching sections keeps their state.
+    @State private var docsViewModel = DocsBrowserViewModel()
+    @State private var toolkitViewModel = ClaudeToolkitViewModel()
     @AppStorage(AppSettingsKeys.docLookupEnabled) private var docLookupEnabled: Bool = false
 
     init(docsetSearchService: DocsetSearchService, docsetManagerService: DocsetManagerService) {
@@ -39,11 +42,12 @@ struct BrowserWindowView: View {
             case .docs:
                 DocsSectionView(
                     windowViewModel: viewModel,
+                    docs: docsViewModel,
                     searchService: docsetSearchService,
                     managerService: docsetManagerService
                 )
             case .toolkit:
-                ToolkitSectionView()
+                ToolkitSectionView(viewModel: toolkitViewModel)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)

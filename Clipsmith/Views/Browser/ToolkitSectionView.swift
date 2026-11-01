@@ -117,7 +117,8 @@ struct ToolkitSectionView: View {
     @AppStorage(AppSettingsKeys.toolkitPath)
     private var toolkitPath: String = AppSettingsKeys.toolkitPathDefault
 
-    @State private var viewModel = ClaudeToolkitViewModel()
+    /// Owned by `BrowserWindowView` so selection and filters survive section switches.
+    @Bindable var viewModel: ClaudeToolkitViewModel
     @State private var showingPathSheet = false
     @FocusState private var isSearchFocused: Bool
 

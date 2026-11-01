@@ -111,6 +111,15 @@ final class DocsBrowserViewModel {
         selectedIndex = 0
     }
 
+    /// Drops the sidebar scope when its docset was disabled or deleted in Settings,
+    /// so the footer's "All docsets" and the search agree.
+    func reconcileSelection() {
+        guard let id = selectedDocsetID,
+              let managerService,
+              !managerService.enabledDocsets.contains(where: { $0.id == id }) else { return }
+        selectedDocsetID = nil
+    }
+
     /// Loads each enabled docset's index off the main actor and records its entry count.
     func loadEntryCounts() {
         guard let searchService, let managerService else { return }

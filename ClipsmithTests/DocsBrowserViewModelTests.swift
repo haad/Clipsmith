@@ -122,6 +122,20 @@ final class DocsBrowserViewModelTests: XCTestCase {
         XCTAssertEqual(viewModel.selectedDocsetID, "go")
     }
 
+    /// Review fix: a docset disabled or deleted in Settings must not leave a stale scope.
+    func testReconcileSelectionClearsVanishedDocset() {
+        let manager = DocsetManagerService()
+        manager.docsets = all
+        viewModel.managerService = manager
+        viewModel.selectedDocsetID = "go"
+        viewModel.reconcileSelection()
+        XCTAssertEqual(viewModel.selectedDocsetID, "go")
+
+        manager.docsets = all.filter { $0.id != "go" }
+        viewModel.reconcileSelection()
+        XCTAssertNil(viewModel.selectedDocsetID)
+    }
+
     // MARK: - Helpers
 
     private func makeResults(count: Int) -> [DocSearchResult] {

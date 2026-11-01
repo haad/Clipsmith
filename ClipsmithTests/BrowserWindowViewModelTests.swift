@@ -43,4 +43,19 @@ final class BrowserWindowViewModelTests: XCTestCase {
         XCTAssertEqual(vm.selectedSection, .snippets)
         XCTAssertNil(vm.pendingDocsQuery)
     }
+
+    /// Review fix: the docs hotkey with nothing selected must still clear and focus the field.
+    func testApplyDocsWithNilQueryYieldsEmptyPrefill() {
+        let vm = BrowserWindowViewModel(defaults: defaults)
+        vm.apply(BrowserOpenRequest(section: .docs, query: nil), docLookupEnabled: true)
+        XCTAssertEqual(vm.pendingDocsQuery, "")
+    }
+
+    /// A section-less request (flag toggles, onAppear) must not touch a Docs field.
+    func testApplyWithoutSectionLeavesPrefillAlone() {
+        let vm = BrowserWindowViewModel(defaults: defaults)
+        vm.selectedSection = .docs
+        vm.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: true)
+        XCTAssertNil(vm.pendingDocsQuery)
+    }
 }

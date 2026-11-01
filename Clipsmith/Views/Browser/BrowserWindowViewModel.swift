@@ -28,7 +28,9 @@ final class BrowserWindowViewModel {
 
     /// Applies an open request: switch to the requested section when it is
     /// available, otherwise keep the current one (falling back to Snippets if
-    /// that is hidden too). A query is kept only when Docs ends up selected.
+    /// that is hidden too). A request that explicitly asked for Docs always
+    /// prefills the search field: with the query, or empty when nothing was
+    /// selected, so the field is cleared and focused either way.
     func apply(_ request: BrowserOpenRequest, docLookupEnabled: Bool) {
         let available = sections(docLookupEnabled: docLookupEnabled)
         if let requested = request.section, available.contains(requested) {
@@ -36,6 +38,10 @@ final class BrowserWindowViewModel {
         } else if !available.contains(selectedSection) {
             selectedSection = .snippets
         }
-        pendingDocsQuery = selectedSection == .docs ? request.query : nil
+        if request.section == .docs, selectedSection == .docs {
+            pendingDocsQuery = request.query ?? ""
+        } else {
+            pendingDocsQuery = nil
+        }
     }
 }

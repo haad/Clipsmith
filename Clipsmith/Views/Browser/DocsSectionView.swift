@@ -15,20 +15,38 @@ import AppKit
 /// | ↑ ↓      | Move through results       |
 /// | ⌥↑ ⌥↓    | Move the docset selection  |
 struct DocsSectionView: View {
-    @Bindable var windowViewModel: BrowserWindowViewModel
+    let windowViewModel: BrowserWindowViewModel
+    /// Owned by `BrowserWindowView` so query, results and page survive section switches.
+    @Bindable var docs: DocsBrowserViewModel
     let searchService: DocsetSearchService
     let managerService: DocsetManagerService
 
-    @State private var docs = DocsBrowserViewModel()
     @FocusState private var isSearchFocused: Bool
 
-    init(windowViewModel: BrowserWindowViewModel, searchService: DocsetSearchService, managerService: DocsetManagerService) {
+    /// Sidebar tag for the "All docsets" row. `List(selection:)` needs a
+    /// non-optional value to highlight a row, so nil scope maps to this sentinel.
+    private static let allDocsetsID = "__all__"
+
+    init(
+        windowViewModel: BrowserWindowViewModel,
+        docs: DocsBrowserViewModel,
+        searchService: DocsetSearchService,
+        managerService: DocsetManagerService
+    ) {
         self.windowViewModel = windowViewModel
+        self.docs = docs
         self.searchService = searchService
         self.managerService = managerService
     }
 
     private var enabledDocsets: [DocsetInfo] { managerService.enabledDocsets }
+
+    private var sidebarSelection: Binding<String> {
+        Binding(
+            get: { docs.selectedDocsetID ?? Self.allDocsetsID },
+            set: { docs.selectedDocsetID = $0 == Self.allDocsetsID ? nil : $0 }
+        )
+    }
 
     var body: some View {
         HSplitView {
@@ -84,7 +102,7 @@ struct DocsSectionView: View {
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
 
-            List(selection: $docs.selectedDocsetID) {
+            List(selection: sidebarSelection) {
                 HStack {
                     Text("All docsets")
                     Spacer()
@@ -92,7 +110,7 @@ struct DocsSectionView: View {
                         .foregroundStyle(.secondary)
                         .font(.caption)
                 }
-                .tag(Optional<String>.none)
+                .tag(Self.allDocsetsID)
 
                 ForEach(enabledDocsets) { docset in
                     HStack {
@@ -105,7 +123,7 @@ struct DocsSectionView: View {
                                 .font(.caption)
                         }
                     }
-                    .tag(Optional(docset.id))
+                    .tag(docset.id)
                 }
             }
             .listStyle(.sidebar)
@@ -255,6 +273,7 @@ struct DocsSectionView: View {
         managerService.loadMetadata()
         docs.searchService = searchService
         docs.managerService = managerService
+        docs.reconcileSelection()
         docs.loadEntryCounts()
     }
 
