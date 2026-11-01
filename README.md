@@ -74,18 +74,19 @@ All shortcuts are configurable in Settings > Shortcuts.
 | Transform picker | `Tab` (or `t` while holding the hotkey) |
 | Quick actions menu | Right-click |
 
-### Browser Window (Snippets, Prompts, Docs, Toolkit)
+### Browser Window (Snippets, Prompts, Docs, Toolkit, Todos)
 
 | Action | Key |
 |---|---|
-| Switch section | `⌘1` `⌘2` `⌘3` `⌘4` |
+| Switch section | `⌘1` … `⌘5` |
 | Focus search | `⌘F` |
 | Filter by doc (Docs) | `python:query`, `go:query` |
 | Move docset selection (Docs) | `⌥↑` `⌥↓` |
 | Navigate results | `↑` `↓` |
 | Paste selected (Snippets, Prompts) | `⏎` |
 | Open in browser (Docs) | `⌘⏎` |
-| New snippet / prompt | `⌘N` |
+| New snippet / prompt / task | `⌘N` |
+| Previous / next project tab (Todos) | `⇧⌘[` `⇧⌘]` |
 | Close window | `Esc` |
 
 ## Requirements

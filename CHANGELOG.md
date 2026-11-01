@@ -5,6 +5,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.4.0] - 2026-11-02
+
 ### Changed
 
 - Snippets, Prompts, Documentation, Claude Toolkit and Todos now live in one browser window with
@@ -14,6 +16,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   Todo project tabs are chips; switch them with ⇧⌘[ / ⇧⌘] (⌘1–⌘9 now pick sections).
   The menu bar's Snippets, Browse Prompts, Documentation Lookup, Todos and Claude Toolkit
   entries are replaced by a single "Browser..." entry.
+- The data store migrates to schema V3 on first launch (drops the Gist table). The migration
+  is one-way: Clipsmith 5.3.0 and older cannot open the store afterwards.
 
 ### Removed
 
@@ -174,7 +178,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Syntax-highlighted snippet editor (20+ languages)
 - Menu bar app with configurable hotkeys
 
-[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.3.0...HEAD
+[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.4.0...HEAD
+[5.4.0]: https://github.com/haad/Clipsmith/compare/v5.3.0...v5.4.0
 [5.3.0]: https://github.com/haad/Clipsmith/compare/v5.2.1...v5.3.0
 [5.2.1]: https://github.com/haad/Clipsmith/compare/v5.2.0...v5.2.1
 [5.2.0]: https://github.com/haad/Clipsmith/compare/v5.1.0...v5.2.0
