@@ -46,4 +46,19 @@ final class DocsetManagerServiceTests: XCTestCase {
         let dir = DocsetInfo.docDirectory(for: "javascript")
         XCTAssertTrue(dir.path.contains("Clipsmith/DevDocs/javascript"))
     }
+
+    func testMissingMetadataSchedulesCatalogFetchOnlyOnce() {
+        let missing = FileManager.default.temporaryDirectory
+            .appendingPathComponent("clipsmith-\(UUID().uuidString)-meta.json")
+        let service = DocsetManagerService(metadataURL: missing)
+
+        service.loadMetadata()
+        let first = service.catalogFetchTask
+        XCTAssertNotNil(first, "first load with no metadata file fetches the catalog")
+
+        service.loadMetadata()
+        service.loadMetadata()
+        XCTAssertEqual(service.catalogFetchTask, first, "repeat loads reuse the in-flight fetch")
+        first?.cancel()
+    }
 }

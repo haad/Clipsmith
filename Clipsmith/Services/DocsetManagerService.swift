@@ -69,9 +69,23 @@ final class DocsetManagerService {
     /// Whether the catalog is being fetched.
     var isFetchingCatalog: Bool = false
 
+    /// The catalog fetch started by `loadMetadata()` when no metadata file
+    /// exists. Kept so repeated loads (every browser window activation) do
+    /// not start another one; Settings > Refresh calls `fetchCatalog()` directly.
+    private(set) var catalogFetchTask: Task<Void, Never>?
+
+    private let metadataOverride: URL?
+
+    /// - Parameter metadataURL: where `devdocs-meta.json` lives; nil means
+    ///   Application Support. Tests point it at a temporary file.
+    init(metadataURL: URL? = nil) {
+        self.metadataOverride = metadataURL
+    }
+
     // MARK: - File paths
 
     private var metadataPath: URL {
+        if let metadataOverride { return metadataOverride }
         let appSupport = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         return appSupport.appendingPathComponent("Clipsmith/devdocs-meta.json")
@@ -127,8 +141,10 @@ final class DocsetManagerService {
     /// Load saved metadata from disk.
     func loadMetadata() {
         guard FileManager.default.fileExists(atPath: metadataPath.path) else {
-            // First launch — trigger catalog fetch
-            Task { await fetchCatalog() }
+            // First launch — trigger catalog fetch, once per process
+            if catalogFetchTask == nil {
+                catalogFetchTask = Task { await fetchCatalog() }
+            }
             return
         }
         if let data = try? Data(contentsOf: metadataPath),
