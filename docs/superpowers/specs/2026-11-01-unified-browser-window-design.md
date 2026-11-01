@@ -92,7 +92,7 @@ Existing behaviour carried over unchanged: snippet CRUD via `SnippetStore`, prom
 |---|---|
 | Menu: Snippets… | opens browser on Snippets |
 | Menu: Browse Prompts… | opens browser on Prompts |
-| Menu: Documentation Lookup… | opens browser on Docs |
+| Menu: Documentation Lookup… | opens browser on Docs (*amended 2026-11-02: all per-section menu entries collapsed into one "Browser..." item opening the last-used section*) |
 | Menu: Claude Toolkit… | opens browser on Toolkit |
 | Hotkey `activateSnippets` | opens browser on Snippets |
 | Hotkey `activateDocLookup` | opens browser on Docs, query prefilled from the frontmost app's selection, search focused |

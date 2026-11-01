@@ -12,6 +12,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
   search field. Documentation gets a docset sidebar that scopes the search; the floating
   documentation panel is gone, and the hotkey opens the window on Docs with the selected text.
   Todo project tabs are chips; switch them with ⇧⌘[ / ⇧⌘] (⌘1–⌘9 now pick sections).
+  The menu bar's Snippets, Browse Prompts, Documentation Lookup, Todos and Claude Toolkit
+  entries are replaced by a single "Browser..." entry.
 
 ### Removed
 

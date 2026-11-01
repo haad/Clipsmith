@@ -276,14 +276,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
-        // Wire "Documentation Lookup..." menu bar button.
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(openDocLookupFromMenu),
-            name: .clipsmithOpenDocLookup,
-            object: nil
-        )
-
         // Wire "App Launcher..." menu bar button (Phase 11).
         NotificationCenter.default.addObserver(
             self,
@@ -444,11 +436,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         bezelController?.showWithSearch()
     }
 
-    // MARK: - Documentation Lookup (from menu bar)
-
-    @objc private func openDocLookupFromMenu() {
-        requestDocsBrowser()
-    }
+    // MARK: - Documentation Lookup (hotkey)
 
     /// Opens the browser window on Docs, prefilled with the previous app's
     /// selection. The selection is read *before* Clipsmith activates, which is

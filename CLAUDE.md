@@ -89,7 +89,7 @@ Both bezels use `.nonactivatingPanel` (don't steal focus). Documentation is a se
 2. Add Button in MenuBarView body
 3. Add `NotificationCenter.default.addObserver` + `@objc` handler in AppDelegate
 
-To open the browser window on a section instead, post `.clipsmithRequestBrowser` with `BrowserOpenRequest(section:query:).userInfo` (or call `openBrowser` directly from `MenuBarView`).
+The menu has a single "Browser..." entry that opens the window on the last-used section (⌘1–⌘5 switch). To open it on a specific section from code, post `.clipsmithRequestBrowser` with `BrowserOpenRequest(section:query:).userInfo` (or call `openBrowser` directly from `MenuBarView`).
 
 ### Feature flags
 Use `AppSettingsKeys` + `@AppStorage` with default `false`, guard at invocation site (not registration).

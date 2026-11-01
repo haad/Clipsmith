@@ -3,8 +3,6 @@ import SwiftData
 
 extension Notification.Name {
     static let clipsmithOpenSearch = Notification.Name("clipsmithOpenSearch")
-    /// Posted to trigger clipboard history export via NSSavePanel.
-    static let clipsmithOpenDocLookup = Notification.Name("clipsmithOpenDocLookup")
     /// Posted by the menu bar "App Launcher..." button to open the app launcher bezel (Phase 11).
     static let clipsmithOpenAppLauncher = Notification.Name("clipsmithOpenAppLauncher")
     static let clipsmithExportHistory = Notification.Name("clipsmithExportHistory")
@@ -38,9 +36,7 @@ struct MenuBarView: View {
     @AppStorage(AppSettingsKeys.displayNum) private var displayNum: Int = 10
     @AppStorage(AppSettingsKeys.displayLen) private var displayLen: Int = 40
     @AppStorage(AppSettingsKeys.menuSelectionPastes) private var menuSelectionPastes: Bool = true
-    @AppStorage(AppSettingsKeys.docLookupEnabled) private var docLookupEnabled: Bool = false
     @AppStorage(AppSettingsKeys.appLauncherEnabled) private var appLauncherEnabled: Bool = false
-    @AppStorage(AppSettingsKeys.todoTrackingEnabled) private var todoTrackingEnabled: Bool = false
 
     private var modelContext: ModelContext {
         ClipsmithApp.sharedModelContainer.mainContext
@@ -79,38 +75,20 @@ struct MenuBarView: View {
 
         Divider()
 
-        Button("Snippets...") {
-            openBrowser(BrowserOpenRequest(section: .snippets, query: nil))
-        }
-
-        Button("Browse Prompts...") {
-            openBrowser(BrowserOpenRequest(section: .prompts, query: nil))
+        // One entry for the browser window; it opens on the last-used section
+        // and ⌘1–⌘5 switch between Snippets, Prompts, Docs, Toolkit and Todos.
+        Button("Browser...") {
+            openBrowser(BrowserOpenRequest(section: nil, query: nil))
         }
 
         Button("Search Clippings...") {
             NotificationCenter.default.post(name: .clipsmithOpenSearch, object: nil)
         }
 
-        if docLookupEnabled {
-            Button("Documentation Lookup...") {
-                NotificationCenter.default.post(name: .clipsmithOpenDocLookup, object: nil)
-            }
-        }
-
         if appLauncherEnabled {
             Button("App Launcher...") {
                 NotificationCenter.default.post(name: .clipsmithOpenAppLauncher, object: nil)
             }
-        }
-
-        if todoTrackingEnabled {
-            Button("Todos...") {
-                openBrowser(BrowserOpenRequest(section: .todos, query: nil))
-            }
-        }
-
-        Button("Claude Toolkit...") {
-            openBrowser(BrowserOpenRequest(section: .toolkit, query: nil))
         }
 
         Divider()
