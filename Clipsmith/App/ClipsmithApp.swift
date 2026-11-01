@@ -67,7 +67,7 @@ struct ClipsmithApp: App {
             )
             .environment(appDelegate.pasteService)
             .environment(appDelegate.appTracker)
-            .frame(minWidth: 760, minHeight: 500)
+            .frame(minWidth: 800, minHeight: 500)
         }
         .modelContainer(ClipsmithApp.sharedModelContainer)
         .windowResizability(.contentSize)

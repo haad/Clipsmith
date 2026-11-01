@@ -28,7 +28,7 @@ Explicitly out of scope: Todos window redesign, the clipboard bezel (except dele
 ### Window
 
 - One `WindowGroup(id: "browser")` in `ClipsmithApp.swift` replaces `WindowGroup(id: "snippets")` and `WindowGroup(id: "claude-toolkit")`. Environment injection (`pasteService`, `appTracker`, `modelContainer`, docset services) moves to it.
-- Minimum size 760 × 500. Resizable. Frame autosaved under a single name so all sections share one remembered size and position.
+- Minimum size 800 × 500. Resizable. Frame autosaved under a single name so all sections share one remembered size and position.
 - Activation policy dance is unchanged: `MenuBarView.activateAsRegularApp()` then `openWindow`, and `onDisappear` restores `.accessory` when no regular windows remain (the existing pattern in `SnippetWindowView` / `TodoWindowView`).
 - Root view `BrowserWindowView` (new, `Clipsmith/Views/Browser/`) owns `selectedSection: BrowserSection` and renders the toolbar plus the active section's content. `BrowserSection` is an enum: `snippets, prompts, docs, toolkit`.
 - Deep-link: a single notification `.clipsmithOpenBrowser` with `userInfo["section"]` replaces `.clipsmithOpenSnippets`, `.clipsmithOpenPrompts`, `.clipsmithOpenDocLookup`, and the toolkit open path. `MenuBarView` observes it, does the activation dance, opens the window, then sets the section (same 150 ms delay trick as today's `openSnippetWindowOnPromptsTab`). The last-used section is remembered in `@AppStorage` and used when the window is opened without an explicit section.
