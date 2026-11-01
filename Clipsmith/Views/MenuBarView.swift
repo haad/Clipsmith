@@ -209,16 +209,16 @@ struct MenuBarView: View {
 
     /// Opens the unified browser window and routes the request to it.
     ///
-    /// Same activation dance as the other windows; the request is re-posted as
-    /// `.clipsmithOpenBrowser` after a brief delay so `BrowserWindowView` has
-    /// appeared and can apply the section and query.
+    /// Same activation dance as the other windows. The request goes into
+    /// `BrowserOpenMailbox` before the window opens: a new window takes it in
+    /// `onAppear`, an already open one on `.clipsmithOpenBrowser`.
     private func openBrowser(_ request: BrowserOpenRequest) {
         Task { @MainActor in
+            BrowserOpenMailbox.shared.post(request)
             activateAsRegularApp()
             try? await Task.sleep(for: .milliseconds(100))
             openWindow(id: "browser")
-            try? await Task.sleep(for: .milliseconds(150))
-            NotificationCenter.default.post(name: .clipsmithOpenBrowser, object: nil, userInfo: request.userInfo)
+            NotificationCenter.default.post(name: .clipsmithOpenBrowser, object: nil)
         }
     }
 }

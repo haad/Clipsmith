@@ -26,3 +26,23 @@ final class BrowserSectionTests: XCTestCase {
         XCTAssertNil(BrowserOpenRequest(userInfo: ["section": "nope"])?.section)
     }
 }
+
+@MainActor
+final class BrowserOpenMailboxTests: XCTestCase {
+    func testTakeReturnsPostedRequestOnce() {
+        let mailbox = BrowserOpenMailbox()
+        mailbox.post(BrowserOpenRequest(section: .docs, query: "fmt"))
+
+        let first = mailbox.take()
+        XCTAssertEqual(first?.section, .docs)
+        XCTAssertEqual(first?.query, "fmt")
+        XCTAssertNil(mailbox.take(), "a request is delivered to exactly one consumer")
+    }
+
+    func testLaterPostReplacesEarlier() {
+        let mailbox = BrowserOpenMailbox()
+        mailbox.post(BrowserOpenRequest(section: .snippets, query: nil))
+        mailbox.post(BrowserOpenRequest(section: .toolkit, query: nil))
+        XCTAssertEqual(mailbox.take()?.section, .toolkit)
+    }
+}

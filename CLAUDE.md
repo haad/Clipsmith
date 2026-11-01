@@ -33,7 +33,7 @@ One window hosts Snippets, Prompts, Docs and Claude Toolkit as sections behind a
 - `SnippetsSectionView`, `PromptsSectionView`, `ToolkitSectionView`, `DocsSectionView` — one per section; filtering logic in `SnippetFilter` / `PromptFilter`
 - `DocsBrowserViewModel` — docs search, docset scoping (sidebar), `prefix:` selection, `open(withQuery:)` prefill
 
-Opening flow (two hops, because `AppDelegate` has no `@Environment(\.openWindow)`): a caller posts `.clipsmithRequestBrowser` with `BrowserOpenRequest.userInfo` → `MenuBarView.openBrowser` activates the app and calls `openWindow(id: "browser")`, then posts `.clipsmithOpenBrowser` → `BrowserWindowView` applies it. The docs hotkey captures the selected text in `AppDelegate.requestDocsBrowser()` before activation.
+Opening flow (two hops, because `AppDelegate` has no `@Environment(\.openWindow)`): a caller posts `.clipsmithRequestBrowser` with `BrowserOpenRequest.userInfo` → `MenuBarView.openBrowser` puts the request in `BrowserOpenMailbox.shared`, activates the app, calls `openWindow(id: "browser")` and posts `.clipsmithOpenBrowser` → `BrowserWindowView` takes the request from the mailbox in `onAppear` (new window) or on the notification (already open). The docs hotkey captures the selected text in `AppDelegate.requestDocsBrowser()` before activation.
 
 ### Bezel Pattern (used 2 times)
 The app uses a consistent NSPanel-based overlay pattern for clipboard and prompts:

@@ -65,11 +65,35 @@ struct BrowserOpenRequest: Sendable {
     private static let queryKey = "query"
 }
 
+/// Hands a `BrowserOpenRequest` from `MenuBarView.openBrowser` to
+/// `BrowserWindowView` whether or not the window exists yet.
+///
+/// The request is posted before `openWindow`; a freshly created window takes
+/// it in `onAppear`, an already open one takes it when `.clipsmithOpenBrowser`
+/// arrives. Whichever runs first consumes it, so no timing delay is needed.
+@MainActor
+final class BrowserOpenMailbox {
+    static let shared = BrowserOpenMailbox()
+
+    private var pending: BrowserOpenRequest?
+
+    func post(_ request: BrowserOpenRequest) {
+        pending = request
+    }
+
+    /// Returns the pending request and clears it.
+    func take() -> BrowserOpenRequest? {
+        defer { pending = nil }
+        return pending
+    }
+}
+
 extension Notification.Name {
     /// Posted by any caller (hotkey, menu, AppDelegate) that wants the browser
     /// window shown. `MenuBarView` observes it, activates the app, opens the
-    /// window, then re-posts as `.clipsmithOpenBrowser`.
+    /// window, then nudges it with `.clipsmithOpenBrowser`.
     static let clipsmithRequestBrowser = Notification.Name("clipsmithRequestBrowser")
-    /// Posted once the window exists; `BrowserWindowView` applies the request.
+    /// Posted after `openWindow`; an already open `BrowserWindowView` takes
+    /// the request from `BrowserOpenMailbox`. Carries no payload.
     static let clipsmithOpenBrowser = Notification.Name("clipsmithOpenBrowser")
 }

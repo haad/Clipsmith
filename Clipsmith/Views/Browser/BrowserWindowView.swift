@@ -4,7 +4,7 @@ import SwiftUI
 ///
 /// A segmented picker in the toolbar switches between Snippets, Prompts,
 /// Docs (feature-flagged) and Toolkit. Each section owns its own panes;
-/// this view only hosts them and routes `.clipsmithOpenBrowser` requests.
+/// this view only hosts them and applies `BrowserOpenRequest`s from the mailbox.
 ///
 /// ## Keyboard Shortcuts
 ///
@@ -79,14 +79,16 @@ struct BrowserWindowView: View {
             .opacity(0)
         }
         .onAppear {
-            // Drop a hidden section if the flag was switched off while it was selected.
-            viewModel.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: docLookupEnabled)
+            // Apply the request that opened us; with none, this still drops a
+            // hidden section if the flag was switched off while it was selected.
+            let request = BrowserOpenMailbox.shared.take() ?? BrowserOpenRequest(section: nil, query: nil)
+            viewModel.apply(request, docLookupEnabled: docLookupEnabled)
         }
         .onChange(of: docLookupEnabled) { _, enabled in
             viewModel.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: enabled)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenBrowser)) { notification in
-            guard let request = BrowserOpenRequest(userInfo: notification.userInfo) else { return }
+        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenBrowser)) { _ in
+            guard let request = BrowserOpenMailbox.shared.take() else { return }
             viewModel.apply(request, docLookupEnabled: docLookupEnabled)
         }
         .onDisappear {
