@@ -3,7 +3,6 @@ import OSLog
 import SwiftUI
 import SwiftData
 import KeyboardShortcuts
-import UserNotifications
 import UniformTypeIdentifiers
 
 // Protocol trick to access NSHostingView.sizingOptions without knowing the
@@ -29,7 +28,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     let pasteService = PasteService()
     var clipboardStore: ClipboardStore!
     var snippetStore: SnippetStore!
-    var gistService: GistService!
     var bezelController: BezelController!
 
     // Phase 5 — Prompt Library
@@ -87,8 +85,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             "bezelHeight": 320.0,
             "displayClippingSource": true,
             "menuIcon": 0,
-            // Phase 4 additions (Plan 04 — Gist sharing)
-            AppSettingsKeys.gistDefaultPublic: false,
             // Wave 6 additions (Plan 06 — final parity polish)
             "skipPasswordLengths": true,
             "skipPasswordLengthsList": "12, 20, 32",
@@ -114,10 +110,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             showAccessibilityAlert()
         }
 
-        // 1. Initialize ClipboardStore, SnippetStore, and GistService with the shared model container.
+        // 1. Initialize ClipboardStore and SnippetStore with the shared model container.
         clipboardStore = ClipboardStore(modelContainer: ClipsmithApp.sharedModelContainer)
         snippetStore = SnippetStore(modelContainer: ClipsmithApp.sharedModelContainer)
-        gistService = GistService(modelContext: ClipsmithApp.sharedModelContainer.mainContext)
 
         // Pre-warm the main model context so @Query in MenuBarView/BezelView
         // is instant on first open. Without this, the SQLite connection opens
@@ -271,16 +266,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             object: nil
         )
 
-        // Wire "Share as Gist" from menu bar clipping context menu.
-        // MenuBarView posts .clipsmithShareAsGist with userInfo["content"]; AppDelegate
-        // handles it here so that GistService (owned by AppDelegate) can be called.
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleShareAsGist(_:)),
-            name: .clipsmithShareAsGist,
-            object: nil
-        )
-
         // Wire Export/Import History buttons (Plan 06-03).
         // GeneralSettingsTab and MenuBarView post these notifications; AppDelegate
         // handles them here so ClipboardStore and file panels can be accessed.
@@ -344,11 +329,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             name: NSWindow.didBecomeKeyNotification,
             object: nil
         )
-
-        // Request notification authorization for Gist creation alerts.
-        // Delivers silently if the user denies (no sound by default).
-        UNUserNotificationCenter.current().delegate = self
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert]) { _, _ in }
 
         // Observe keyboard layout changes (Bug #30) so PasteService can
         // adapt the V keycode for non-QWERTY layouts in the future.
@@ -529,29 +509,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
     }
 
-    // MARK: - Share as Gist (from menu bar clipping context menu)
-
-    @objc private func handleShareAsGist(_ notification: Notification) {
-        guard let content = notification.userInfo?["content"] as? String else { return }
-        Task { @MainActor in
-            let ext = GistService.languageExtension(for: nil)
-            let filename = "clipping.\(ext)"
-            do {
-                let response = try await gistService.createGist(
-                    filename: filename,
-                    content: content,
-                    description: "Shared from Clipsmith",
-                    isPublic: UserDefaults.standard.bool(forKey: AppSettingsKeys.gistDefaultPublic)
-                )
-                sendGistNotification(url: response.htmlURL, filename: filename)
-            } catch GistError.noToken {
-                showGistNoTokenAlert()
-            } catch {
-                showGistErrorAlert(error)
-            }
-        }
-    }
-
     // MARK: - Export/Import History (Plan 06-03)
 
     @objc private func handleExportHistory() {
@@ -672,51 +629,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    // MARK: - Gist Notifications
-
-    /// Sends a macOS system notification after a Gist is created.
-    /// Clicking the notification opens the Gist URL in the browser.
-    func sendGistNotification(url: String, filename: String) {
-        let content = UNMutableNotificationContent()
-        content.title = "Gist Created"
-        content.body = filename
-        content.userInfo = ["url": url]
-        // No sound — consistent with CONTEXT.md preference for non-intrusive notifications
-
-        let request = UNNotificationRequest(
-            identifier: UUID().uuidString,
-            content: content,
-            trigger: nil  // Deliver immediately
-        )
-        UNUserNotificationCenter.current().add(request)
-    }
-
-    // MARK: - Gist Error Alerts
-
-    private func showGistNoTokenAlert() {
-        let alert = NSAlert()
-        alert.messageText = "No GitHub Token Configured"
-        alert.informativeText = "Add your GitHub Personal Access Token in Preferences > Gist to enable Gist sharing."
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "Open Preferences")
-        alert.addButton(withTitle: "Cancel")
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            NSApp.activate()
-            // Open Settings — post the settings notification (AppDelegate has no openSettings env)
-            NotificationCenter.default.post(name: .clipsmithOpenGistSettings, object: nil)
-        }
-    }
-
-    private func showGistErrorAlert(_ error: Error) {
-        let alert = NSAlert()
-        alert.messageText = "Gist Sharing Failed"
-        alert.informativeText = error.localizedDescription
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "OK")
-        alert.runModal()
-    }
-
     // MARK: - Hosting view sizing fix
 
     /// Set of windows already configured — avoids redundant work.
@@ -810,32 +722,5 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             try? mainContext.delete(model: ClipsmithSchemaV1.Clipping.self)
             try? mainContext.save()
         }
-    }
-}
-
-// MARK: - UNUserNotificationCenterDelegate
-
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    /// Called when user clicks a delivered notification.
-    /// Opens the Gist URL stored in the notification's userInfo.
-    nonisolated func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse
-    ) async {
-        let userInfo = response.notification.request.content.userInfo
-        if let urlString = userInfo["url"] as? String,
-           let url = URL(string: urlString) {
-            _ = await MainActor.run {
-                NSWorkspace.shared.open(url)
-            }
-        }
-    }
-
-    /// Allows notifications to display while the app is in the foreground.
-    nonisolated func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        willPresent notification: UNNotification
-    ) async -> UNNotificationPresentationOptions {
-        return [.banner]
     }
 }

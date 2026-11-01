@@ -8,7 +8,7 @@ enum SettingsTab: Int {
     case general = 0
     case shortcuts = 1
     case prompts = 2
-    case gist = 3
+    case gist = 3  // retired; raw value reserved so stored selections stay valid
     case docsets = 4
     case help = 5
     case license = 6  // hidden from UI; kept for AppDelegate navigation
@@ -43,12 +43,6 @@ struct SettingsView: View {
                     Label("Prompts", systemImage: "text.book.closed")
                 }
                 .tag(SettingsTab.prompts.rawValue)
-
-            GistSettingsSection()
-                .tabItem {
-                    Label("Gist", systemImage: "link")
-                }
-                .tag(SettingsTab.gist.rawValue)
 
             DocsetSettingsSection()
                 .tabItem {

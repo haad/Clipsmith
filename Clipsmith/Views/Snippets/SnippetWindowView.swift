@@ -2,11 +2,10 @@ import SwiftUI
 
 /// Root view for the snippet WindowGroup.
 ///
-/// Contains a segmented control that switches between the Snippets list,
-/// the Prompts management tab, and the Gists history tab.
+/// Contains a segmented control that switches between the Snippets list
+/// and the Prompts management tab.
 /// - Snippets tab: SnippetListView for browsing and editing code snippets
 /// - Prompts tab: PromptLibraryView for browsing and editing library prompts
-/// - Gists tab: GistHistoryView for browsing shared Gists
 ///
 /// ## Keyboard Shortcuts
 ///
@@ -14,8 +13,6 @@ import SwiftUI
 /// |----------------|-------------------------------------------|
 /// | ⌘1             | Switch to Snippets tab                    |
 /// | ⌘2             | Switch to Prompts tab                     |
-/// | ⌘3             | Switch to Gists tab                       |
-/// | ⇧⌘G            | Share selected snippet as Gist            |
 /// | ⌘N             | Create new snippet / new prompt           |
 /// | ⌘F             | Focus search field                        |
 /// | ⌘⌫             | Delete selected snippet / user prompt     |
@@ -32,29 +29,18 @@ struct SnippetWindowView: View {
                 Picker("", selection: $selectedTab) {
                     Text("Snippets").tag(0)
                     Text("Prompts").tag(1)
-                    Text("Gists").tag(2)
                 }
                 .pickerStyle(.segmented)
                 .frame(maxWidth: 260)
 
                 Spacer()
-
-                if selectedTab == 0 {
-                    Button("Share as Gist") {
-                        NotificationCenter.default.post(name: .clipsmithShareSnippetAsGist, object: nil)
-                    }
-                    .keyboardShortcut("g", modifiers: [.command, .shift])
-                    .help("Share selected snippet as GitHub Gist (⇧⌘G)")
-                }
             }
             .padding()
 
             if selectedTab == 0 {
                 SnippetListView()
-            } else if selectedTab == 1 {
-                PromptLibraryView()
             } else {
-                GistHistoryView()
+                PromptLibraryView()
             }
         }
         // ⎋ Escape closes the snippet window (yields to text fields)
@@ -68,8 +54,6 @@ struct SnippetWindowView: View {
                     .keyboardShortcut("1", modifiers: .command)
                 Button("") { selectedTab = 1 }
                     .keyboardShortcut("2", modifiers: .command)
-                Button("") { selectedTab = 2 }
-                    .keyboardShortcut("3", modifiers: .command)
             }
             .frame(width: 0, height: 0)
             .opacity(0)

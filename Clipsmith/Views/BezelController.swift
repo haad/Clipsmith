@@ -391,10 +391,6 @@ final class BezelController: NSPanel {
         rtfItem.target = self
         shareMenu.addItem(rtfItem)
 
-        let gistItem = NSMenuItem(title: "Create Gist...", action: #selector(actionShareAsGist), keyEquivalent: "")
-        gistItem.target = self
-        shareMenu.addItem(gistItem)
-
         let shareParent = NSMenuItem(title: "Share", action: nil, keyEquivalent: "")
         shareParent.submenu = shareMenu
         menu.addItem(shareParent)
@@ -525,19 +521,6 @@ final class BezelController: NSPanel {
         clipboardMonitor?.blockedChangeCount = pasteboard.changeCount
         hide()
         logger.info("Copied as RTF to pasteboard")
-    }
-
-    /// Posts .clipsmithShareAsGist notification reusing the existing AppDelegate handler.
-    /// Zero new Gist code needed — AppDelegate already handles this notification from MenuBarView.
-    @objc private func actionShareAsGist() {
-        guard let content = viewModel.currentClipping else { return }
-        NotificationCenter.default.post(
-            name: .clipsmithShareAsGist,
-            object: nil,
-            userInfo: ["content": content]
-        )
-        hide()
-        logger.info("Posted clipsmithShareAsGist notification")
     }
 
     // MARK: - Private helpers

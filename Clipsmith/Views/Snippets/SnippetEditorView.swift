@@ -13,17 +13,12 @@ struct SnippetEditorView: View {
     let snippet: ClipsmithSchemaV1.Snippet
     let snippetStore: SnippetStore
 
-    // MARK: - Environment
-
-    @Environment(GistService.self) private var gistService
-
     // MARK: - State
 
     @State private var name: String = ""
     @State private var content: String = ""
     @State private var language: String? = nil
     @State private var tagsText: String = ""
-    @AppStorage(AppSettingsKeys.gistDefaultPublic) private var gistDefaultPublic: Bool = false
 
     // MARK: - Language Options
 
@@ -115,12 +110,6 @@ struct SnippetEditorView: View {
             guard !Task.isCancelled else { return }
             await saveSnippet()
         }
-        // Observe share-as-gist notification from SnippetWindowView top bar button
-        .onReceive(NotificationCenter.default.publisher(for: .clipsmithShareSnippetAsGist)) { _ in
-            Task {
-                await shareAsGist()
-            }
-        }
     }
 
     // MARK: - Helpers
@@ -159,59 +148,5 @@ struct SnippetEditorView: View {
             language: language,
             tags: parsedTags
         )
-    }
-
-    // MARK: - Share as Gist
-
-    /// Shares the current snippet content as a GitHub Gist.
-    ///
-    /// One-click share: no confirmation dialog. The Gist URL is automatically
-    /// copied to the clipboard by GistService (GIST-04) and a macOS notification
-    /// is sent via AppDelegate.sendGistNotification.
-    @MainActor
-    private func shareAsGist() async {
-        guard !content.isEmpty else { return }
-        let ext = GistService.languageExtension(for: language)
-        let safeName = name.isEmpty ? "snippet" : name.replacingOccurrences(of: " ", with: "_")
-        let filename = "\(safeName).\(ext)"
-        do {
-            let response = try await gistService.createGist(
-                filename: filename,
-                content: content,
-                description: name.isEmpty ? "Snippet from Clipsmith" : name,
-                isPublic: gistDefaultPublic
-            )
-            // Send macOS notification via AppDelegate
-            if let appDelegate = NSApp.delegate as? AppDelegate {
-                appDelegate.sendGistNotification(url: response.htmlURL, filename: filename)
-            }
-        } catch GistError.noToken {
-            showNoTokenAlert()
-        } catch {
-            showShareErrorAlert(error)
-        }
-    }
-
-    private func showNoTokenAlert() {
-        let alert = NSAlert()
-        alert.messageText = "No GitHub Token Configured"
-        alert.informativeText = "Add your GitHub Personal Access Token in Preferences > Gist to enable Gist sharing."
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "Open Preferences")
-        alert.addButton(withTitle: "Cancel")
-        let response = alert.runModal()
-        if response == .alertFirstButtonReturn {
-            NSApp.activate()
-            NotificationCenter.default.post(name: .clipsmithOpenGistSettings, object: nil)
-        }
-    }
-
-    private func showShareErrorAlert(_ error: Error) {
-        let alert = NSAlert()
-        alert.messageText = "Gist Sharing Failed"
-        alert.informativeText = error.localizedDescription
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "OK")
-        alert.runModal()
     }
 }

@@ -45,11 +45,6 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 - Press `Tab` in the clipboard bezel (or `t` while holding the hotkey) to fuzzy-search transforms with live previews — `⏎` transforms and pastes in one motion
 - Also available from the right-click quick-actions menu
 
-### GitHub Gist Sharing
-- Share any clipping or snippet as a GitHub Gist
-- Automatic language detection for syntax highlighting
-- Public or private gists via personal access token
-
 ### Import / Export
 - Export clipboard history to JSON, CSV, or plain text
 - Import history from exported files
@@ -114,7 +109,6 @@ Build the `Clipsmith` scheme in Xcode 16+. The app runs as a menu bar utility �
 - **General** — history size, paste behavior, bezel appearance, menu bar options, feature flags
 - **Shortcuts** — record custom keyboard shortcuts for all features
 - **Prompts** — manage prompt library, sync URL, template variables
-- **Gists** — GitHub personal access token, default visibility
 - **Docsets** — browse DevDocs catalog, download/delete documentation sets
 - **Todos** — todo file location (choose, reveal in Finder, reset to default)
 
@@ -127,7 +121,7 @@ Some features are behind experimental flags in Settings > General > Features:
 
 ## Privacy
 
-All data stays on your Mac. No cloud sync, no analytics, no tracking. GitHub Gist sharing requires a personal access token stored in the macOS Keychain.
+All data stays on your Mac. No cloud sync, no analytics, no tracking.
 
 ## Changelog
 

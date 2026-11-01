@@ -6,9 +6,6 @@ extension Notification.Name {
     static let clipsmithOpenSnippets = Notification.Name("clipsmithOpenSnippets")
     /// Posted to open the snippet window on the Prompts tab (tab index 1).
     static let clipsmithOpenPrompts = Notification.Name("clipsmithOpenPrompts")
-    static let clipsmithShareAsGist = Notification.Name("clipsmithShareAsGist")
-    static let clipsmithOpenGistSettings = Notification.Name("clipsmithOpenGistSettings")
-    static let clipsmithShareSnippetAsGist = Notification.Name("clipsmithShareSnippetAsGist")
     /// Posted to trigger clipboard history export via NSSavePanel.
     static let clipsmithOpenDocLookup = Notification.Name("clipsmithOpenDocLookup")
     /// Posted by the menu bar "App Launcher..." button to open the app launcher bezel (Phase 11).
@@ -81,13 +78,6 @@ struct MenuBarView: View {
                     Button("Delete", role: .destructive) {
                         modelContext.delete(clipping)
                         try? modelContext.save()
-                    }
-                    Button("Share as Gist...") {
-                        NotificationCenter.default.post(
-                            name: .clipsmithShareAsGist,
-                            object: nil,
-                            userInfo: ["content": clipping.content]
-                        )
                     }
                 }
             }
@@ -187,10 +177,6 @@ struct MenuBarView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenTodos)) { _ in
             openTodoWindow()
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenGistSettings)) { _ in
-            NSApp.activate()
-            openSettings()
         }
     }
 

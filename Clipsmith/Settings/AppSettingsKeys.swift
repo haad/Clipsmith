@@ -24,9 +24,6 @@ enum AppSettingsKeys {
     static let displayClippingSource = "displayClippingSource"
     static let menuIcon = "menuIcon"
 
-    // Phase 4 additions (Plan 04 — Gist sharing)
-    static let gistDefaultPublic = "gistDefaultPublic"
-
     // Wave 6 additions (Plan 06 — final parity polish)
     static let skipPasswordLengths = "skipPasswordLengths"
     static let skipPasswordLengthsList = "skipPasswordLengthsList"

@@ -35,10 +35,6 @@
 		AA0027 /* BezelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0029 /* BezelController.swift */; };
 		AA0028 /* BezelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0030 /* BezelView.swift */; };
 		AA0029 /* BezelControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0031 /* BezelControllerTests.swift */; };
-		AA0030 /* TokenStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0032 /* TokenStore.swift */; };
-		AA0031 /* TokenStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0033 /* TokenStoreTests.swift */; };
-		AA0032 /* GistService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0034 /* GistService.swift */; };
-		AA0033 /* GistServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0035 /* GistServiceTests.swift */; };
 		AA0034 /* SnippetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0036 /* SnippetStore.swift */; };
 		AA0035 /* SnippetStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0037 /* SnippetStoreTests.swift */; };
 		AA0036 /* HighlightSwift in Frameworks */ = {isa = PBXBuildFile; productRef = SP0003 /* HighlightSwift */; };
@@ -46,8 +42,6 @@
 		AA0038 /* SnippetListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0039 /* SnippetListView.swift */; };
 		AA0039 /* SnippetEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0040 /* SnippetEditorView.swift */; };
 		AA0040 /* SnippetPasteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0041 /* SnippetPasteTests.swift */; };
-		AA0041 /* GistHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0042 /* GistHistoryView.swift */; };
-		AA0042 /* GistSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0043 /* GistSettingsSection.swift */; };
 		AA0043 /* HighlightedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0044 /* HighlightedTextEditor.swift */; };
 		AA0044 /* ClipsmithSchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0045 /* ClipsmithSchemaV2.swift */; };
 		AA0045 /* PromptLibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0046 /* PromptLibraryStore.swift */; };
@@ -161,18 +155,12 @@
 		AF0029 /* BezelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezelController.swift; sourceTree = "<group>"; };
 		AF0030 /* BezelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezelView.swift; sourceTree = "<group>"; };
 		AF0031 /* BezelControllerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BezelControllerTests.swift; sourceTree = "<group>"; };
-		AF0032 /* TokenStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStore.swift; sourceTree = "<group>"; };
-		AF0033 /* TokenStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TokenStoreTests.swift; sourceTree = "<group>"; };
-		AF0034 /* GistService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistService.swift; sourceTree = "<group>"; };
-		AF0035 /* GistServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistServiceTests.swift; sourceTree = "<group>"; };
 		AF0036 /* SnippetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetStore.swift; sourceTree = "<group>"; };
 		AF0037 /* SnippetStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetStoreTests.swift; sourceTree = "<group>"; };
 		AF0038 /* SnippetWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetWindowView.swift; sourceTree = "<group>"; };
 		AF0039 /* SnippetListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetListView.swift; sourceTree = "<group>"; };
 		AF0040 /* SnippetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorView.swift; sourceTree = "<group>"; };
 		AF0041 /* SnippetPasteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPasteTests.swift; sourceTree = "<group>"; };
-		AF0042 /* GistHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistHistoryView.swift; sourceTree = "<group>"; };
-		AF0043 /* GistSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GistSettingsSection.swift; sourceTree = "<group>"; };
 		AF0044 /* HighlightedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedTextEditor.swift; sourceTree = "<group>"; };
 		AF0045 /* ClipsmithSchemaV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsmithSchemaV2.swift; sourceTree = "<group>"; };
 		AF0046 /* PromptLibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryStore.swift; sourceTree = "<group>"; };
@@ -314,8 +302,6 @@
 				AF0022 /* ClipboardMonitor.swift */,
 				AF0024 /* PasteService.swift */,
 				AF0025 /* AppTracker.swift */,
-				AF0032 /* TokenStore.swift */,
-				AF0034 /* GistService.swift */,
 				AF0036 /* SnippetStore.swift */,
 				AF0046 /* PromptLibraryStore.swift */,
 				AF0047 /* TemplateSubstitutor.swift */,
@@ -363,7 +349,6 @@
 				AF0098 /* CommandPaletteView.swift */,
 				GG0009 /* Settings */,
 				GG0011 /* Snippets */,
-				GG0012 /* Gists */,
 				GG0014 /* Prompts */,
 				GG0016 /* ClaudeToolkit */,
 				GG0017 /* Todos */,
@@ -406,7 +391,6 @@
 				AF0015 /* GeneralSettingsTab.swift */,
 				AF0016 /* HotkeySettingsTab.swift */,
 				AF0017 /* AccessibilitySettingsSection.swift */,
-				AF0043 /* GistSettingsSection.swift */,
 				AF0053 /* PromptLibrarySettingsSection.swift */,
 				AF0075 /* DocsetSettingsSection.swift */,
 				AF0080 /* LicenseSettingsSection.swift */,
@@ -425,8 +409,6 @@
 				AF0026 /* PasteServiceTests.swift */,
 				AF0028 /* BezelViewModelTests.swift */,
 				AF0031 /* BezelControllerTests.swift */,
-				AF0033 /* TokenStoreTests.swift */,
-				AF0035 /* GistServiceTests.swift */,
 				AF0037 /* SnippetStoreTests.swift */,
 				AF0041 /* SnippetPasteTests.swift */,
 				AF0049 /* SchemaMigrationTests.swift */,
@@ -465,14 +447,6 @@
 				AF0044 /* HighlightedTextEditor.swift */,
 			);
 			path = Snippets;
-			sourceTree = "<group>";
-		};
-		GG0012 /* Gists */ = {
-			isa = PBXGroup;
-			children = (
-				AF0042 /* GistHistoryView.swift */,
-			);
-			path = Gists;
 			sourceTree = "<group>";
 		};
 		GG0013 /* Resources */ = {
@@ -641,14 +615,10 @@
 				AA0025 /* BezelViewModel.swift in Sources */,
 				AA0027 /* BezelController.swift in Sources */,
 				AA0028 /* BezelView.swift in Sources */,
-				AA0030 /* TokenStore.swift in Sources */,
-				AA0032 /* GistService.swift in Sources */,
 				AA0034 /* SnippetStore.swift in Sources */,
 				AA0037 /* SnippetWindowView.swift in Sources */,
 				AA0038 /* SnippetListView.swift in Sources */,
 				AA0039 /* SnippetEditorView.swift in Sources */,
-				AA0041 /* GistHistoryView.swift in Sources */,
-				AA0042 /* GistSettingsSection.swift in Sources */,
 				AA0043 /* HighlightedTextEditor.swift in Sources */,
 				AA0044 /* ClipsmithSchemaV2.swift in Sources */,
 				AA0045 /* PromptLibraryStore.swift in Sources */,
@@ -707,8 +677,6 @@
 				AA0024 /* PasteServiceTests.swift in Sources */,
 				AA0026 /* BezelViewModelTests.swift in Sources */,
 				AA0029 /* BezelControllerTests.swift in Sources */,
-				AA0031 /* TokenStoreTests.swift in Sources */,
-				AA0033 /* GistServiceTests.swift in Sources */,
 				AA0035 /* SnippetStoreTests.swift in Sources */,
 				AA0040 /* SnippetPasteTests.swift in Sources */,
 				AA0048 /* SchemaMigrationTests.swift in Sources */,

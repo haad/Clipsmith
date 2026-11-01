@@ -5,6 +5,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Removed
+
+- GitHub Gist sharing (menu item, bezel Share action, snippet share, Gist history tab,
+  Settings > Gist, Keychain token). Unused; removed in favour of the unified browser window.
+
 ### Fixed
 
 - Command palette: typing a number with a thousands separator (e.g. `54,898.92`)

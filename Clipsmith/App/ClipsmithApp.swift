@@ -64,7 +64,6 @@ struct ClipsmithApp: App {
             SnippetWindowView()
                 .environment(appDelegate.pasteService)
                 .environment(appDelegate.appTracker)
-                .environment(appDelegate.gistService)
                 .frame(minWidth: 700, minHeight: 500)
         }
         .modelContainer(ClipsmithApp.sharedModelContainer)

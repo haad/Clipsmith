@@ -4,7 +4,7 @@ import XCTest
 // MARK: - MockURLProtocolForCurrency
 
 /// A URLProtocol mock scoped to `CurrencyServiceTests` to avoid a duplicate-symbol collision
-/// with the `MockURLProtocol` already declared in `GistServiceTests.swift`.
+/// with the `MockURLProtocol` declared in `LicenseServiceTests.swift`.
 final class MockURLProtocolForCurrency: URLProtocol {
     nonisolated(unsafe) static var requestHandler: ((URLRequest) throws -> (HTTPURLResponse, Data))?
 
