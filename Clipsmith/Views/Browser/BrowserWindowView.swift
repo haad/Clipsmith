@@ -35,7 +35,7 @@ struct BrowserWindowView: View {
             case .snippets:
                 SnippetsSectionView()
             case .prompts:
-                Text("Coming in the next task")
+                PromptsSectionView()
             case .docs:
                 Text("Coming in the next task")
             case .toolkit:

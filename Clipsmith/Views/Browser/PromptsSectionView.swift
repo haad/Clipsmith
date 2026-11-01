@@ -1,18 +1,12 @@
 import SwiftUI
 import SwiftData
 
-/// Master-detail prompt browser for the Prompts tab.
+/// Prompts section of the browser window.
 ///
-/// Left panel: searchable flat list of all prompts with category badges, a "+" button
-/// to create user prompts, and visual distinction between library vs user-created prompts.
-/// Right panel: editable detail view with {{variable}} highlighting, Save to My Snippets,
-/// and Revert to Original actions.
-///
-/// Supports #category search syntax: "#coding Python" filters to coding category and
-/// searches for "Python". "#my" or "#My Prompts" filters to user-created prompts.
-///
-/// See ``SnippetWindowView`` for the full keyboard shortcuts reference.
-struct PromptLibraryView: View {
+/// Left: search (with `#category` / `#my` syntax), category chips, prompt
+/// list. Right: editable title and content with variables caption and the
+/// Save to My Snippets / Revert / Paste actions in the footer.
+struct PromptsSectionView: View {
 
     // MARK: - Environment
 
@@ -29,6 +23,7 @@ struct PromptLibraryView: View {
 
     @State private var searchText: String = ""
     @State private var selectedPromptID: PersistentIdentifier?
+    @State private var chipID: String?
     @State private var promptStore: PromptLibraryStore?
     @State private var snippetStore: SnippetStore?
     @FocusState private var isSearchFocused: Bool
@@ -42,38 +37,7 @@ struct PromptLibraryView: View {
     // MARK: - Computed
 
     private var filteredPrompts: [ClipsmithSchemaV2.PromptLibraryItem] {
-        guard !searchText.isEmpty else { return allPrompts }
-
-        let trimmed = searchText.trimmingCharacters(in: .whitespaces)
-
-        if trimmed.hasPrefix("#") {
-            let withoutHash = String(trimmed.dropFirst())
-            let parts = withoutHash.split(separator: " ", maxSplits: 1)
-            let categoryFilter = parts.isEmpty ? "" : String(parts[0]).lowercased()
-            let textSearch = parts.count > 1 ? String(parts[1]).trimmingCharacters(in: .whitespaces) : ""
-
-            // Match "my" or partial category name
-            let isMyPrompts = categoryFilter == "my" || "my prompts".hasPrefix(categoryFilter)
-
-            return allPrompts.filter { prompt in
-                let categoryMatches: Bool
-                if isMyPrompts {
-                    categoryMatches = prompt.isUserCreated
-                } else {
-                    categoryMatches = prompt.category.lowercased().hasPrefix(categoryFilter)
-                }
-                guard categoryMatches else { return false }
-                if textSearch.isEmpty { return true }
-                return prompt.title.localizedCaseInsensitiveContains(textSearch)
-                    || prompt.content.localizedCaseInsensitiveContains(textSearch)
-            }
-        }
-
-        return allPrompts.filter { prompt in
-            prompt.title.localizedCaseInsensitiveContains(trimmed)
-            || prompt.content.localizedCaseInsensitiveContains(trimmed)
-            || prompt.category.localizedCaseInsensitiveContains(trimmed)
-        }
+        PromptFilter.apply(allPrompts, query: searchText, chip: chipID.flatMap(PromptFilter.Chip.init(id:)))
     }
 
     private var selectedPrompt: ClipsmithSchemaV2.PromptLibraryItem? {
@@ -81,46 +45,26 @@ struct PromptLibraryView: View {
         return allPrompts.first { $0.persistentModelID == id }
     }
 
+    private var mineCount: Int { allPrompts.filter(\.isUserCreated).count }
+
     // MARK: - Body
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Search bar
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                TextField("Search prompts... (#coding, #writing)", text: $searchText)
-                    .textFieldStyle(.plain)
-                    .focused($isSearchFocused)
-                    .onKeyPress(.tab) {
-                        isSearchFocused = false
-                        isListFocused = true
-                        return .handled
-                    }
-                if !searchText.isEmpty {
-                    Button {
-                        searchText = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
-                    }
-                    .buttonStyle(.plain)
+        HSplitView {
+            listPane
+            detailPane
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .automatic) {
+                Button {
+                    createNewPrompt()
+                } label: {
+                    Image(systemName: "plus")
                 }
-            }
-            .padding(8)
-            .background(Color(NSColor.controlBackgroundColor))
-
-            Divider()
-
-            HSplitView {
-                // Left: prompt list
-                leftPanel
-
-                // Right: detail view
-                rightPanel
+                .keyboardShortcut("n", modifiers: .command)
+                .help("New Prompt (⌘N)")
             }
         }
-        // Hidden keyboard shortcuts
         .background {
             Group {
                 Button("") { isSearchFocused = true }
@@ -144,10 +88,8 @@ struct PromptLibraryView: View {
             }
         }
         .onChange(of: selectedPromptID) { _, newID in
-            // Cancel pending save when switching selection
             saveTask?.cancel()
             saveTask = nil
-            // Populate edit fields from newly selected prompt
             if let id = newID,
                let prompt = allPrompts.first(where: { $0.persistentModelID == id }) {
                 editedTitle = prompt.title
@@ -159,31 +101,27 @@ struct PromptLibraryView: View {
         }
     }
 
-    // MARK: - Left Panel
+    // MARK: - List Pane
 
-    private var leftPanel: some View {
-        VStack(spacing: 0) {
-            // Toolbar: "+" button
-            HStack {
-                Spacer()
-                Button {
-                    createNewPrompt()
-                } label: {
-                    Image(systemName: "plus")
-                }
-                .buttonStyle(.plain)
-                .keyboardShortcut("n", modifiers: .command)
-                .padding(8)
-                .help("New Prompt (⌘N)")
+    private var listPane: some View {
+        BrowserListPane {
+            BrowserSearchField(
+                text: $searchText,
+                placeholder: "Search prompts… (#coding, #my)",
+                isFocused: $isSearchFocused
+            )
+            .onKeyPress(.tab) {
+                isSearchFocused = false
+                isListFocused = true
+                return .handled
             }
-            .background(Color(NSColor.controlBackgroundColor))
-
-            Divider()
-
+        } filter: {
+            BrowserFilterRow(options: PromptFilter.options(in: allPrompts), selection: $chipID)
+        } content: {
             if filteredPrompts.isEmpty {
                 VStack {
                     Spacer()
-                    Text(searchText.isEmpty ? "No prompts" : "No results")
+                    Text(searchText.isEmpty && chipID == nil ? "No prompts" : "No results")
                         .foregroundStyle(.secondary)
                     Spacer()
                 }
@@ -193,7 +131,7 @@ struct PromptLibraryView: View {
                     promptRow(prompt)
                         .tag(prompt.persistentModelID)
                 }
-                .listStyle(.plain)
+                .listStyle(.sidebar)
                 .focused($isListFocused)
                 .onKeyPress(.return) {
                     if let prompt = selectedPrompt {
@@ -207,33 +145,14 @@ struct PromptLibraryView: View {
                     return .handled
                 }
             }
-        }
-        .frame(minWidth: 200, idealWidth: 240, maxWidth: 300)
-    }
-
-    // MARK: - Right Panel
-
-    @ViewBuilder
-    private var rightPanel: some View {
-        if let prompt = selectedPrompt {
-            detailView(for: prompt)
-        } else {
-            VStack {
-                Spacer()
-                Text("Select a prompt")
-                    .foregroundStyle(.secondary)
-                Spacer()
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        } footer: {
+            BrowserCountsFooter(leading: "\(filteredPrompts.count) prompts", trailing: "\(mineCount) mine")
         }
     }
-
-    // MARK: - Prompt Row
 
     @ViewBuilder
     private func promptRow(_ prompt: ClipsmithSchemaV2.PromptLibraryItem) -> some View {
         HStack(spacing: 6) {
-            // Icon: book.fill for library, person.fill for user-created
             Image(systemName: prompt.isUserCreated ? "person.fill" : "book.fill")
                 .foregroundStyle(prompt.isUserCreated ? Color.accentColor : Color.secondary)
                 .font(.caption)
@@ -243,7 +162,6 @@ struct PromptLibraryView: View {
                 HStack(spacing: 4) {
                     Text(prompt.title.isEmpty ? "Untitled" : prompt.title)
                         .lineLimit(1)
-                    // Orange "edited" indicator for customized library prompts
                     if prompt.isUserCustomized && !prompt.isUserCreated {
                         Circle()
                             .fill(Color.orange)
@@ -251,12 +169,12 @@ struct PromptLibraryView: View {
                             .help("Customized — edited from original")
                     }
                 }
-                // Category badge
                 categoryBadge(for: prompt)
             }
 
             Spacer()
         }
+        .padding(.vertical, 2)
         .contentShape(Rectangle())
         .onTapGesture(count: 2) {
             pastePrompt(prompt)
@@ -304,13 +222,21 @@ struct PromptLibraryView: View {
         }
     }
 
-    // MARK: - Detail View
+    // MARK: - Detail Pane
+
+    @ViewBuilder
+    private var detailPane: some View {
+        if let prompt = selectedPrompt {
+            detailView(for: prompt)
+        } else {
+            BrowserEmptyDetail(systemImage: "text.book.closed", message: "Select a prompt")
+        }
+    }
 
     private func detailView(for prompt: ClipsmithSchemaV2.PromptLibraryItem) -> some View {
         let variables = TemplateSubstitutor.extractVariables(from: editedContent)
 
-        return VStack(alignment: .leading, spacing: 0) {
-            // Header: title + category badge
+        return BrowserDetailPane {
             HStack {
                 TextField("Prompt title", text: $editedTitle)
                     .font(.headline)
@@ -332,32 +258,22 @@ struct PromptLibraryView: View {
                         )
                 }
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color(NSColor.controlBackgroundColor))
-
-            Divider()
-
-            // Content editor
+        } body: {
             TextEditor(text: $editedContent)
                 .font(.body)
                 .padding(8)
                 .onChange(of: editedContent) { _, _ in
                     scheduleSave(for: prompt)
                 }
-
-            Divider()
-
-            // Variables note (shown when {{variables}} are detected)
+        } footerLeading: {
             if !variables.isEmpty {
-                HStack {
+                HStack(spacing: 6) {
                     Image(systemName: "curlybraces")
                         .foregroundStyle(.secondary)
                         .font(.caption)
                     Text("Variables: \(variables.map { "{{\($0)}}" }.joined(separator: ", "))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
-                    Spacer()
                     if variables.contains("clipboard") {
                         HStack(spacing: 3) {
                             Image(systemName: "exclamationmark.triangle")
@@ -368,37 +284,28 @@ struct PromptLibraryView: View {
                         .foregroundStyle(.orange)
                     }
                 }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color(NSColor.controlBackgroundColor))
-
-                Divider()
             }
+        } footerTrailing: {
+            Button("Save to My Snippets") {
+                saveToSnippets(prompt)
+            }
+            .buttonStyle(.bordered)
+            .help("Create an independent Snippet copy of this prompt")
 
-            // Action buttons
-            HStack(spacing: 8) {
-                Button("Save to My Snippets") {
-                    saveToSnippets(prompt)
+            if prompt.isUserCustomized && !prompt.isUserCreated {
+                Button("Revert to Original") {
+                    revertPrompt(prompt)
                 }
                 .buttonStyle(.bordered)
-                .help("Create an independent Snippet copy of this prompt")
-
-                if prompt.isUserCustomized && !prompt.isUserCreated {
-                    Button("Revert to Original") {
-                        revertPrompt(prompt)
-                    }
-                    .buttonStyle(.bordered)
-                    .foregroundStyle(.orange)
-                    .help("Restore this prompt to its original upstream version")
-                }
-
-                Spacer()
+                .foregroundStyle(.orange)
+                .help("Restore this prompt to its original upstream version")
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(Color(NSColor.controlBackgroundColor))
+
+            Button("Paste ↩") {
+                pastePrompt(prompt)
+            }
+            .buttonStyle(.borderedProminent)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 
     // MARK: - Actions
@@ -422,7 +329,7 @@ struct PromptLibraryView: View {
                 isUserCreated: true
             )
             await MainActor.run {
-                // Select the new prompt (it will appear at top of filtered list after @Query refresh)
+                chipID = nil
                 selectedPromptID = allPrompts.first(where: { $0.id == newID })?.persistentModelID
                     ?? filteredPrompts.first?.persistentModelID
             }
@@ -464,12 +371,8 @@ struct PromptLibraryView: View {
         deletePrompt(prompt)
     }
 
-    /// Schedules a debounced save of the current edit state.
-    ///
-    /// Auto-saves title + content 0.75s after the last keystroke.
-    /// For library prompts, this sets isUserCustomized = true.
-    /// Skips save if values haven't actually changed from the model (avoids
-    /// marking prompts as edited on selection change).
+    /// Debounced save of title + content 0.75 s after the last keystroke.
+    /// For library prompts this sets `isUserCustomized`. Skips when nothing changed.
     private func scheduleSave(for prompt: ClipsmithSchemaV2.PromptLibraryItem) {
         guard editedTitle != prompt.title || editedContent != prompt.content else { return }
         saveTask?.cancel()
@@ -477,7 +380,7 @@ struct PromptLibraryView: View {
         let title = editedTitle
         let content = editedContent
         saveTask = Task {
-            try? await Task.sleep(nanoseconds: 750_000_000) // 0.75s debounce
+            try? await Task.sleep(nanoseconds: 750_000_000)
             guard !Task.isCancelled else { return }
             try? await promptStore?.update(id: id, title: title, content: content)
         }
@@ -487,7 +390,6 @@ struct PromptLibraryView: View {
         guard prompt.isUserCustomized && !prompt.isUserCreated else { return }
         setupStores()
 
-        // Show NSAlert confirmation
         let alert = NSAlert()
         alert.messageText = "Revert to Original?"
         alert.informativeText = "Your edits to \"\(prompt.title)\" will be discarded. The prompt will be restored to the upstream version on next sync."
@@ -495,8 +397,7 @@ struct PromptLibraryView: View {
         alert.addButton(withTitle: "Revert")
         alert.addButton(withTitle: "Cancel")
 
-        let response = alert.runModal()
-        guard response == .alertFirstButtonReturn else { return }
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
 
         let id = prompt.persistentModelID
         Task {
@@ -523,10 +424,7 @@ struct PromptLibraryView: View {
         let content = prompt.content
         let previousApp = appTracker.previousApp
 
-        // Read clipboard for {{clipboard}} substitution
         let clipboardContent = NSPasteboard.general.string(forType: .string) ?? ""
-
-        // Build variables from UserDefaults (user-defined) + built-in clipboard
         var variables: [String: String] = ["clipboard": clipboardContent]
         if let jsonData = UserDefaults.standard.data(forKey: AppSettingsKeys.promptLibraryVariables),
            let kvPairs = try? JSONDecoder().decode([[String: String]].self, from: jsonData) {
@@ -540,8 +438,7 @@ struct PromptLibraryView: View {
         let substituted = TemplateSubstitutor.substitute(in: content, variables: variables)
 
         Task { @MainActor in
-            // Close snippet window
-            for window in NSApp.windows where !window.isPanel {
+            for window in NSApp.windows where !(window is NSPanel) {
                 if window.isVisible && window.level == .normal {
                     window.close()
                 }
@@ -550,10 +447,4 @@ struct PromptLibraryView: View {
             pasteService.paste(content: substituted, into: previousApp)
         }
     }
-}
-
-// MARK: - NSWindow Extension
-
-private extension NSWindow {
-    var isPanel: Bool { self is NSPanel }
 }

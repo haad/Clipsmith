@@ -60,15 +60,6 @@ struct ClipsmithApp: App {
                 .environment(appSettings)
         }
 
-        WindowGroup(id: "snippets") {
-            SnippetWindowView()
-                .environment(appDelegate.pasteService)
-                .environment(appDelegate.appTracker)
-                .frame(minWidth: 700, minHeight: 500)
-        }
-        .modelContainer(ClipsmithApp.sharedModelContainer)
-        .windowResizability(.contentSize)
-
         WindowGroup(id: "browser") {
             BrowserWindowView(
                 docsetSearchService: appDelegate.docsetSearchService,

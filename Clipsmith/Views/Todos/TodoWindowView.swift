@@ -116,7 +116,7 @@ struct TodoWindowView: View {
         .buttonStyle(.borderless)
     }
 
-    /// Hidden ⌘1…⌘9 buttons — same pattern as SnippetWindowView.
+    /// Hidden ⌘1…⌘9 buttons — same pattern as BrowserWindowView.
     private var tabShortcutButtons: some View {
         Group {
             ForEach(Array(tabs.prefix(9).enumerated()), id: \.offset) { index, tab in

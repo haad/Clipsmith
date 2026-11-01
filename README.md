@@ -58,7 +58,7 @@ All shortcuts are configurable in Settings > Shortcuts.
 | Open Clipboard | `⇧⌘B` |
 | Prompt Library | `⇧⌘P` |
 | Documentation Lookup | `⇧⌘D` |
-| Open Snippets | `⇧⌘S` |
+| Open browser (Snippets) | `⇧⌘S` |
 
 ### Inside the Bezel
 

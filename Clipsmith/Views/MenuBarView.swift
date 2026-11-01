@@ -3,9 +3,6 @@ import SwiftData
 
 extension Notification.Name {
     static let clipsmithOpenSearch = Notification.Name("clipsmithOpenSearch")
-    static let clipsmithOpenSnippets = Notification.Name("clipsmithOpenSnippets")
-    /// Posted to open the snippet window on the Prompts tab (tab index 1).
-    static let clipsmithOpenPrompts = Notification.Name("clipsmithOpenPrompts")
     /// Posted to trigger clipboard history export via NSSavePanel.
     static let clipsmithOpenDocLookup = Notification.Name("clipsmithOpenDocLookup")
     /// Posted by the menu bar "App Launcher..." button to open the app launcher bezel (Phase 11).
@@ -90,7 +87,7 @@ struct MenuBarView: View {
         }
 
         Button("Browse Prompts...") {
-            openSnippetWindowOnPromptsTab()
+            openBrowser(BrowserOpenRequest(section: .prompts, query: nil))
         }
 
         Button("Search Clippings...") {
@@ -172,9 +169,6 @@ struct MenuBarView: View {
         .onAppear {
             fetchClippings()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenSnippets)) { _ in
-            openBrowser(BrowserOpenRequest(section: .snippets, query: nil))
-        }
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenTodos)) { _ in
             openTodoWindow()
         }
@@ -200,20 +194,7 @@ struct MenuBarView: View {
         NSApp.activate(ignoringOtherApps: true)
     }
 
-    // MARK: - Snippet Window
-
-    /// Opens the snippet window with proper activation policy switch.
-    ///
-    /// PITFALL (RESEARCH.md): Without switching to .regular first, the window opens
-    /// behind other windows. The 100ms sleep allows the policy change to propagate
-    /// before activating and opening the window.
-    private func openSnippetWindow() {
-        Task { @MainActor in
-            activateAsRegularApp()
-            try? await Task.sleep(for: .milliseconds(100))
-            openWindow(id: "snippets")
-        }
-    }
+    // MARK: - Todo Window
 
     /// Opens the todo window with the same activation-policy dance as snippets.
     private func openTodoWindow() {
@@ -221,22 +202,6 @@ struct MenuBarView: View {
             activateAsRegularApp()
             try? await Task.sleep(for: .milliseconds(100))
             openWindow(id: "todos")
-        }
-    }
-
-    /// Opens the snippet window and navigates to the Prompts tab (tab index 1).
-    ///
-    /// Opens the window first (with the same activation policy dance as openSnippetWindow),
-    /// then posts .clipsmithOpenPrompts after a brief delay so SnippetWindowView can switch
-    /// to the Prompts tab once the window has appeared.
-    private func openSnippetWindowOnPromptsTab() {
-        Task { @MainActor in
-            activateAsRegularApp()
-            try? await Task.sleep(for: .milliseconds(100))
-            openWindow(id: "snippets")
-            // Brief delay ensures SnippetWindowView has appeared before tab switch fires.
-            try? await Task.sleep(for: .milliseconds(150))
-            NotificationCenter.default.post(name: .clipsmithOpenPrompts, object: nil)
         }
     }
 
