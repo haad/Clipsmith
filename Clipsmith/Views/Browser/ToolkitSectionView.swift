@@ -3,7 +3,7 @@ import OSLog
 
 private let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier ?? "com.github.haad.clipsmith",
-    category: "ClaudeToolkitWindowView"
+    category: "ToolkitSectionView"
 )
 
 // MARK: - ViewModel
@@ -15,6 +15,12 @@ final class ClaudeToolkitViewModel {
     var selectedItem: ClaudeToolkitItem?
     var searchQuery: String = ""
     var selectedKind: ClaudeToolkitItem.Kind?   // nil = show all
+
+    /// String-keyed view of `selectedKind` for the shared filter chip row.
+    var kindFilterID: String? {
+        get { selectedKind?.rawValue }
+        set { selectedKind = newValue.flatMap(ClaudeToolkitItem.Kind.init(rawValue:)) }
+    }
     var isLoading: Bool = false
     var errorMessage: String?
     var installedIDs: Set<String> = []
@@ -100,32 +106,28 @@ final class ClaudeToolkitViewModel {
     }
 }
 
-// MARK: - Window View
+// MARK: - Section View
 
 /// Browser for installing Claude Code skills, commands, and agents from the
 /// awesome-claude-code-toolkit into `~/.claude/`.
 ///
-/// Opens as a `WindowGroup(id: "claude-toolkit")` from the menu bar.
-struct ClaudeToolkitWindowView: View {
+/// The Toolkit section of the unified browser window.
+struct ToolkitSectionView: View {
 
     @AppStorage(AppSettingsKeys.toolkitPath)
     private var toolkitPath: String = AppSettingsKeys.toolkitPathDefault
 
     @State private var viewModel = ClaudeToolkitViewModel()
     @State private var showingPathSheet = false
+    @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         HSplitView {
             listPane
-                .frame(minWidth: 240, idealWidth: 290, maxWidth: 380)
             detailPane
-                .frame(minWidth: 400)
         }
         .toolbar {
-            ToolbarItem(placement: .principal) {
-                kindPicker
-            }
-            ToolbarItem(placement: .automatic) {
+            ToolbarItemGroup(placement: .automatic) {
                 Button {
                     showingPathSheet = true
                 } label: {
@@ -134,94 +136,61 @@ struct ClaudeToolkitWindowView: View {
                 .help("Configure toolkit path")
             }
         }
-        .navigationTitle("Claude Toolkit")
         .onAppear {
             viewModel.reload(from: toolkitPath)
         }
         .onChange(of: toolkitPath) { _, new in
             viewModel.reload(from: new)
         }
+        .onChange(of: viewModel.selectedKind) { _, _ in
+            viewModel.selectedItem = viewModel.filteredItems.first
+        }
         .sheet(isPresented: $showingPathSheet) {
             ToolkitPathSheet(toolkitPath: $toolkitPath, isPresented: $showingPathSheet)
         }
-    }
-
-    // MARK: - Kind Picker
-
-    private var kindPicker: some View {
-        Picker("Kind", selection: $viewModel.selectedKind) {
-            Text("All").tag(Optional<ClaudeToolkitItem.Kind>.none)
-            ForEach(ClaudeToolkitItem.Kind.allCases, id: \.self) { kind in
-                Text(kind.label).tag(Optional(kind))
-            }
-        }
-        .pickerStyle(.segmented)
-        .frame(maxWidth: 320)
-        .onChange(of: viewModel.selectedKind) { _, _ in
-            viewModel.selectedItem = viewModel.filteredItems.first
+        .background {
+            Button("") { isSearchFocused = true }
+                .keyboardShortcut("f", modifiers: .command)
+                .frame(width: 0, height: 0)
+                .opacity(0)
         }
     }
 
     // MARK: - List Pane
 
     private var listPane: some View {
-        VStack(spacing: 0) {
-            // Search bar
-            HStack(spacing: 6) {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                    .font(.subheadline)
-                TextField("Search...", text: $viewModel.searchQuery)
-                    .textFieldStyle(.plain)
-                    .font(.subheadline)
-                if !viewModel.searchQuery.isEmpty {
-                    Button {
-                        viewModel.searchQuery = ""
-                    } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundStyle(.secondary)
-                    }
-                    .buttonStyle(.plain)
+        BrowserListPane {
+            BrowserSearchField(
+                text: $viewModel.searchQuery,
+                placeholder: "Search toolkit…",
+                isFocused: $isSearchFocused
+            )
+        } filter: {
+            BrowserFilterRow(
+                options: ClaudeToolkitItem.Kind.allCases.map { .init(id: $0.rawValue, label: $0.label) },
+                selection: $viewModel.kindFilterID
+            )
+        } content: {
+            if viewModel.isLoading {
+                ProgressView()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+            } else if let error = viewModel.errorMessage, viewModel.items.isEmpty {
+                errorPlaceholder(error)
+            } else {
+                List(viewModel.filteredItems, selection: $viewModel.selectedItem) { item in
+                    ClaudeToolkitRowView(
+                        item: item,
+                        isInstalled: viewModel.isInstalled(item)
+                    )
+                    .tag(item)
                 }
+                .listStyle(.sidebar)
             }
-            .padding(.horizontal, 10)
-            .padding(.vertical, 7)
-            .background(Color(NSColor.controlBackgroundColor))
-
-            Divider()
-
-            // List body
-            Group {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if let error = viewModel.errorMessage, viewModel.items.isEmpty {
-                    errorPlaceholder(error)
-                } else {
-                    List(viewModel.filteredItems, selection: $viewModel.selectedItem) { item in
-                        ClaudeToolkitRowView(
-                            item: item,
-                            isInstalled: viewModel.isInstalled(item)
-                        )
-                        .tag(item)
-                    }
-                    .listStyle(.sidebar)
-                }
-            }
-
-            Divider()
-
-            // Footer
-            HStack {
-                Text("\(viewModel.filteredItems.count) items")
-                Spacer()
-                Text("\(viewModel.installedCount) installed")
-                    .foregroundStyle(.secondary)
-            }
-            .font(.caption)
-            .foregroundStyle(.secondary)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
+        } footer: {
+            BrowserCountsFooter(
+                leading: "\(viewModel.filteredItems.count) items",
+                trailing: "\(viewModel.installedCount) installed"
+            )
         }
     }
 
@@ -253,15 +222,9 @@ struct ClaudeToolkitWindowView: View {
                 onInstall: { viewModel.install(item) },
                 onUninstall: { viewModel.uninstall(item) }
             )
+            .frame(minWidth: 400)
         } else {
-            VStack(spacing: 12) {
-                Image(systemName: "shippingbox")
-                    .font(.system(size: 48))
-                    .foregroundStyle(.quaternary)
-                Text("Select an item to preview")
-                    .foregroundStyle(.secondary)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            BrowserEmptyDetail(systemImage: "shippingbox", message: "Select an item to preview")
         }
     }
 }

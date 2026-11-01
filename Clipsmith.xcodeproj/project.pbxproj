@@ -81,7 +81,7 @@
 		AA0081 /* AppScannerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0082 /* AppScannerServiceTests.swift */; };
 		AA0082 /* AppLaunchViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0083 /* AppLaunchViewModelTests.swift */; };
 		AA0083 /* ClaudeToolkitService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0084 /* ClaudeToolkitService.swift */; };
-		AA0084 /* ClaudeToolkitWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0085 /* ClaudeToolkitWindowView.swift */; };
+		AA0084 /* ToolkitSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0085 /* ToolkitSectionView.swift */; };
 		AA0085 /* AppLaunchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0086 /* AppLaunchViewModel.swift */; };
 		AA0086 /* AppLaunchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0087 /* AppLaunchView.swift */; };
 		AA0087 /* AppLaunchController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0088 /* AppLaunchController.swift */; };
@@ -204,7 +204,7 @@
 		AF0082 /* AppScannerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppScannerServiceTests.swift; sourceTree = "<group>"; };
 		AF0083 /* AppLaunchViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchViewModelTests.swift; sourceTree = "<group>"; };
 		AF0084 /* ClaudeToolkitService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeToolkitService.swift; sourceTree = "<group>"; };
-		AF0085 /* ClaudeToolkitWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeToolkitWindowView.swift; sourceTree = "<group>"; };
+		AF0085 /* ToolkitSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolkitSectionView.swift; sourceTree = "<group>"; };
 		AF0086 /* AppLaunchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchViewModel.swift; sourceTree = "<group>"; };
 		AF0087 /* AppLaunchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchView.swift; sourceTree = "<group>"; };
 		AF0088 /* AppLaunchController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLaunchController.swift; sourceTree = "<group>"; };
@@ -358,7 +358,6 @@
 				GG0009 /* Settings */,
 				GG0011 /* Snippets */,
 				GG0014 /* Prompts */,
-				GG0016 /* ClaudeToolkit */,
 				GG0017 /* Todos */,
 				GG0018 /* Browser */,
 			);
@@ -484,14 +483,6 @@
 			path = Fixtures;
 			sourceTree = "<group>";
 		};
-		GG0016 /* ClaudeToolkit */ = {
-			isa = PBXGroup;
-			children = (
-				AF0085 /* ClaudeToolkitWindowView.swift */,
-			);
-			path = ClaudeToolkit;
-			sourceTree = "<group>";
-		};
 		GG0017 /* Todos */ = {
 			isa = PBXGroup;
 			children = (
@@ -508,6 +499,7 @@
 			children = (
 				AF0116 /* BrowserSection.swift */,
 				AF0117 /* BrowserPanes.swift */,
+				AF0085 /* ToolkitSectionView.swift */,
 			);
 			path = Browser;
 			sourceTree = "<group>";
@@ -665,7 +657,7 @@
 				AA0079 /* LicenseSettingsSection.swift in Sources */,
 				AA0080 /* AppScannerService.swift in Sources */,
 				AA0083 /* ClaudeToolkitService.swift in Sources */,
-				AA0084 /* ClaudeToolkitWindowView.swift in Sources */,
+				AA0084 /* ToolkitSectionView.swift in Sources */,
 				AA0085 /* AppLaunchViewModel.swift in Sources */,
 				AA0086 /* AppLaunchView.swift in Sources */,
 				AA0087 /* AppLaunchController.swift in Sources */,

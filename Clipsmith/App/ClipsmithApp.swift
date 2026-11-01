@@ -70,7 +70,8 @@ struct ClipsmithApp: App {
         .windowResizability(.contentSize)
 
         WindowGroup(id: "claude-toolkit") {
-            ClaudeToolkitWindowView()
+            ToolkitSectionView()
+                .navigationTitle("Clipsmith")
                 .frame(minWidth: 700, minHeight: 480)
         }
         .windowResizability(.contentSize)
