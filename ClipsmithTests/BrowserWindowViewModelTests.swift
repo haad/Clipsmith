@@ -5,8 +5,8 @@ import XCTest
 final class BrowserWindowViewModelTests: XCTestCase {
     private var defaults: UserDefaults!
 
-    override func setUp() {
-        super.setUp()
+    override func setUp() async throws {
+        try await super.setUp()
         defaults = UserDefaults(suiteName: "BrowserWindowViewModelTests-\(UUID().uuidString)")
     }
 

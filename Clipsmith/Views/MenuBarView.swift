@@ -86,7 +86,7 @@ struct MenuBarView: View {
         Divider()
 
         Button("Snippets...") {
-            openSnippetWindow()
+            openBrowser(BrowserOpenRequest(section: .snippets, query: nil))
         }
 
         Button("Browse Prompts...") {
@@ -173,7 +173,7 @@ struct MenuBarView: View {
             fetchClippings()
         }
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenSnippets)) { _ in
-            openSnippetWindow()
+            openBrowser(BrowserOpenRequest(section: .snippets, query: nil))
         }
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenTodos)) { _ in
             openTodoWindow()

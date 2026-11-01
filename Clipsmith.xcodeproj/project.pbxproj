@@ -118,6 +118,9 @@
 		AA0121 /* BrowserWindowViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0121 /* BrowserWindowViewModelTests.swift */; };
 		AA0119 /* BrowserWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0119 /* BrowserWindowViewModel.swift */; };
 		AA0120 /* BrowserWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0120 /* BrowserWindowView.swift */; };
+		AA0124 /* SnippetFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0124 /* SnippetFilterTests.swift */; };
+		AA0122 /* SnippetsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0122 /* SnippetsSectionView.swift */; };
+		AA0123 /* SnippetFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0123 /* SnippetFilter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -244,6 +247,9 @@
 		AF0121 /* BrowserWindowViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowViewModelTests.swift; sourceTree = "<group>"; };
 		AF0119 /* BrowserWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowViewModel.swift; sourceTree = "<group>"; };
 		AF0120 /* BrowserWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowView.swift; sourceTree = "<group>"; };
+		AF0124 /* SnippetFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFilterTests.swift; sourceTree = "<group>"; };
+		AF0122 /* SnippetsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetsSectionView.swift; sourceTree = "<group>"; };
+		AF0123 /* SnippetFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFilter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -337,6 +343,7 @@
 				AF0103 /* TaskPaperParser.swift */,
 				AF0105 /* TodoStore.swift */,
 				AF0107 /* TodoQuickAddParser.swift */,
+				AF0123 /* SnippetFilter.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -451,6 +458,7 @@
 				GG0015 /* Fixtures */,
 				AF0118 /* BrowserSectionTests.swift */,
 				AF0121 /* BrowserWindowViewModelTests.swift */,
+				AF0124 /* SnippetFilterTests.swift */,
 			);
 			path = ClipsmithTests;
 			sourceTree = "<group>";
@@ -509,6 +517,7 @@
 				AF0085 /* ToolkitSectionView.swift */,
 				AF0119 /* BrowserWindowViewModel.swift */,
 				AF0120 /* BrowserWindowView.swift */,
+				AF0122 /* SnippetsSectionView.swift */,
 			);
 			path = Browser;
 			sourceTree = "<group>";
@@ -690,6 +699,8 @@
 				AA0117 /* BrowserPanes.swift in Sources */,
 				AA0119 /* BrowserWindowViewModel.swift in Sources */,
 				AA0120 /* BrowserWindowView.swift in Sources */,
+				AA0122 /* SnippetsSectionView.swift in Sources */,
+				AA0123 /* SnippetFilter.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -729,6 +740,7 @@
 				AA0110 /* TodoWindowViewModelTests.swift in Sources */,
 				AA0118 /* BrowserSectionTests.swift in Sources */,
 				AA0121 /* BrowserWindowViewModelTests.swift in Sources */,
+				AA0124 /* SnippetFilterTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

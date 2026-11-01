@@ -33,7 +33,7 @@ struct BrowserWindowView: View {
         Group {
             switch viewModel.selectedSection {
             case .snippets:
-                Text("Coming in the next task")
+                SnippetsSectionView()
             case .prompts:
                 Text("Coming in the next task")
             case .docs:

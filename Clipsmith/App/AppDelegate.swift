@@ -346,14 +346,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             }
         }
 
-        // Register global hotkey for the snippet window (Plan 04-03).
-        // MenuBarView observes .clipsmithOpenSnippets and calls openSnippetWindow()
+        // Register global hotkey for the Snippets browser section.
+        // MenuBarView observes .clipsmithRequestBrowser and opens the window
         // because AppDelegate cannot use @Environment(\.openWindow).
         KeyboardShortcuts.onKeyDown(for: .activateSnippets) {
             Task { @MainActor in
-                // Activation policy switch and icon refresh are handled by
-                // MenuBarView.openSnippetWindow() via the notification below.
-                NotificationCenter.default.post(name: .clipsmithOpenSnippets, object: nil)
+                NotificationCenter.default.post(
+                    name: .clipsmithRequestBrowser,
+                    object: nil,
+                    userInfo: BrowserOpenRequest(section: .snippets, query: nil).userInfo
+                )
             }
         }
 
