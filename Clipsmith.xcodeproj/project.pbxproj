@@ -66,8 +66,6 @@
 		AA0069 /* DocsetManagerServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0068 /* DocsetManagerServiceTests.swift */; };
 		AA0070 /* DocsBrowserViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0071 /* DocsBrowserViewModel.swift */; };
 		AA0071 /* DocsBrowserViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0072 /* DocsBrowserViewModelTests.swift */; };
-		AA0072 /* DocBezelController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0073 /* DocBezelController.swift */; };
-		AA0073 /* DocBezelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0074 /* DocBezelView.swift */; };
 		AA0074 /* DocsetSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0075 /* DocsetSettingsSection.swift */; };
 		AA0075 /* LicenseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0076 /* LicenseService.swift */; };
 		AA0076 /* LicenseServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0077 /* LicenseServiceTests.swift */; };
@@ -121,6 +119,8 @@
 		AA0127 /* PromptFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0127 /* PromptFilterTests.swift */; };
 		AA0125 /* PromptsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0125 /* PromptsSectionView.swift */; };
 		AA0126 /* PromptFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0126 /* PromptFilter.swift */; };
+		AA0128 /* DocsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0128 /* DocsSectionView.swift */; };
+		AA0129 /* DocWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0129 /* DocWebView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -195,8 +195,6 @@
 		AF0068 /* DocsetManagerServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetManagerServiceTests.swift; sourceTree = "<group>"; };
 		AF0071 /* DocsBrowserViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsBrowserViewModel.swift; sourceTree = "<group>"; };
 		AF0072 /* DocsBrowserViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsBrowserViewModelTests.swift; sourceTree = "<group>"; };
-		AF0073 /* DocBezelController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocBezelController.swift; sourceTree = "<group>"; };
-		AF0074 /* DocBezelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocBezelView.swift; sourceTree = "<group>"; };
 		AF0075 /* DocsetSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsetSettingsSection.swift; sourceTree = "<group>"; };
 		AF0076 /* LicenseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseService.swift; sourceTree = "<group>"; };
 		AF0077 /* LicenseServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LicenseServiceTests.swift; sourceTree = "<group>"; };
@@ -250,6 +248,8 @@
 		AF0127 /* PromptFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptFilterTests.swift; sourceTree = "<group>"; };
 		AF0125 /* PromptsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptsSectionView.swift; sourceTree = "<group>"; };
 		AF0126 /* PromptFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptFilter.swift; sourceTree = "<group>"; };
+		AF0128 /* DocsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsSectionView.swift; sourceTree = "<group>"; };
+		AF0129 /* DocWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -360,8 +360,6 @@
 				AF0054 /* PromptBezelViewModel.swift */,
 				AF0055 /* PromptBezelView.swift */,
 				AF0056 /* PromptBezelController.swift */,
-				AF0073 /* DocBezelController.swift */,
-				AF0074 /* DocBezelView.swift */,
 				AF0078 /* LicenseNagController.swift */,
 				AF0079 /* LicenseNagView.swift */,
 				AF0086 /* AppLaunchViewModel.swift */,
@@ -510,6 +508,8 @@
 				AF0122 /* SnippetsSectionView.swift */,
 				AF0125 /* PromptsSectionView.swift */,
 				AF0071 /* DocsBrowserViewModel.swift */,
+				AF0128 /* DocsSectionView.swift */,
+				AF0129 /* DocWebView.swift */,
 			);
 			path = Browser;
 			sourceTree = "<group>";
@@ -655,8 +655,6 @@
 				AA0066 /* DocsetManagerService.swift in Sources */,
 				AA0067 /* SelectedTextService.swift in Sources */,
 				AA0070 /* DocsBrowserViewModel.swift in Sources */,
-				AA0072 /* DocBezelController.swift in Sources */,
-				AA0073 /* DocBezelView.swift in Sources */,
 				AA0074 /* DocsetSettingsSection.swift in Sources */,
 				AA0075 /* LicenseService.swift in Sources */,
 				AA0077 /* LicenseNagController.swift in Sources */,
@@ -692,6 +690,8 @@
 				AA0123 /* SnippetFilter.swift in Sources */,
 				AA0125 /* PromptsSectionView.swift in Sources */,
 				AA0126 /* PromptFilter.swift in Sources */,
+				AA0128 /* DocsSectionView.swift in Sources */,
+				AA0129 /* DocWebView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

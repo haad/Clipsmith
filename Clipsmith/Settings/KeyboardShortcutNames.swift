@@ -15,7 +15,7 @@ extension KeyboardShortcuts.Name {
     /// Hotkey that opens the prompt bezel for quick prompt access.
     static let activatePrompts = Self("activatePrompts", default: .init(.p, modifiers: [.command, .shift]))
 
-    /// Hotkey that triggers documentation lookup for selected text.
+    /// Hotkey that opens the browser window on Docs, prefilled with the selected text.
     static let activateDocLookup = Self("activateDocLookup",
         default: .init(.d, modifiers: [.command, .shift]))
 

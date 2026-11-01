@@ -38,7 +38,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // Phase 8 — Documentation Lookup
     var docsetSearchService: DocsetSearchService!
     var docsetManagerService: DocsetManagerService!
-    var docBezelController: DocBezelController!
 
     // Phase 10 — Licensing and Monetization
     var licenseService: LicenseService!
@@ -176,11 +175,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         docsetSearchService = DocsetSearchService()
         docsetManagerService = DocsetManagerService()
         docsetManagerService.loadMetadata()
-
-        docBezelController = DocBezelController()
-        docBezelController.appTracker = appTracker
-        docBezelController.docsetSearchService = docsetSearchService
-        docBezelController.docsetManagerService = docsetManagerService
 
         // 9. Initialize App Launcher components (Phase 11).
         appScannerService = AppScannerService()
@@ -396,21 +390,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         KeyboardShortcuts.onKeyDown(for: .activateDocLookup) { [weak self] in
             logger.info("Doc lookup hotkey pressed")
             Task { @MainActor in
-                guard let self else {
-                    logger.warning("Doc lookup: self is nil")
-                    return
-                }
-                guard UserDefaults.standard.bool(forKey: AppSettingsKeys.docLookupEnabled) else {
-                    logger.info("Doc lookup: feature flag disabled, ignoring")
-                    return
-                }
-                if self.docBezelController.isVisible {
-                    self.docBezelController.viewModel.navigateDown()
-                } else {
-                    // Doc browser always uses sticky mode — no hold-to-browse
-                    self.docBezelController.isHotkeyHold = false
-                    self.docBezelController.show()
-                }
+                self?.requestDocsBrowser()
             }
         }
 
@@ -465,7 +445,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // MARK: - Documentation Lookup (from menu bar)
 
     @objc private func openDocLookupFromMenu() {
-        docBezelController?.show()
+        requestDocsBrowser()
+    }
+
+    /// Opens the browser window on Docs, prefilled with the previous app's
+    /// selection. The selection is read *before* Clipsmith activates, which is
+    /// why this lives here and not in the window.
+    private func requestDocsBrowser() {
+        guard UserDefaults.standard.bool(forKey: AppSettingsKeys.docLookupEnabled) else {
+            logger.info("Doc lookup: feature flag disabled, ignoring")
+            return
+        }
+        let text = SelectedTextService.selectedText(from: appTracker.previousApp)
+        NotificationCenter.default.post(
+            name: .clipsmithRequestBrowser,
+            object: nil,
+            userInfo: BrowserOpenRequest(section: .docs, query: text).userInfo
+        )
     }
 
     // MARK: - App Launcher (from menu bar)
@@ -712,7 +708,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillTerminate(_ notification: Notification) {
         bezelController?.hide()
         promptBezelController?.hide()
-        docBezelController?.hide()
         todoQuickAddController?.hide()
         todoStore?.saveNow()   // flush any pending debounced todo save
         clipboardMonitor.stop()

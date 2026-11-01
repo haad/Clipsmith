@@ -37,7 +37,11 @@ struct BrowserWindowView: View {
             case .prompts:
                 PromptsSectionView()
             case .docs:
-                Text("Coming in the next task")
+                DocsSectionView(
+                    windowViewModel: viewModel,
+                    searchService: docsetSearchService,
+                    managerService: docsetManagerService
+                )
             case .toolkit:
                 ToolkitSectionView()
             }
