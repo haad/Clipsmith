@@ -31,7 +31,9 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 - 789+ documentation sets available (Python, Go, JavaScript, Rust, CSS, Bash, and more)
 - Fuzzy search across all downloaded docs
 - Doc-scoped search with prefix syntax: `python:map`, `go:fmt`, `css:grid`
-- HTML documentation rendered in a split-view panel with dark/light mode support
+- Lives in the Docs section of the browser window: pick a docset in the sidebar, search inside it, read the page
+- HTML documentation rendered with dark/light mode support
+- The hotkey opens the window with the selected text already in the search field
 - Download and manage docs in Settings > Docsets
 
 ### Todo Tracking (Experimental)
@@ -72,15 +74,19 @@ All shortcuts are configurable in Settings > Shortcuts.
 | Transform picker | `Tab` (or `t` while holding the hotkey) |
 | Quick actions menu | Right-click |
 
-### Documentation Browser
+### Browser Window (Snippets, Prompts, Docs, Toolkit)
 
 | Action | Key |
 |---|---|
-| Search | Type in the search field |
-| Filter by doc | `python:query`, `go:query` |
+| Switch section | `⌘1` `⌘2` `⌘3` `⌘4` |
+| Focus search | `⌘F` |
+| Filter by doc (Docs) | `python:query`, `go:query` |
+| Move docset selection (Docs) | `⌥↑` `⌥↓` |
 | Navigate results | `↑` `↓` |
-| Open in browser | `⌘⏎` |
-| Dismiss | `Esc` |
+| Paste selected (Snippets, Prompts) | `⏎` |
+| Open in browser (Docs) | `⌘⏎` |
+| New snippet / prompt | `⌘N` |
+| Close window | `Esc` |
 
 ## Requirements
 
@@ -116,7 +122,7 @@ Build the `Clipsmith` scheme in Xcode 16+. The app runs as a menu bar utility �
 
 Some features are behind experimental flags in Settings > General > Features:
 
-- **Documentation Lookup** — enables the doc browser bezel and hotkey (default: off)
+- **Documentation Lookup** — enables the Docs section of the browser window and its hotkey (default: off)
 - **Todo Tracking** — enables the todo window, quick-add bezel, and their hotkeys (default: off; no default key bindings — assign them in Settings > Shortcuts)
 
 ## Privacy

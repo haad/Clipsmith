@@ -231,6 +231,7 @@ struct DocsSectionView: View {
                     Button("Open in Browser") {
                         NSWorkspace.shared.open(url)
                     }
+                    .keyboardShortcut(.return, modifiers: .command)
                     Button("Copy Link") {
                         NSPasteboard.general.clearContents()
                         NSPasteboard.general.setString(url.absoluteString, forType: .string)

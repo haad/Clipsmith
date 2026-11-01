@@ -25,13 +25,23 @@ No `Package.swift` — dependencies are managed via Xcode SPM integration in the
 - `ClipsmithApp.swift` — SwiftUI App entry point, MenuBarExtra, Settings window
 - `AppDelegate.swift` — owns all services and controllers, registers global hotkeys, wires notifications from MenuBarView
 
-### Bezel Pattern (used 3 times)
-The app uses a consistent NSPanel-based overlay pattern for clipboard, prompts, and docs:
-- **Controller** (`BezelController`, `PromptBezelController`, `DocBezelController`) — NSPanel subclass, keyboard routing, show/hide, event monitors
-- **ViewModel** (`BezelViewModel`, `PromptBezelViewModel`, `DocBezelViewModel`) — `@Observable @MainActor`, search/filter, navigation state
-- **View** (`BezelView`, `PromptBezelView`, `DocBezelView`) — SwiftUI view hosted in `NSHostingView`
+### Browser Window (`WindowGroup(id: "browser")`)
+One window hosts Snippets, Prompts, Docs and Claude Toolkit as sections behind a toolbar picker (⌘1–⌘4). Files live in `Views/Browser/`:
+- `BrowserWindowView` / `BrowserWindowViewModel` — section picker, last-used section (`browserLastSection`), applies `BrowserOpenRequest`s
+- `BrowserSection` — section enum, `BrowserOpenRequest` (section + optional query), the two notifications below
+- `BrowserPanes` — shared `BrowserSearchField`, `BrowserFilterRow` (chips), `BrowserListPane`, `BrowserDetailPane`, `BrowserEmptyDetail`
+- `SnippetsSectionView`, `PromptsSectionView`, `ToolkitSectionView`, `DocsSectionView` — one per section; filtering logic in `SnippetFilter` / `PromptFilter`
+- `DocsBrowserViewModel` — docs search, docset scoping (sidebar), `prefix:` selection, `open(withQuery:)` prefill
 
-Clipboard and prompt bezels use `.nonactivatingPanel` (don't steal focus). Doc bezel uses `.titled` (activates for resize/move interaction).
+Opening flow (two hops, because `AppDelegate` has no `@Environment(\.openWindow)`): a caller posts `.clipsmithRequestBrowser` with `BrowserOpenRequest.userInfo` → `MenuBarView.openBrowser` activates the app and calls `openWindow(id: "browser")`, then posts `.clipsmithOpenBrowser` → `BrowserWindowView` applies it. The docs hotkey captures the selected text in `AppDelegate.requestDocsBrowser()` before activation.
+
+### Bezel Pattern (used 2 times)
+The app uses a consistent NSPanel-based overlay pattern for clipboard and prompts:
+- **Controller** (`BezelController`, `PromptBezelController`) — NSPanel subclass, keyboard routing, show/hide, event monitors
+- **ViewModel** (`BezelViewModel`, `PromptBezelViewModel`) — `@Observable @MainActor`, search/filter, navigation state
+- **View** (`BezelView`, `PromptBezelView`) — SwiftUI view hosted in `NSHostingView`
+
+Both bezels use `.nonactivatingPanel` (don't steal focus). Documentation is a section of the browser window, not a bezel.
 
 ### Services
 - `ClipboardMonitor` — adaptive polling of `NSPasteboard.general` (no accessibility-based monitoring)
@@ -40,14 +50,13 @@ Clipboard and prompt bezels use `.nonactivatingPanel` (don't steal focus). Doc b
 - `AppTracker` — tracks the frontmost app so paste goes to the right target
 - `FuzzyMatcher` — character-subsequence matching with consecutive-bonus scoring
 - `TextTransformer` — text transformations (uppercase, trim, sort lines, etc.)
-- `GistService` — GitHub Gist creation via personal access token
 - `PromptLibraryStore` / `PromptSyncService` — SwiftData prompts + JSON sync from remote URL
 - `DocsetSearchService` — fuzzy search across DevDocs index.json entries
 - `DocsetManagerService` — downloads index.json + db.json from devdocs.io, manages catalog
 - `SelectedTextService` — reads selected text via AXUIElement with Cmd-C fallback
 
 ### Data Storage
-- **Clippings & Prompts** — SwiftData (`ClipsmithSchemaV1`, `ClipsmithSchemaV2`)
+- **Clippings & Prompts** — SwiftData (`ClipsmithSchemaV1` → `V2` → `V3`; V3 dropped `GistRecord`, migrations are lightweight)
 - **Snippets** — SwiftData
 - **DevDocs metadata** — JSON in `~/Library/Application Support/Clipsmith/devdocs-meta.json`
 - **DevDocs content** — `index.json` + `db.json` per doc in `~/Library/Application Support/Clipsmith/DevDocs/{slug}/`
@@ -66,7 +75,7 @@ Clipboard and prompt bezels use `.nonactivatingPanel` (don't steal focus). Doc b
 - No app sandbox (`ENABLE_APP_SANDBOX = NO`) — required for accessibility, global hotkeys, WKWebView
 - Hardened runtime enabled
 - Bundle ID: `com.github.haad.clipsmith`
-- Menu bar only app (`.accessory` activation policy), switches to `.regular` temporarily when showing Settings or Snippet windows
+- Menu bar only app (`.accessory` activation policy), switches to `.regular` temporarily when showing the Settings, browser or todo windows
 
 ## Common Patterns
 
@@ -80,6 +89,8 @@ Clipboard and prompt bezels use `.nonactivatingPanel` (don't steal focus). Doc b
 2. Add Button in MenuBarView body
 3. Add `NotificationCenter.default.addObserver` + `@objc` handler in AppDelegate
 
+To open the browser window on a section instead, post `.clipsmithRequestBrowser` with `BrowserOpenRequest(section:query:).userInfo` (or call `openBrowser` directly from `MenuBarView`).
+
 ### Feature flags
 Use `AppSettingsKeys` + `@AppStorage` with default `false`, guard at invocation site (not registration).
 
@@ -88,7 +99,9 @@ Use `AppSettingsKeys` + `@AppStorage` with default `false`, guard at invocation 
 Behind feature flag `docLookupEnabled` (Settings > Features). Uses devdocs.io as documentation source:
 - Catalog fetched from `https://devdocs.io/docs.json` (~789 docs)
 - Per-doc download: `index.json` (search entries) + `db.json` (HTML content)
-- Search supports doc prefix filter: `python:map`, `go:fmt`
+- Lives in the Docs section of the browser window: docset sidebar (scopes the search), results, rendered page
+- Search supports doc prefix filter: `python:map`, `go:fmt` — the prefix also selects the docset in the sidebar
+- Hotkey (`activateDocLookup`) opens the window on Docs prefilled with the selected text
 - HTML rendered in WKWebView with custom dark/light CSS
 - WKWebView WebContent process logs sandbox errors — these are harmless noise
 

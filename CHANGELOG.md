@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- Snippets, Prompts, Documentation and Claude Toolkit now live in one browser window with a
+  toolbar section picker (⌘1–⌘4), in the Claude Toolkit layout. Filters are chip rows under the
+  search field. Documentation gets a docset sidebar that scopes the search; the floating
+  documentation panel is gone, and the hotkey opens the window on Docs with the selected text.
+
 ### Removed
 
 - GitHub Gist sharing (menu item, bezel Share action, snippet share, Gist history tab,
