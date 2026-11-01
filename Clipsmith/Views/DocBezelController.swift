@@ -11,7 +11,7 @@ private let logger = Logger(
 @MainActor
 final class DocBezelController: NSPanel {
 
-    let viewModel = DocBezelViewModel()
+    let viewModel = DocsBrowserViewModel()
     var appTracker: AppTracker?
     var docsetSearchService: DocsetSearchService?
     var docsetManagerService: DocsetManagerService?

@@ -4,7 +4,7 @@ import OSLog
 
 private let logger = Logger(
     subsystem: Bundle.main.bundleIdentifier ?? "com.github.haad.clipsmith",
-    category: "DocBezelViewModel"
+    category: "DocsBrowserViewModel"
 )
 
 /// Result item combining a doc source with a search entry.
@@ -17,9 +17,9 @@ struct DocSearchResult: Identifiable, Sendable {
 }
 
 @Observable @MainActor
-final class DocBezelViewModel {
+final class DocsBrowserViewModel {
 
-    // MARK: - Dependencies (injected by DocBezelController)
+    // MARK: - Dependencies (injected by the hosting view)
     var searchService: DocsetSearchService?
     var managerService: DocsetManagerService?
 
@@ -50,6 +50,28 @@ final class DocBezelViewModel {
     var isSearching: Bool = false
     var wraparoundBezel: Bool = false
 
+    /// Sidebar selection; nil = search every enabled docset. Changing it
+    /// re-runs the current query immediately.
+    var selectedDocsetID: String? {
+        didSet {
+            guard !isApplyingPrefixSelection, selectedDocsetID != oldValue else { return }
+            let query = searchText.trimmingCharacters(in: .whitespaces)
+            if query.isEmpty {
+                filteredResults = []
+            } else {
+                performSearch(query: query)
+            }
+        }
+    }
+
+    /// Entry counts per docset slug for the sidebar, filled by `loadEntryCounts()`.
+    var entryCounts: [String: Int] = [:]
+
+    /// Set while `performSearch` moves the sidebar selection for a `prefix:` query,
+    /// so the `selectedDocsetID` observer does not start a second search.
+    private var isApplyingPrefixSelection = false
+    private var entryCountsTask: Task<Void, Never>?
+
     /// Active doc filter prefix (e.g. "python" from "python:map")
     var activeDocFilter: String?
     /// Display names of docs matching the active filter
@@ -73,6 +95,66 @@ final class DocBezelViewModel {
     var navigationLabel: String {
         guard !filteredResults.isEmpty else { return "" }
         return "\(selectedIndex + 1) of \(filteredResults.count)"
+    }
+
+    var selectedDocset: DocsetInfo? {
+        guard let selectedDocsetID else { return nil }
+        return managerService?.enabledDocsets.first { $0.id == selectedDocsetID }
+    }
+
+    // MARK: - Entry points
+
+    /// Prefill from the docs hotkey: trims the selection, keeps the docset
+    /// scope, and restarts from the first result. Whitespace-only clears the field.
+    func open(withQuery query: String?) {
+        searchText = query?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        selectedIndex = 0
+    }
+
+    /// Loads each enabled docset's index off the main actor and records its entry count.
+    func loadEntryCounts() {
+        guard let searchService, let managerService else { return }
+        let docsets = managerService.enabledDocsets
+        entryCountsTask?.cancel()
+        entryCountsTask = Task {
+            let counts = await Task.detached {
+                var counts: [String: Int] = [:]
+                for docset in docsets {
+                    guard let indexPath = docset.indexPath,
+                          let entries = try? searchService.loadIndex(slug: docset.id, from: indexPath) else { continue }
+                    counts[docset.id] = entries.count
+                }
+                return counts
+            }.value
+            guard !Task.isCancelled else { return }
+            entryCounts = counts
+        }
+    }
+
+    /// Which docsets a query runs against, and whether the sidebar selection should move.
+    ///
+    /// - `prefix:` present → the first matching docset (selection moves to it), or
+    ///   nothing when no installed docset matches (selection untouched).
+    /// - no prefix, docset selected → that docset (or nothing if it vanished).
+    /// - neither → every docset.
+    ///
+    /// `newSelection` is `.some(id)` to move the selection, `nil` to leave it alone.
+    nonisolated static func targetDocsets(
+        selectedDocsetID: String?,
+        parsedFilter: String?,
+        from docsets: [DocsetInfo],
+        using service: DocsetSearchService
+    ) -> (docsets: [DocsetInfo], newSelection: String??) {
+        if let parsedFilter {
+            let matching = service.matchingDocsets(filter: parsedFilter, from: docsets)
+            guard let first = matching.first else { return ([], nil) }
+            return ([first], .some(first.id))
+        }
+        if let selectedDocsetID {
+            let selected = docsets.filter { $0.id == selectedDocsetID }
+            return (selected, nil)
+        }
+        return (docsets, nil)
     }
 
     // MARK: - Search
@@ -100,9 +182,20 @@ final class DocBezelViewModel {
             return
         }
 
+        let target = Self.targetDocsets(
+            selectedDocsetID: selectedDocsetID,
+            parsedFilter: parsed.docFilter,
+            from: managerService.enabledDocsets,
+            using: searchService
+        )
+        if case .some(let id) = target.newSelection, id != selectedDocsetID {
+            isApplyingPrefixSelection = true
+            selectedDocsetID = id
+            isApplyingPrefixSelection = false
+        }
+
         do {
-            let docsets = managerService.enabledDocsets
-            let results = try searchService.searchAll(query: searchQuery, docFilter: parsed.docFilter, docsets: docsets)
+            let results = try searchService.searchAll(query: searchQuery, docFilter: nil, docsets: target.docsets)
             filteredResults = results.map { (docset, entry, score) in
                 DocSearchResult(
                     docsetID: docset.id,

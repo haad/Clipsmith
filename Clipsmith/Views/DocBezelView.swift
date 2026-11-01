@@ -2,7 +2,7 @@ import SwiftUI
 import WebKit
 
 struct DocBezelView: View {
-    @Bindable var viewModel: DocBezelViewModel
+    @Bindable var viewModel: DocsBrowserViewModel
 
     var body: some View {
         VStack(spacing: 0) {
