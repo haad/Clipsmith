@@ -111,6 +111,7 @@
 		AA0114 /* TodoSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0114 /* TodoSettingsSection.swift */; };
 		AA0097 /* CommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0098 /* CommandPaletteView.swift */; };
 		AA0099 /* HelpSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0099 /* HelpSettingsTab.swift */; };
+		AA0115 /* ClipsmithSchemaV3.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0115 /* ClipsmithSchemaV3.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -230,6 +231,7 @@
 		AF0114 /* TodoSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSettingsSection.swift; sourceTree = "<group>"; };
 		AF0098 /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
 		AF0099 /* HelpSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSettingsTab.swift; sourceTree = "<group>"; };
+		AF0115 /* ClipsmithSchemaV3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsmithSchemaV3.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -362,6 +364,7 @@
 				AF0003 /* ClipsmithSchemaV1.swift */,
 				AF0004 /* ClipsmithMigrationPlan.swift */,
 				AF0045 /* ClipsmithSchemaV2.swift */,
+				AF0115 /* ClipsmithSchemaV3.swift */,
 			);
 			path = Schema;
 			sourceTree = "<group>";
@@ -664,6 +667,7 @@
 				AA0112 /* TodoListView.swift in Sources */,
 				AA0113 /* TodoQuickAddController.swift in Sources */,
 				AA0114 /* TodoSettingsSection.swift in Sources */,
+				AA0115 /* ClipsmithSchemaV3.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

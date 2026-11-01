@@ -13,7 +13,7 @@ struct ClipsmithApp: App {
     @AppStorage(AppSettingsKeys.menuIcon) private var menuIcon: Int = 0
 
     static let sharedModelContainer: ModelContainer = {
-        let schema = Schema(ClipsmithSchemaV2.models)
+        let schema = Schema(ClipsmithSchemaV3.models)
         let storeURL = FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appending(path: "Clipsmith/clipboard.sqlite")

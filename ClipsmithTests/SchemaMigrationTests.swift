@@ -66,10 +66,10 @@ final class SchemaMigrationTests: XCTestCase {
         XCTAssertNil(item.sourceURL, "sourceURL default should be nil")
     }
 
-    // MARK: - testV1ModelsWorkWithV2Schema
+    // MARK: - testV1ModelsWorkWithCurrentSchema
 
-    /// Clipping, Snippet, and GistRecord all work correctly with the V2 schema.
-    func testV1ModelsWorkWithV2Schema() async throws {
+    /// Clipping and Snippet (V1 models) persist through the current (V3) test container.
+    func testV1ModelsWorkWithCurrentSchema() async throws {
         let container = try makeTestContainer()
 
         try await MainActor.run {
@@ -83,19 +83,57 @@ final class SchemaMigrationTests: XCTestCase {
             let snippet = ClipsmithSchemaV2.Snippet(name: "test snippet", content: "let x = 1")
             context.insert(snippet)
 
-            // Insert a GistRecord
-            let gist = ClipsmithSchemaV2.GistRecord(gistID: "abc123", gistURL: "https://gist.github.com/abc123", filename: "test.swift")
-            context.insert(gist)
-
             try context.save()
 
             let clippings = try context.fetch(FetchDescriptor<ClipsmithSchemaV2.Clipping>())
             let snippets = try context.fetch(FetchDescriptor<ClipsmithSchemaV2.Snippet>())
-            let gists = try context.fetch(FetchDescriptor<ClipsmithSchemaV2.GistRecord>())
 
-            XCTAssertEqual(clippings.count, 1, "Clipping should be persisted with V2 schema")
-            XCTAssertEqual(snippets.count, 1, "Snippet should be persisted with V2 schema")
-            XCTAssertEqual(gists.count, 1, "GistRecord should be persisted with V2 schema")
+            XCTAssertEqual(clippings.count, 1, "Clipping should be persisted with the current schema")
+            XCTAssertEqual(snippets.count, 1, "Snippet should be persisted with the current schema")
+        }
+    }
+
+    // MARK: - V3
+
+    func testV3SchemaHasThreeModels() {
+        XCTAssertEqual(ClipsmithSchemaV3.models.count, 3)
+        XCTAssertFalse(ClipsmithSchemaV3.models.contains { $0 == ClipsmithSchemaV1.GistRecord.self })
+    }
+
+    func testMigrationPlanEndsAtV3() {
+        XCTAssertTrue(ClipsmithMigrationPlan.schemas.last == ClipsmithSchemaV3.self)
+        XCTAssertEqual(ClipsmithMigrationPlan.stages.count, 2)
+    }
+
+    /// Review Focus 5: a V2 store holding Gist records opens under V3 and keeps the rest.
+    func testV2StoreWithGistRecordsMigratesToV3() async throws {
+        let url = FileManager.default.temporaryDirectory
+            .appending(path: "migration-\(UUID().uuidString).sqlite")
+        defer { try? FileManager.default.removeItem(at: url) }
+
+        // Seed a V2 store.
+        do {
+            let v2Schema = Schema(ClipsmithSchemaV2.models)
+            let v2 = try ModelContainer(for: v2Schema,
+                                        configurations: [ModelConfiguration(schema: v2Schema, url: url)])
+            try await MainActor.run {
+                let ctx = v2.mainContext
+                ctx.insert(ClipsmithSchemaV1.GistRecord(gistID: "g1", gistURL: "https://gist.github.com/g1", filename: "a.txt"))
+                ctx.insert(ClipsmithSchemaV1.Snippet(name: "keep", content: "x"))
+                ctx.insert(ClipsmithSchemaV2.PromptLibraryItem(id: "p", title: "P", content: "c", category: "coding", version: 1))
+                try ctx.save()
+            }
+        }
+
+        // Reopen with the migration plan at V3.
+        let v3Schema = Schema(ClipsmithSchemaV3.models)
+        let v3 = try ModelContainer(for: v3Schema,
+                                    migrationPlan: ClipsmithMigrationPlan.self,
+                                    configurations: [ModelConfiguration(schema: v3Schema, url: url)])
+        try await MainActor.run {
+            let ctx = v3.mainContext
+            XCTAssertEqual(try ctx.fetchCount(FetchDescriptor<ClipsmithSchemaV3.Snippet>()), 1)
+            XCTAssertEqual(try ctx.fetchCount(FetchDescriptor<ClipsmithSchemaV3.PromptLibraryItem>()), 1)
         }
     }
 }
