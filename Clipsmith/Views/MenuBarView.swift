@@ -116,7 +116,7 @@ struct MenuBarView: View {
         }
 
         Button("Claude Toolkit...") {
-            openClaudeToolkitWindow()
+            openBrowser(BrowserOpenRequest(section: .toolkit, query: nil))
         }
 
         Divider()
@@ -178,6 +178,9 @@ struct MenuBarView: View {
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenTodos)) { _ in
             openTodoWindow()
         }
+        .onReceive(NotificationCenter.default.publisher(for: .clipsmithRequestBrowser)) { notification in
+            openBrowser(BrowserOpenRequest(userInfo: notification.userInfo) ?? BrowserOpenRequest(section: nil, query: nil))
+        }
     }
 
     private func fetchClippings() {
@@ -237,11 +240,20 @@ struct MenuBarView: View {
         }
     }
 
-    private func openClaudeToolkitWindow() {
+    // MARK: - Browser Window
+
+    /// Opens the unified browser window and routes the request to it.
+    ///
+    /// Same activation dance as the other windows; the request is re-posted as
+    /// `.clipsmithOpenBrowser` after a brief delay so `BrowserWindowView` has
+    /// appeared and can apply the section and query.
+    private func openBrowser(_ request: BrowserOpenRequest) {
         Task { @MainActor in
             activateAsRegularApp()
             try? await Task.sleep(for: .milliseconds(100))
-            openWindow(id: "claude-toolkit")
+            openWindow(id: "browser")
+            try? await Task.sleep(for: .milliseconds(150))
+            NotificationCenter.default.post(name: .clipsmithOpenBrowser, object: nil, userInfo: request.userInfo)
         }
     }
 }

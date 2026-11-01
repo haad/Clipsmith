@@ -115,6 +115,9 @@
 		AA0118 /* BrowserSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0118 /* BrowserSectionTests.swift */; };
 		AA0116 /* BrowserSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0116 /* BrowserSection.swift */; };
 		AA0117 /* BrowserPanes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0117 /* BrowserPanes.swift */; };
+		AA0121 /* BrowserWindowViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0121 /* BrowserWindowViewModelTests.swift */; };
+		AA0119 /* BrowserWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0119 /* BrowserWindowViewModel.swift */; };
+		AA0120 /* BrowserWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0120 /* BrowserWindowView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -238,6 +241,9 @@
 		AF0118 /* BrowserSectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSectionTests.swift; sourceTree = "<group>"; };
 		AF0116 /* BrowserSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSection.swift; sourceTree = "<group>"; };
 		AF0117 /* BrowserPanes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserPanes.swift; sourceTree = "<group>"; };
+		AF0121 /* BrowserWindowViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowViewModelTests.swift; sourceTree = "<group>"; };
+		AF0119 /* BrowserWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowViewModel.swift; sourceTree = "<group>"; };
+		AF0120 /* BrowserWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -444,6 +450,7 @@
 				AF0110 /* TodoWindowViewModelTests.swift */,
 				GG0015 /* Fixtures */,
 				AF0118 /* BrowserSectionTests.swift */,
+				AF0121 /* BrowserWindowViewModelTests.swift */,
 			);
 			path = ClipsmithTests;
 			sourceTree = "<group>";
@@ -500,6 +507,8 @@
 				AF0116 /* BrowserSection.swift */,
 				AF0117 /* BrowserPanes.swift */,
 				AF0085 /* ToolkitSectionView.swift */,
+				AF0119 /* BrowserWindowViewModel.swift */,
+				AF0120 /* BrowserWindowView.swift */,
 			);
 			path = Browser;
 			sourceTree = "<group>";
@@ -679,6 +688,8 @@
 				AA0115 /* ClipsmithSchemaV3.swift in Sources */,
 				AA0116 /* BrowserSection.swift in Sources */,
 				AA0117 /* BrowserPanes.swift in Sources */,
+				AA0119 /* BrowserWindowViewModel.swift in Sources */,
+				AA0120 /* BrowserWindowView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -717,6 +728,7 @@
 				AA0108 /* TodoQuickAddParserTests.swift in Sources */,
 				AA0110 /* TodoWindowViewModelTests.swift in Sources */,
 				AA0118 /* BrowserSectionTests.swift in Sources */,
+				AA0121 /* BrowserWindowViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

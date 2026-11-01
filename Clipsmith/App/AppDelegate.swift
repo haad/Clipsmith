@@ -642,6 +642,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         if let hostingView = window.contentView as? (any HostingSizingConfigurable) {
             hostingView.sizingOptions = []
         }
+        // The browser window remembers its frame across launches.
+        if window.identifier?.rawValue.hasPrefix("browser") == true {
+            window.setFrameAutosaveName("BrowserWindowFrame")
+        }
     }
 
     // MARK: - Activation policy restoration

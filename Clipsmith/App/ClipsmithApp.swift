@@ -69,11 +69,16 @@ struct ClipsmithApp: App {
         .modelContainer(ClipsmithApp.sharedModelContainer)
         .windowResizability(.contentSize)
 
-        WindowGroup(id: "claude-toolkit") {
-            ToolkitSectionView()
-                .navigationTitle("Clipsmith")
-                .frame(minWidth: 700, minHeight: 480)
+        WindowGroup(id: "browser") {
+            BrowserWindowView(
+                docsetSearchService: appDelegate.docsetSearchService,
+                docsetManagerService: appDelegate.docsetManagerService
+            )
+            .environment(appDelegate.pasteService)
+            .environment(appDelegate.appTracker)
+            .frame(minWidth: 760, minHeight: 500)
         }
+        .modelContainer(ClipsmithApp.sharedModelContainer)
         .windowResizability(.contentSize)
 
         WindowGroup(id: "todos") {
