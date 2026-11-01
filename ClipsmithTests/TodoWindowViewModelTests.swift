@@ -130,4 +130,25 @@ final class TodoWindowViewModelTests: XCTestCase {
         vm.selectPrevious(in: items)
         XCTAssertEqual(vm.selectedItemID, items[0].id)
     }
+
+    // MARK: - Tab navigation (⇧⌘[ / ⇧⌘])
+
+    func testMoveTabStepsThroughTabsAndClamps() {
+        let tabs = vm.tabs(for: sample)   // Today, Inbox, Home, Work
+        XCTAssertEqual(vm.selectedTab, .today)
+        vm.moveTab(by: -1, in: tabs)
+        XCTAssertEqual(vm.selectedTab, .today, "clamps at the first tab")
+        vm.moveTab(by: 1, in: tabs)
+        XCTAssertEqual(vm.selectedTab, .project("Inbox"))
+        vm.moveTab(by: 2, in: tabs)
+        XCTAssertEqual(vm.selectedTab, .project("Work"))
+        vm.moveTab(by: 1, in: tabs)
+        XCTAssertEqual(vm.selectedTab, .project("Work"), "clamps at the last tab")
+    }
+
+    func testMoveTabFromVanishedTabGoesToToday() {
+        vm.selectedTab = .project("Gone")
+        vm.moveTab(by: 1, in: vm.tabs(for: sample))
+        XCTAssertEqual(vm.selectedTab, .today)
+    }
 }

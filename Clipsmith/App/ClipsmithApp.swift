@@ -67,16 +67,10 @@ struct ClipsmithApp: App {
             )
             .environment(appDelegate.pasteService)
             .environment(appDelegate.appTracker)
+            .environment(appDelegate.todoStore)
             .frame(minWidth: 800, minHeight: 500)
         }
         .modelContainer(ClipsmithApp.sharedModelContainer)
-        .windowResizability(.contentSize)
-
-        WindowGroup(id: "todos") {
-            TodoWindowView()
-                .environment(appDelegate.todoStore)
-                .frame(minWidth: 640, minHeight: 420)
-        }
         .windowResizability(.contentSize)
     }
 

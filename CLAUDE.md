@@ -26,11 +26,11 @@ No `Package.swift` — dependencies are managed via Xcode SPM integration in the
 - `AppDelegate.swift` — owns all services and controllers, registers global hotkeys, wires notifications from MenuBarView
 
 ### Browser Window (`WindowGroup(id: "browser")`)
-One window hosts Snippets, Prompts, Docs and Claude Toolkit as sections behind a toolbar picker (⌘1–⌘4). Files live in `Views/Browser/`:
+One window hosts Snippets, Prompts, Docs, Claude Toolkit and Todos as sections behind a toolbar picker (⌘1–⌘5). Docs and Todos are feature-flagged (`docLookupEnabled`, `todoTrackingEnabled`). Files live in `Views/Browser/`:
 - `BrowserWindowView` / `BrowserWindowViewModel` — section picker, last-used section (`browserLastSection`), applies `BrowserOpenRequest`s
 - `BrowserSection` — section enum, `BrowserOpenRequest` (section + optional query), the two notifications below
 - `BrowserPanes` — shared `BrowserSearchField`, `BrowserFilterRow` (chips), `BrowserListPane`, `BrowserDetailPane`, `BrowserEmptyDetail`
-- `SnippetsSectionView`, `PromptsSectionView`, `ToolkitSectionView`, `DocsSectionView` — one per section; filtering logic in `SnippetFilter` / `PromptFilter`
+- `SnippetsSectionView`, `PromptsSectionView`, `ToolkitSectionView`, `DocsSectionView`, `TodosSectionView` — one per section; filtering logic in `SnippetFilter` / `PromptFilter`; Todos reuses `TodoListView` / `TodoWindowViewModel` from `Views/Todos/` (project tabs are chips, ⇧⌘[ / ⇧⌘] switch them)
 - `DocsBrowserViewModel` — docs search, docset scoping (sidebar), `prefix:` selection, `open(withQuery:)` prefill
 
 Opening flow (two hops, because `AppDelegate` has no `@Environment(\.openWindow)`): a caller posts `.clipsmithRequestBrowser` with `BrowserOpenRequest.userInfo` → `MenuBarView.openBrowser` puts the request in `BrowserOpenMailbox.shared`, activates the app, calls `openWindow(id: "browser")` and posts `.clipsmithOpenBrowser` → `BrowserWindowView` takes the request from the mailbox in `onAppear` (new window) or on the notification (already open). The docs hotkey captures the selected text in `AppDelegate.requestDocsBrowser()` before activation.
@@ -75,7 +75,7 @@ Both bezels use `.nonactivatingPanel` (don't steal focus). Documentation is a se
 - No app sandbox (`ENABLE_APP_SANDBOX = NO`) — required for accessibility, global hotkeys, WKWebView
 - Hardened runtime enabled
 - Bundle ID: `com.github.haad.clipsmith`
-- Menu bar only app (`.accessory` activation policy), switches to `.regular` temporarily when showing the Settings, browser or todo windows
+- Menu bar only app (`.accessory` activation policy), switches to `.regular` temporarily when showing the Settings or browser windows
 
 ## Common Patterns
 

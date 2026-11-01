@@ -22,14 +22,14 @@ final class BrowserWindowViewModelTests: XCTestCase {
 
     func testApplySelectsSectionAndStoresDocsQuery() {
         let vm = BrowserWindowViewModel(defaults: defaults)
-        vm.apply(BrowserOpenRequest(section: .docs, query: "map"), docLookupEnabled: true)
+        vm.apply(BrowserOpenRequest(section: .docs, query: "map"), docLookupEnabled: true, todoTrackingEnabled: true)
         XCTAssertEqual(vm.selectedSection, .docs)
         XCTAssertEqual(vm.pendingDocsQuery, "map")
     }
 
     func testApplyIgnoresQueryForOtherSections() {
         let vm = BrowserWindowViewModel(defaults: defaults)
-        vm.apply(BrowserOpenRequest(section: .prompts, query: "x"), docLookupEnabled: true)
+        vm.apply(BrowserOpenRequest(section: .prompts, query: "x"), docLookupEnabled: true, todoTrackingEnabled: true)
         XCTAssertNil(vm.pendingDocsQuery)
     }
 
@@ -37,9 +37,9 @@ final class BrowserWindowViewModelTests: XCTestCase {
     func testApplyFallsBackWhenDocsDisabled() {
         let vm = BrowserWindowViewModel(defaults: defaults)
         vm.selectedSection = .docs
-        vm.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: false)
+        vm.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: false, todoTrackingEnabled: true)
         XCTAssertEqual(vm.selectedSection, .snippets)
-        vm.apply(BrowserOpenRequest(section: .docs, query: "q"), docLookupEnabled: false)
+        vm.apply(BrowserOpenRequest(section: .docs, query: "q"), docLookupEnabled: false, todoTrackingEnabled: true)
         XCTAssertEqual(vm.selectedSection, .snippets)
         XCTAssertNil(vm.pendingDocsQuery)
     }
@@ -47,7 +47,7 @@ final class BrowserWindowViewModelTests: XCTestCase {
     /// Review fix: the docs hotkey with nothing selected must still clear and focus the field.
     func testApplyDocsWithNilQueryYieldsEmptyPrefill() {
         let vm = BrowserWindowViewModel(defaults: defaults)
-        vm.apply(BrowserOpenRequest(section: .docs, query: nil), docLookupEnabled: true)
+        vm.apply(BrowserOpenRequest(section: .docs, query: nil), docLookupEnabled: true, todoTrackingEnabled: true)
         XCTAssertEqual(vm.pendingDocsQuery, "")
     }
 
@@ -55,7 +55,19 @@ final class BrowserWindowViewModelTests: XCTestCase {
     func testApplyWithoutSectionLeavesPrefillAlone() {
         let vm = BrowserWindowViewModel(defaults: defaults)
         vm.selectedSection = .docs
-        vm.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: true)
+        vm.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: true, todoTrackingEnabled: true)
         XCTAssertNil(vm.pendingDocsQuery)
+    }
+
+    /// Todos was the last section, Todo Tracking is now off.
+    func testApplyFallsBackWhenTodosDisabled() {
+        let vm = BrowserWindowViewModel(defaults: defaults)
+        vm.selectedSection = .todos
+        vm.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: true, todoTrackingEnabled: false)
+        XCTAssertEqual(vm.selectedSection, .snippets)
+        vm.apply(BrowserOpenRequest(section: .todos, query: nil), docLookupEnabled: true, todoTrackingEnabled: false)
+        XCTAssertEqual(vm.selectedSection, .snippets)
+        vm.apply(BrowserOpenRequest(section: .todos, query: nil), docLookupEnabled: true, todoTrackingEnabled: true)
+        XCTAssertEqual(vm.selectedSection, .todos)
     }
 }

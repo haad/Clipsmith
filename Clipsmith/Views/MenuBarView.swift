@@ -19,9 +19,6 @@ extension Notification.Name {
     /// Posted by TodoSettingsSection when the todo file path changes;
     /// AppDelegate observes it and re-points TodoStore at the new file.
     static let clipsmithTodoFilePathChanged = Notification.Name("clipsmithTodoFilePathChanged")
-    /// Posted by the .openTodos hotkey (AppDelegate) to open the todo window —
-    /// AppDelegate cannot use @Environment(\.openWindow), MenuBarView can.
-    static let clipsmithOpenTodos = Notification.Name("clipsmithOpenTodos")
 }
 
 struct MenuBarView: View {
@@ -108,7 +105,7 @@ struct MenuBarView: View {
 
         if todoTrackingEnabled {
             Button("Todos...") {
-                openTodoWindow()
+                openBrowser(BrowserOpenRequest(section: .todos, query: nil))
             }
         }
 
@@ -169,9 +166,6 @@ struct MenuBarView: View {
         .onAppear {
             fetchClippings()
         }
-        .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenTodos)) { _ in
-            openTodoWindow()
-        }
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithRequestBrowser)) { notification in
             openBrowser(BrowserOpenRequest(userInfo: notification.userInfo) ?? BrowserOpenRequest(section: nil, query: nil))
         }
@@ -192,17 +186,6 @@ struct MenuBarView: View {
         NSApp.setActivationPolicy(.regular)
         NSApp.applicationIconImage = NSImage(named: NSImage.applicationIconName)
         NSApp.activate(ignoringOtherApps: true)
-    }
-
-    // MARK: - Todo Window
-
-    /// Opens the todo window with the same activation-policy dance as snippets.
-    private func openTodoWindow() {
-        Task { @MainActor in
-            activateAsRegularApp()
-            try? await Task.sleep(for: .milliseconds(100))
-            openWindow(id: "todos")
-        }
     }
 
     // MARK: - Browser Window

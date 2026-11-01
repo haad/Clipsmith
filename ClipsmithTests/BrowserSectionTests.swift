@@ -3,14 +3,22 @@ import XCTest
 
 final class BrowserSectionTests: XCTestCase {
     func testOrderAndKeyboardIndex() {
-        XCTAssertEqual(BrowserSection.allCases, [.snippets, .prompts, .docs, .toolkit])
+        XCTAssertEqual(BrowserSection.allCases, [.snippets, .prompts, .docs, .toolkit, .todos])
         XCTAssertEqual(BrowserSection.docs.keyboardIndex, 3)
+        XCTAssertEqual(BrowserSection.todos.keyboardIndex, 5)
         XCTAssertEqual(BrowserSection.toolkit.title, "Toolkit")
+        XCTAssertEqual(BrowserSection.todos.title, "Todos")
     }
 
-    func testAvailableHidesDocsWhenFlagOff() {
-        XCTAssertEqual(BrowserSection.available(docLookupEnabled: false), [.snippets, .prompts, .toolkit])
-        XCTAssertEqual(BrowserSection.available(docLookupEnabled: true), BrowserSection.allCases)
+    func testAvailableHidesFlaggedSections() {
+        XCTAssertEqual(BrowserSection.available(docLookupEnabled: false, todoTrackingEnabled: false),
+                       [.snippets, .prompts, .toolkit])
+        XCTAssertEqual(BrowserSection.available(docLookupEnabled: true, todoTrackingEnabled: false),
+                       [.snippets, .prompts, .docs, .toolkit])
+        XCTAssertEqual(BrowserSection.available(docLookupEnabled: false, todoTrackingEnabled: true),
+                       [.snippets, .prompts, .toolkit, .todos])
+        XCTAssertEqual(BrowserSection.available(docLookupEnabled: true, todoTrackingEnabled: true),
+                       BrowserSection.allCases)
     }
 
     func testOpenRequestRoundTripsThroughUserInfo() {

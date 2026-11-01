@@ -1,14 +1,16 @@
 import SwiftUI
 
-/// Task list for the selected tab: search bar, inline new-task row, task rows
-/// with checkbox, title, tag chips, and due date (overdue in red).
+/// Task list for the selected tab: inline new-task row, task rows with
+/// checkbox, title, tag chips, and due date (overdue in red). The search
+/// field lives in `TodosSectionView`; `searchFocused` says whether it has
+/// focus so Space does not toggle a task while typing.
 struct TodoListView: View {
     @Environment(TodoStore.self) private var store
     @Bindable var viewModel: TodoWindowViewModel
+    let searchFocused: Bool
 
     @State private var isAddingTask = false
     @State private var draftText = ""
-    @FocusState private var searchFocused: Bool
     @FocusState private var draftFocused: Bool
 
     private var today: String { TodoDates.dateString() }
@@ -19,17 +21,6 @@ struct TodoListView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Image(systemName: "magnifyingglass")
-                    .foregroundStyle(.secondary)
-                TextField("Search — @tag terms match tags", text: $viewModel.searchText)
-                    .textFieldStyle(.plain)
-                    .focused($searchFocused)
-            }
-            .padding(8)
-
-            Divider()
-
             List(selection: $viewModel.selectedItemID) {
                 if isAddingTask {
                     TextField("New task — tags like @today welcome", text: $draftText)
@@ -70,8 +61,6 @@ struct TodoListView: View {
                 .keyboardShortcut(.delete, modifiers: .command)
             Button("") { viewModel.showCompleted.toggle() }
                 .keyboardShortcut("h", modifiers: [.command, .shift])
-            Button("") { searchFocused = true }
-                .keyboardShortcut("f", modifiers: .command)
         }
         .frame(width: 0, height: 0)
         .opacity(0)

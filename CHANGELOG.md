@@ -7,10 +7,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Changed
 
-- Snippets, Prompts, Documentation and Claude Toolkit now live in one browser window with a
-  toolbar section picker (⌘1–⌘4), in the Claude Toolkit layout. Filters are chip rows under the
+- Snippets, Prompts, Documentation, Claude Toolkit and Todos now live in one browser window with
+  a toolbar section picker (⌘1–⌘5), in the Claude Toolkit layout. Filters are chip rows under the
   search field. Documentation gets a docset sidebar that scopes the search; the floating
   documentation panel is gone, and the hotkey opens the window on Docs with the selected text.
+  Todo project tabs are chips; switch them with ⇧⌘[ / ⇧⌘] (⌘1–⌘9 now pick sections).
 
 ### Removed
 

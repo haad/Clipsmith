@@ -3,14 +3,15 @@ import SwiftUI
 /// Root view of the unified browser window (`WindowGroup(id: "browser")`).
 ///
 /// A segmented picker in the toolbar switches between Snippets, Prompts,
-/// Docs (feature-flagged) and Toolkit. Each section owns its own panes;
+/// Docs (feature-flagged), Toolkit and Todos (feature-flagged). Each
+/// section owns its own panes;
 /// this view only hosts them and applies `BrowserOpenRequest`s from the mailbox.
 ///
 /// ## Keyboard Shortcuts
 ///
 /// | Shortcut | Action                          |
 /// |----------|---------------------------------|
-/// | ⌘1–⌘4    | Switch section                  |
+/// | ⌘1–⌘5    | Switch section                  |
 /// | ⌘F       | Focus the section's search field|
 /// | ⎋        | Close the window                |
 struct BrowserWindowView: View {
@@ -21,7 +22,9 @@ struct BrowserWindowView: View {
     // Section view models live here so switching sections keeps their state.
     @State private var docsViewModel = DocsBrowserViewModel()
     @State private var toolkitViewModel = ClaudeToolkitViewModel()
+    @State private var todosViewModel = TodoWindowViewModel()
     @AppStorage(AppSettingsKeys.docLookupEnabled) private var docLookupEnabled: Bool = false
+    @AppStorage(AppSettingsKeys.todoTrackingEnabled) private var todoTrackingEnabled: Bool = false
 
     init(docsetSearchService: DocsetSearchService, docsetManagerService: DocsetManagerService) {
         self.docsetSearchService = docsetSearchService
@@ -29,7 +32,7 @@ struct BrowserWindowView: View {
     }
 
     private var sections: [BrowserSection] {
-        viewModel.sections(docLookupEnabled: docLookupEnabled)
+        viewModel.sections(docLookupEnabled: docLookupEnabled, todoTrackingEnabled: todoTrackingEnabled)
     }
 
     var body: some View {
@@ -48,6 +51,8 @@ struct BrowserWindowView: View {
                 )
             case .toolkit:
                 ToolkitSectionView(viewModel: toolkitViewModel)
+            case .todos:
+                TodosSectionView(viewModel: todosViewModel)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -60,14 +65,14 @@ struct BrowserWindowView: View {
                     }
                 }
                 .pickerStyle(.segmented)
-                .frame(maxWidth: 420)
+                .frame(maxWidth: 500)
             }
         }
         // ⎋ closes the window (yields to text fields)
         .onExitCommand {
             NSApp.keyWindow?.close()
         }
-        // Hidden buttons for ⌘1–⌘4 section switching
+        // Hidden buttons for ⌘1–⌘5 section switching
         .background {
             Group {
                 ForEach(sections) { section in
@@ -82,14 +87,17 @@ struct BrowserWindowView: View {
             // Apply the request that opened us; with none, this still drops a
             // hidden section if the flag was switched off while it was selected.
             let request = BrowserOpenMailbox.shared.take() ?? BrowserOpenRequest(section: nil, query: nil)
-            viewModel.apply(request, docLookupEnabled: docLookupEnabled)
+            viewModel.apply(request, docLookupEnabled: docLookupEnabled, todoTrackingEnabled: todoTrackingEnabled)
         }
         .onChange(of: docLookupEnabled) { _, enabled in
-            viewModel.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: enabled)
+            viewModel.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: enabled, todoTrackingEnabled: todoTrackingEnabled)
+        }
+        .onChange(of: todoTrackingEnabled) { _, enabled in
+            viewModel.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: docLookupEnabled, todoTrackingEnabled: enabled)
         }
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenBrowser)) { _ in
             guard let request = BrowserOpenMailbox.shared.take() else { return }
-            viewModel.apply(request, docLookupEnabled: docLookupEnabled)
+            viewModel.apply(request, docLookupEnabled: docLookupEnabled, todoTrackingEnabled: todoTrackingEnabled)
         }
         .onDisappear {
             // Restore accessory policy when the window closes,

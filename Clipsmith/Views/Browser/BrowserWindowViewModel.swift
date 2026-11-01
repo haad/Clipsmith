@@ -22,8 +22,8 @@ final class BrowserWindowViewModel {
         selectedSection = stored.flatMap(BrowserSection.init(rawValue:)) ?? .snippets
     }
 
-    func sections(docLookupEnabled: Bool) -> [BrowserSection] {
-        BrowserSection.available(docLookupEnabled: docLookupEnabled)
+    func sections(docLookupEnabled: Bool, todoTrackingEnabled: Bool) -> [BrowserSection] {
+        BrowserSection.available(docLookupEnabled: docLookupEnabled, todoTrackingEnabled: todoTrackingEnabled)
     }
 
     /// Applies an open request: switch to the requested section when it is
@@ -31,8 +31,8 @@ final class BrowserWindowViewModel {
     /// that is hidden too). A request that explicitly asked for Docs always
     /// prefills the search field: with the query, or empty when nothing was
     /// selected, so the field is cleared and focused either way.
-    func apply(_ request: BrowserOpenRequest, docLookupEnabled: Bool) {
-        let available = sections(docLookupEnabled: docLookupEnabled)
+    func apply(_ request: BrowserOpenRequest, docLookupEnabled: Bool, todoTrackingEnabled: Bool) {
+        let available = sections(docLookupEnabled: docLookupEnabled, todoTrackingEnabled: todoTrackingEnabled)
         if let requested = request.section, available.contains(requested) {
             selectedSection = requested
         } else if !available.contains(selectedSection) {

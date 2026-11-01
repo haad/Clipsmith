@@ -46,6 +46,16 @@ final class TodoWindowViewModel {
         return tabs
     }
 
+    /// ⇧⌘[ / ⇧⌘]: step through `tabs`, clamped at both ends. A selected tab
+    /// that no longer exists (project removed externally) lands on Today.
+    func moveTab(by delta: Int, in tabs: [Tab]) {
+        guard let current = tabs.firstIndex(of: selectedTab) else {
+            selectedTab = .today
+            return
+        }
+        selectedTab = tabs[max(0, min(tabs.count - 1, current + delta))]
+    }
+
     /// Target project for a new task: nil (→ Inbox) on Today and Inbox tabs.
     func currentProjectName() -> String? {
         if case .project(let name) = selectedTab, name != "Inbox" { return name }

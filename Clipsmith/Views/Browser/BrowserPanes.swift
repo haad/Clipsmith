@@ -69,14 +69,16 @@ struct BrowserFilterOption: Identifiable, Hashable, Sendable {
     let label: String
 }
 
-/// A wrapping row of capsule chips. The leading "All" chip is bound to `nil`.
+/// A wrapping row of capsule chips. The leading chip ("All" unless
+/// `leadingLabel` says otherwise) is bound to `nil`.
 struct BrowserFilterRow: View {
     let options: [BrowserFilterOption]
     @Binding var selection: String?
+    var leadingLabel: String = "All"
 
     var body: some View {
         BrowserFlowLayout(spacing: 6) {
-            chip(label: "All", isSelected: selection == nil) { selection = nil }
+            chip(label: leadingLabel, isSelected: selection == nil) { selection = nil }
             ForEach(options) { option in
                 chip(label: option.label, isSelected: selection == option.id) {
                     selection = option.id

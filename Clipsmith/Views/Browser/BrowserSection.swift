@@ -2,13 +2,15 @@ import Foundation
 
 /// The sections of the unified browser window, in toolbar order.
 ///
-/// ⌘1–⌘4 map to `keyboardIndex`. `.docs` is hidden while the
-/// `docLookupEnabled` feature flag is off.
+/// ⌘1–⌘5 map to `keyboardIndex`. `.docs` is hidden while the
+/// `docLookupEnabled` feature flag is off, `.todos` while
+/// `todoTrackingEnabled` is off.
 enum BrowserSection: String, CaseIterable, Identifiable, Sendable {
     case snippets
     case prompts
     case docs
     case toolkit
+    case todos
 
     var id: String { rawValue }
 
@@ -18,6 +20,7 @@ enum BrowserSection: String, CaseIterable, Identifiable, Sendable {
         case .prompts: return "Prompts"
         case .docs: return "Docs"
         case .toolkit: return "Toolkit"
+        case .todos: return "Todos"
         }
     }
 
@@ -26,8 +29,14 @@ enum BrowserSection: String, CaseIterable, Identifiable, Sendable {
         (Self.allCases.firstIndex(of: self) ?? 0) + 1
     }
 
-    static func available(docLookupEnabled: Bool) -> [BrowserSection] {
-        docLookupEnabled ? allCases : allCases.filter { $0 != .docs }
+    static func available(docLookupEnabled: Bool, todoTrackingEnabled: Bool) -> [BrowserSection] {
+        allCases.filter { section in
+            switch section {
+            case .docs: return docLookupEnabled
+            case .todos: return todoTrackingEnabled
+            default: return true
+            }
+        }
     }
 }
 

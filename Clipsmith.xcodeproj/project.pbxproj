@@ -100,7 +100,7 @@
 		AA0108 /* TodoQuickAddParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0108 /* TodoQuickAddParserTests.swift */; };
 		AA0109 /* TodoWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0109 /* TodoWindowViewModel.swift */; };
 		AA0110 /* TodoWindowViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0110 /* TodoWindowViewModelTests.swift */; };
-		AA0111 /* TodoWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0111 /* TodoWindowView.swift */; };
+		AA0111 /* TodosSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0111 /* TodosSectionView.swift */; };
 		AA0112 /* TodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0112 /* TodoListView.swift */; };
 		AA0113 /* TodoQuickAddController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0113 /* TodoQuickAddController.swift */; };
 		AA0114 /* TodoSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0114 /* TodoSettingsSection.swift */; };
@@ -229,7 +229,7 @@
 		AF0108 /* TodoQuickAddParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoQuickAddParserTests.swift; sourceTree = "<group>"; };
 		AF0109 /* TodoWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoWindowViewModel.swift; sourceTree = "<group>"; };
 		AF0110 /* TodoWindowViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoWindowViewModelTests.swift; sourceTree = "<group>"; };
-		AF0111 /* TodoWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoWindowView.swift; sourceTree = "<group>"; };
+		AF0111 /* TodosSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodosSectionView.swift; sourceTree = "<group>"; };
 		AF0112 /* TodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListView.swift; sourceTree = "<group>"; };
 		AF0113 /* TodoQuickAddController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoQuickAddController.swift; sourceTree = "<group>"; };
 		AF0114 /* TodoSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSettingsSection.swift; sourceTree = "<group>"; };
@@ -490,7 +490,6 @@
 			isa = PBXGroup;
 			children = (
 				AF0109 /* TodoWindowViewModel.swift */,
-				AF0111 /* TodoWindowView.swift */,
 				AF0112 /* TodoListView.swift */,
 				AF0113 /* TodoQuickAddController.swift */,
 			);
@@ -510,6 +509,7 @@
 				AF0071 /* DocsBrowserViewModel.swift */,
 				AF0128 /* DocsSectionView.swift */,
 				AF0129 /* DocWebView.swift */,
+				AF0111 /* TodosSectionView.swift */,
 			);
 			path = Browser;
 			sourceTree = "<group>";
@@ -677,7 +677,7 @@
 				AA0105 /* TodoStore.swift in Sources */,
 				AA0107 /* TodoQuickAddParser.swift in Sources */,
 				AA0109 /* TodoWindowViewModel.swift in Sources */,
-				AA0111 /* TodoWindowView.swift in Sources */,
+				AA0111 /* TodosSectionView.swift in Sources */,
 				AA0112 /* TodoListView.swift in Sources */,
 				AA0113 /* TodoQuickAddController.swift in Sources */,
 				AA0114 /* TodoSettingsSection.swift in Sources */,

@@ -417,9 +417,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         KeyboardShortcuts.onKeyDown(for: .openTodos) {
             Task { @MainActor in
                 guard UserDefaults.standard.bool(forKey: AppSettingsKeys.todoTrackingEnabled) else { return }
-                // MenuBarView observes this and performs the activation-policy
-                // dance + openWindow (AppDelegate has no openWindow env).
-                NotificationCenter.default.post(name: .clipsmithOpenTodos, object: nil)
+                NotificationCenter.default.post(
+                    name: .clipsmithRequestBrowser,
+                    object: nil,
+                    userInfo: BrowserOpenRequest(section: .todos, query: nil).userInfo
+                )
             }
         }
 

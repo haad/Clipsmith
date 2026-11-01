@@ -13,7 +13,7 @@ At the same time, GitHub Gist sharing has never been used and is removed outrigh
 
 | Decision | Choice |
 |---|---|
-| Scope of merge | Snippets, Prompts, Docs and Claude Toolkit become sections of **one window**. Todos stays its own window. |
+| Scope of merge | Snippets, Prompts, Docs and Claude Toolkit become sections of **one window**. Todos stays its own window. *Amended 2026-11-02: Todos joins as the fifth section (⌘5, behind `todoTrackingEnabled`); project tabs become the chip row with Today leading, tab switching moves to ⇧⌘[ / ⇧⌘].* |
 | Design template | The existing Claude Toolkit window: native toolbar, list pane with search on top and counts footer, detail pane with header / body / action footer. |
 | Section switcher | Segmented picker in the toolbar's principal slot: **Snippets · Prompts · Docs · Toolkit** (order is the builder-facing default, see "My calls"). |
 | Per-section filter | Always-visible **filter row** of chips directly under the search field (Snippets: languages; Prompts: All / My Prompts / categories; Toolkit: All / Commands / Agents / Skills). Not a popup. |

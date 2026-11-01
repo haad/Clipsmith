@@ -38,7 +38,7 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 
 ### Todo Tracking (Experimental)
 - Keyboard-first todos backed by a plain-text [TaskPaper](https://www.taskpaper.com/) file you own — edit it with any editor, external changes are picked up live
-- Tabbed todo window: Today view (`@today` plus overdue/due items), one tab per project, fuzzy search with `@tag` terms, show/hide completed
+- Todos section of the browser window: Today view (`@today` plus overdue/due items), one chip per project (⇧⌘[ / ⇧⌘] to switch), fuzzy search with `@tag` terms, show/hide completed
 - Global quick-add bezel with inline syntax: `Fix pricing page #project @due(2026-09-05) @today`
 - Default file `~/Library/Application Support/Clipsmith/todos.taskpaper`, changeable in Settings > Todos
 
@@ -123,7 +123,7 @@ Build the `Clipsmith` scheme in Xcode 16+. The app runs as a menu bar utility �
 Some features are behind experimental flags in Settings > General > Features:
 
 - **Documentation Lookup** — enables the Docs section of the browser window and its hotkey (default: off)
-- **Todo Tracking** — enables the todo window, quick-add bezel, and their hotkeys (default: off; no default key bindings — assign them in Settings > Shortcuts)
+- **Todo Tracking** — enables the Todos section, quick-add bezel, and their hotkeys (default: off; no default key bindings — assign them in Settings > Shortcuts)
 
 ## Privacy
 
