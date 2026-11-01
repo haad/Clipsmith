@@ -68,6 +68,57 @@ final class ExpressionEvaluatorTests: XCTestCase {
         XCTAssertNil(ExpressionEvaluator.evaluate("3-"))
     }
 
+    // MARK: - Thousands separators
+
+    /// English-style grouping commas (`54,898.92`, `10,000,000.123123`) are stripped
+    /// before evaluation so the number evaluates to its plain value. Previously the
+    /// comma reached NSExpression(format:), which raised an uncatchable
+    /// NSInvalidArgumentException and aborted the process.
+    func testGroupedNumberEvaluatesWithoutSeparators() throws {
+        XCTAssertEqual(try XCTUnwrap(ExpressionEvaluator.evaluate("54,898.92")), 54898.92, accuracy: 1e-9)
+        XCTAssertEqual(try XCTUnwrap(ExpressionEvaluator.evaluate("10,000,000.123123")), 10_000_000.123123, accuracy: 1e-6)
+        XCTAssertEqual(ExpressionEvaluator.evaluate("1,000 + 1"), 1001.0)
+    }
+
+    /// The command palette evaluates on every keystroke. A comma that is not a
+    /// well-formed grouping separator (not followed by exactly three digits) must
+    /// return nil, never crash.
+    func testMalformedCommaInputReturnsNil() {
+        XCTAssertNil(ExpressionEvaluator.evaluate("54,"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("54,8"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("54,89"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("1,0000"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("1,5 + 2"))
+    }
+
+    // MARK: - Scientific notation
+
+    /// `e`/`E` exponent literals must evaluate. The bare-int promotion used to rewrite
+    /// `10e16` as `10.0e16.0`, which NSExpression(format:) cannot parse and aborts on.
+    func testScientificNotationEvaluates() throws {
+        XCTAssertEqual(ExpressionEvaluator.evaluate("10e16"), 1e17)
+        XCTAssertEqual(ExpressionEvaluator.evaluate("2e3 + 1"), 2001.0)
+        XCTAssertEqual(ExpressionEvaluator.evaluate("1.5E2"), 150.0)
+        XCTAssertEqual(try XCTUnwrap(ExpressionEvaluator.evaluate("1e-2")), 0.01, accuracy: 1e-12)
+        XCTAssertEqual(ExpressionEvaluator.evaluate("1e+2 / 4"), 25.0)
+    }
+
+    /// Partial or malformed exponents typed on the way to a valid literal must
+    /// return nil instead of reaching NSExpression.
+    func testMalformedExponentReturnsNil() {
+        XCTAssertNil(ExpressionEvaluator.evaluate("1e"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("1e+"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("e"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("2e - 3"))
+        XCTAssertNil(ExpressionEvaluator.evaluate("e5"))
+    }
+
+    /// A decimal point not followed by a digit (`5. + 1`) crashes NSExpression(format:).
+    func testDanglingDecimalPointReturnsNil() {
+        XCTAssertNil(ExpressionEvaluator.evaluate("5."))
+        XCTAssertNil(ExpressionEvaluator.evaluate("5. + 1"))
+    }
+
     // MARK: - Result formatting (D-06)
 
     /// D-06: Whole-number results must be displayed without a decimal point.

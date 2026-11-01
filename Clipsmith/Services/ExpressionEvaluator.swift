@@ -24,14 +24,34 @@ nonisolated struct ExpressionEvaluator {
 
     /// Compiled safe-chars regex. Characters permitted after function names are
     /// stripped: digits, whitespace, grouping parens, decimal point, arithmetic
-    /// operators (+  -  *  /), comma (for multi-arg functions), and scientific
-    /// notation exponent markers (e, E).
+    /// operators (+  -  *  /), and scientific notation exponent markers (e, E).
+    ///
+    /// Comma is intentionally NOT in the class. Well-formed thousands separators
+    /// (`54,898.92`) are removed by `groupingCommaRegex` before the gate runs; any
+    /// comma that survives is malformed and must be rejected here, because
+    /// NSExpression(format:) cannot parse `"54,8 == 1"` and raises an uncatchable
+    /// NSInvalidArgumentException.
     ///
     /// `^` is intentionally NOT in the class — it is stripped by preprocessing
     /// before the regex runs.  `*` and `/` cover both regular and `**` (power)
     /// since `**` is two adjacent `*` characters, both already in the class.
     private static let safeMathRegex: NSRegularExpression = try! NSRegularExpression(
-        pattern: #"^[\d\s()\.\+\-\*/,eE]+$"#
+        pattern: #"^[\d\s()\.\+\-\*/eE]+$"#
+    )
+
+    /// Matches an English-style thousands separator: a comma between a digit and a
+    /// group of exactly three digits. `10,000,000.5` → `10000000.5`. A comma in any
+    /// other position (`54,8`, `1,0000`) is left in place and fails the gate.
+    private static let groupingCommaRegex: NSRegularExpression = try! NSRegularExpression(
+        pattern: #"(?<=\d),(?=\d{3}(?!\d))"#
+    )
+
+    /// Matches a malformed numeric literal that passes the safe-chars gate but
+    /// crashes NSExpression(format:): an exponent marker without a digit mantissa
+    /// (`e5`), an exponent marker without digits after it (`1e`, `1e+`, `2e - 3`),
+    /// or a decimal point not followed by a digit (`5. + 1`).
+    private static let malformedLiteralRegex: NSRegularExpression = try! NSRegularExpression(
+        pattern: #"(?<!\d)[eE]|[eE](?![+-]?\d)|\.(?!\d)"#
     )
 
     /// Detects integer division by zero: `/` followed by optional whitespace then `0`
@@ -43,11 +63,13 @@ nonisolated struct ExpressionEvaluator {
         pattern: #"/\s*0(?![.\d])"#
     )
 
-    /// Matches bare integer literals not adjacent to a decimal point.
-    /// Used to inject `.0` so NSExpression uses floating-point arithmetic.
+    /// Matches bare integer literals not adjacent to a decimal point or an exponent
+    /// marker. Used to inject `.0` so NSExpression uses floating-point arithmetic.
     /// e.g. `70000/640` → `70000.0/640.0` → 109.375 instead of 109.
+    /// Digits that belong to a scientific literal (`10e16`, `1e-5`) are left alone:
+    /// `10.0e16.0` is unparseable and NSExpression already treats `10e16` as a double.
     private static let bareIntRegex: NSRegularExpression = try! NSRegularExpression(
-        pattern: #"(?<![.\d])(\d+)(?![.\d])"#
+        pattern: #"(?<![.\deE])(?<![eE][+-])(\d+)(?![.\deE])"#
     )
 
     /// NSExpression built-in function names accepted in expressions (D-05).
@@ -63,7 +85,7 @@ nonisolated struct ExpressionEvaluator {
     /// if the expression is invalid, unsafe, or results in a non-finite value.
     ///
     /// Pipeline:
-    /// 1. Trim → empty returns nil.
+    /// 1. Trim → empty returns nil. Strip thousands separators (`1,000` → `1000`).
     /// 2. Preprocess `^` → `**` (caret-to-power; Pitfall 1 mitigation).
     /// 3. Strip known function names and apply safe-chars regex gate (T-12-01).
     /// 4. Evaluate with `NSExpression(format:)`.
@@ -74,8 +96,13 @@ nonisolated struct ExpressionEvaluator {
     @MainActor
     static func evaluate(_ rawText: String) -> Double? {
         // 1. Trim and reject empty input.
-        let trimmed = rawText.trimmingCharacters(in: .whitespaces)
+        var trimmed = rawText.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return nil }
+        trimmed = groupingCommaRegex.stringByReplacingMatches(
+            in: trimmed,
+            range: NSRange(trimmed.startIndex..., in: trimmed),
+            withTemplate: ""
+        )
 
         // 2. Preprocess: replace `^` (not part of an existing `**`) with `**`.
         //    The look-behind/ahead avoids double-replacing if user already typed `**`.
@@ -96,6 +123,12 @@ nonisolated struct ExpressionEvaluator {
         guard safeMathRegex.firstMatch(in: stripped, range: range) != nil else {
             // Input contains characters outside the allowed set — reject without
             // calling NSExpression (T-12-01 mitigation).
+            return nil
+        }
+
+        // 3a. Reject malformed exponent / decimal literals (`1e`, `e5`, `5. + 1`) that
+        //     pass the gate but make NSExpression(format:) throw (T-12-01).
+        if malformedLiteralRegex.firstMatch(in: stripped, range: range) != nil {
             return nil
         }
 

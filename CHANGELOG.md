@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Command palette: typing a number with a thousands separator (e.g. `54,898.92`)
+  crashed the app. Grouping commas are now stripped before evaluation, so
+  `10,000,000.5 / 4` evaluates; a stray comma (`54,8`) is rejected instead of
+  reaching `NSExpression`.
+- Command palette: scientific notation (`10e16`, `2e3 + 1`) crashed the app. The
+  float-promotion step rewrote `10e16` as `10.0e16.0`, which `NSExpression`
+  cannot parse. Exponent digits are now left alone, and partial input such as
+  `1e`, `e5`, or `5. + 1` returns no result instead of crashing.
+
 ## [5.3.0] - 2026-09-01
 
 ### Added
