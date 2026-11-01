@@ -25,3 +25,6 @@ Package.resolved
 *.orig
 .claude/*
 !.claude/commands/
+
+# Superpowers scratch (brainstorm mockups, SDD ledgers)
+.superpowers/
