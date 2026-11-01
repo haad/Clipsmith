@@ -53,6 +53,9 @@ enum AppSettingsKeys {
     static let commandPaletteEnabled = "commandPaletteEnabled"
     static let commandPalettePrefix = "commandPalettePrefix"
 
+    // Unified browser window
+    static let browserLastSection = "browserLastSection"
+
     // Claude Toolkit browser
     static let toolkitPath = "toolkitPath"
     static let toolkitPathDefault = "~/.claude/plugins/claude-code-toolkit"
