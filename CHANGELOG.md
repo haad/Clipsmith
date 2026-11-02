@@ -5,6 +5,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- App Launcher uses Liquid Glass on macOS 26: a single glass surface with the Transparency slider driving its tint, frosted glass on the opaque half and clear glass on the transparent half. macOS 15 keeps the frosted material. The selection highlight now slides between grid cells.
+
 ## [5.4.0] - 2026-11-02
 
 ### Changed

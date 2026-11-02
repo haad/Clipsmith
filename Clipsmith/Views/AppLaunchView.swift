@@ -8,7 +8,8 @@ import SwiftUI
 /// - Displays a scrollable list of app rows with icon + name (CONTEXT D-06)
 /// - Shows a loading indicator while AppScannerService scans
 /// - Shows a navigation counter footer
-/// - Frosted glass background matching the clipboard and prompt bezel visual style
+/// - Liquid Glass panel on macOS 26; frosted material stack (matching the clipboard and
+///   prompt bezels) on macOS 15
 ///
 /// No SwiftData dependency — the launcher does not persist clippings or prompts.
 /// The view receives an AppLaunchViewModel shared with AppLaunchController so that
@@ -25,6 +26,9 @@ struct AppLaunchView: View {
     /// Focus state for the search TextField — always focused on bezel appear (D-03).
     @FocusState private var isSearchFieldFocused: Bool
 
+    /// Lets the selection highlight slide between grid cells instead of jumping.
+    @Namespace private var selectionNamespace
+
     // MARK: - Body
 
     var body: some View {
@@ -39,7 +43,7 @@ struct AppLaunchView: View {
             }
             .padding(.horizontal, 16)
             .padding(.vertical, 6)
-            .background(.regularMaterial)
+            .background(sectionBackground)
 
             Divider()
 
@@ -50,7 +54,7 @@ struct AppLaunchView: View {
                 .focused($isSearchFieldFocused)
                 .padding(.horizontal, 16)
                 .padding(.vertical, 14)
-                .background(.regularMaterial)
+                .background(sectionBackground)
 
             Divider()
 
@@ -82,22 +86,17 @@ struct AppLaunchView: View {
                     .padding(.horizontal, 16)
                     .padding(.vertical, 6)
             }
-            .background(.regularMaterial)
+            .background(sectionBackground)
         }
-        .background(
-            ZStack {
-                // Frosted glass blur layer
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(.ultraThinMaterial)
-                // Opacity layer — controlled by Transparency slider in Preferences.
-                // bezelAlpha 0.1 (least transparent) → overlay 0.9 (nearly solid)
-                // bezelAlpha 0.9 (most transparent) → overlay 0.1 (mostly glass)
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color(NSColor.windowBackgroundColor).opacity(1.0 - bezelAlpha))
-            }
-        )
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .modifier(LauncherChrome(bezelAlpha: bezelAlpha))
         .onAppear { isSearchFieldFocused = true }
+    }
+
+    /// Header, search and footer bands sit directly on the glass on macOS 26;
+    /// on macOS 15 they keep their own material so they read against the blur.
+    private var sectionBackground: AnyShapeStyle {
+        if #available(macOS 26, *) { return AnyShapeStyle(.clear) }
+        return AnyShapeStyle(.regularMaterial)
     }
 
     // MARK: - Sub-views
@@ -122,6 +121,7 @@ struct AppLaunchView: View {
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 12)
+                .animation(.snappy(duration: 0.18), value: viewModel.selectedIndex)
             }
             .onChange(of: viewModel.selectedIndex) { _, newIndex in
                 let apps = viewModel.displayedApps
@@ -160,9 +160,51 @@ struct AppLaunchView: View {
         }
         .padding(.vertical, 10)
         .padding(.horizontal, 6)
-        .background(
-            RoundedRectangle(cornerRadius: 10)
-                .fill(isSelected ? Color.accentColor.opacity(0.3) : Color.clear)
-        )
+        .background {
+            if isSelected {
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(Color.accentColor.opacity(0.3))
+                    .matchedGeometryEffect(id: "selection", in: selectionNamespace)
+            }
+        }
+    }
+}
+
+// MARK: - Chrome
+
+/// Panel chrome for the launcher.
+///
+/// macOS 26: a single Liquid Glass surface — the system refracts and tints whatever is
+/// behind the panel, and reacts to the pointer. The Transparency slider keeps its meaning:
+/// the opaque half uses frosted `.regular` glass, the transparent half switches to `.clear`
+/// glass (regular glass stays frosted however thin its tint), and the window-background
+/// tint fades out as the slider moves right.
+/// macOS 15: the frosted material stack shared with the clipboard and prompt bezels.
+private struct LauncherChrome: ViewModifier {
+    let bezelAlpha: Double
+
+    func body(content: Content) -> some View {
+        if #available(macOS 26, *) {
+            let base: Glass = bezelAlpha >= 0.5 ? .clear : .regular
+            content.glassEffect(
+                base.tint(Color(NSColor.windowBackgroundColor).opacity(1.0 - bezelAlpha)),
+                in: .rect(cornerRadius: 24)
+            )
+        } else {
+            content
+                .background(
+                    ZStack {
+                        // Frosted glass blur layer
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(.ultraThinMaterial)
+                        // Opacity layer — controlled by Transparency slider in Preferences.
+                        // bezelAlpha 0.1 (least transparent) → overlay 0.9 (nearly solid)
+                        // bezelAlpha 0.9 (most transparent) → overlay 0.1 (mostly glass)
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(NSColor.windowBackgroundColor).opacity(1.0 - bezelAlpha))
+                    }
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+        }
     }
 }
