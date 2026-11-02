@@ -5,6 +5,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.4.1] - 2026-11-02
+
 ### Changed
 - App Launcher uses Liquid Glass on macOS 26: a single glass surface with the Transparency slider driving its tint, frosted glass on the opaque half and clear glass on the transparent half. macOS 15 keeps the frosted material. The selection highlight now slides between grid cells.
 
@@ -181,7 +183,8 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Syntax-highlighted snippet editor (20+ languages)
 - Menu bar app with configurable hotkeys
 
-[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.4.0...HEAD
+[Unreleased]: https://github.com/haad/Clipsmith/compare/v5.4.1...HEAD
+[5.4.1]: https://github.com/haad/Clipsmith/compare/v5.4.0...v5.4.1
 [5.4.0]: https://github.com/haad/Clipsmith/compare/v5.3.0...v5.4.0
 [5.3.0]: https://github.com/haad/Clipsmith/compare/v5.2.1...v5.3.0
 [5.2.1]: https://github.com/haad/Clipsmith/compare/v5.2.0...v5.2.1
