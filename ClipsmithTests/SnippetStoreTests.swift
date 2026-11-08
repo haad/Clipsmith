@@ -203,4 +203,37 @@ final class SnippetStoreTests: XCTestCase {
         let content = await store.content(for: ids[0])
         XCTAssertEqual(content, "print(\"hello world\")")
     }
+
+    // MARK: - Unique names
+
+    func testNameTakenIsCaseInsensitive() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        try await store.insert(name: "Blog Notes", content: "", language: nil, tags: [])
+        let taken = try await store.isNameTaken("blog notes", excluding: nil)
+        XCTAssertTrue(taken)
+    }
+
+    func testNameTakenIgnoresSelf() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        let id = try await store.insert(name: "xyz", content: "", language: nil, tags: [])
+        let taken = try await store.isNameTaken("XYZ", excluding: id)
+        XCTAssertFalse(taken)
+    }
+
+    func testAvailableNameAppendsCounter() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        try await store.insert(name: "Untitled Snippet", content: "", language: nil, tags: [])
+        try await store.insert(name: "Untitled Snippet 2", content: "", language: nil, tags: [])
+        let name = try await store.availableName(base: "Untitled Snippet")
+        XCTAssertEqual(name, "Untitled Snippet 3")
+    }
+
+    func testFindByNamePicksMostRecentlyUpdated() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        let older = try await store.insert(name: "dup", content: "old", language: nil, tags: [])
+        try await store.insert(name: "DUP", content: "new", language: nil, tags: [])
+        try await store.update(id: older, name: "dup", content: "old!", language: nil, tags: [])
+        let found = try await store.findByName("Dup")
+        XCTAssertEqual(found, older)
+    }
 }

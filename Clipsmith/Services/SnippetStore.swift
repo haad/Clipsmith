@@ -39,12 +39,13 @@ actor SnippetStore {
     /// Inserts a new snippet with name, content, language, and tags.
     ///
     /// Always saves immediately to ensure the PersistentIdentifier is permanent (PITFALL 3).
+    @discardableResult
     func insert(
         name: String,
         content: String,
         language: String?,
         tags: [String]
-    ) throws {
+    ) throws -> PersistentIdentifier {
         let snippet = ClipsmithSchemaV1.Snippet(
             name: name,
             content: content,
@@ -54,6 +55,36 @@ actor SnippetStore {
         modelContext.insert(snippet)
         try modelContext.save()
         logger.debug("Snippet inserted: \(name, privacy: .public)")
+        return snippet.persistentModelID
+    }
+
+    // MARK: - Unique names
+
+    /// Names are unique case-insensitively so `[[name]]` todo references are
+    /// unambiguous. Compared in Swift: the set is small and #Predicate has no
+    /// reliable case-insensitive equality.
+    func isNameTaken(_ name: String, excluding id: PersistentIdentifier?) throws -> Bool {
+        try modelContext.fetch(FetchDescriptor<ClipsmithSchemaV1.Snippet>()).contains {
+            $0.persistentModelID != id && $0.name.caseInsensitiveCompare(name) == .orderedSame
+        }
+    }
+
+    /// `base` if free, else "<base> 2", "<base> 3", ...
+    func availableName(base: String) throws -> String {
+        guard try isNameTaken(base, excluding: nil) else { return base }
+        var n = 2
+        while try isNameTaken("\(base) \(n)", excluding: nil) { n += 1 }
+        return "\(base) \(n)"
+    }
+
+    /// Case-insensitive match; with legacy duplicates, the most recently updated.
+    func findByName(_ name: String) throws -> PersistentIdentifier? {
+        let descriptor = FetchDescriptor<ClipsmithSchemaV1.Snippet>(
+            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
+        )
+        return try modelContext.fetch(descriptor)
+            .first { $0.name.caseInsensitiveCompare(name) == .orderedSame }?
+            .persistentModelID
     }
 
     // MARK: - Fetch All

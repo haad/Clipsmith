@@ -29,4 +29,25 @@ nonisolated enum SnippetFilter {
             return languageMatch && textMatch
         }
     }
+
+    /// Lowercased names used by more than one snippet (names compared as
+    /// stored, not trimmed).
+    static func duplicateNames(_ names: [String]) -> Set<String> {
+        var seen = Set<String>(), dupes = Set<String>()
+        for name in names.map({ $0.lowercased() }) where !seen.insert(name).inserted {
+            dupes.insert(name)
+        }
+        return dupes
+    }
+
+    /// The snippet a `[[name]]` reference opens: case-insensitive match,
+    /// most recently updated wins.
+    static func bestMatch(
+        named name: String,
+        in snippets: [ClipsmithSchemaV1.Snippet]
+    ) -> ClipsmithSchemaV1.Snippet? {
+        snippets
+            .filter { $0.name.caseInsensitiveCompare(name) == .orderedSame }
+            .max { $0.updatedAt < $1.updatedAt }
+    }
 }

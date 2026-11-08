@@ -36,4 +36,20 @@ final class SnippetFilterTests: XCTestCase {
         XCTAssertEqual(SnippetFilter.apply(all, query: "MODEL", language: nil).map(\.name), ["Config"])
         XCTAssertEqual(SnippetFilter.apply(all, query: "kubectl", language: "swift").count, 0)
     }
+
+    // MARK: - Names
+
+    func testDuplicateNames() {
+        XCTAssertEqual(SnippetFilter.duplicateNames(["a", "A", "b", "c", "c "]), ["a"])
+    }
+
+    func testBestMatchIsCaseInsensitiveAndPrefersNewest() {
+        let old = ClipsmithSchemaV1.Snippet(name: "Notes", content: "old")
+        old.updatedAt = Date(timeIntervalSince1970: 100)
+        let new = ClipsmithSchemaV1.Snippet(name: "NOTES", content: "new")
+        new.updatedAt = Date(timeIntervalSince1970: 200)
+        let other = ClipsmithSchemaV1.Snippet(name: "Notes 2", content: "x")
+        XCTAssertTrue(SnippetFilter.bestMatch(named: "notes", in: [old, other, new]) === new)
+        XCTAssertNil(SnippetFilter.bestMatch(named: "missing", in: [old, new]))
+    }
 }
