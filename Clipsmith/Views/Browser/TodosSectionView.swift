@@ -13,6 +13,7 @@ import SwiftUI
 /// | ⌘⌫        | Delete selected task            |
 /// | ⌘F        | Focus search                    |
 /// | ⇧⌘H       | Toggle show-completed           |
+/// | ⌘O        | Open the task's snippet reference |
 /// | ↑↓        | Navigate list                   |
 struct TodosSectionView: View {
     @Environment(TodoStore.self) private var store

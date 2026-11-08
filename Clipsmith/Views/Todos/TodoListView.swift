@@ -47,9 +47,12 @@ struct TodoListView: View {
                                 }
                                 .padding(.leading, CGFloat(item.indentLevel) * 16)
                         } else {
-                            TodoRowView(item: item, today: today) {
-                                store.toggleDone(id: item.id)
-                            }
+                            TodoRowView(
+                                item: item,
+                                today: today,
+                                onToggle: { store.toggleDone(id: item.id) },
+                                onOpenReference: openSnippetReference
+                            )
                             // Drop on a project chip to move it there.
                             .draggable(item.id.uuidString) {
                                 Text(item.title)
@@ -118,6 +121,9 @@ struct TodoListView: View {
                 .disabled(editingID != nil)
             Button("") { viewModel.showCompleted.toggle() }
                 .keyboardShortcut("h", modifiers: [.command, .shift])
+            Button("") { openSelectedReference() }
+                .keyboardShortcut("o", modifiers: .command)
+                .disabled(editingID != nil)
         }
         .frame(width: 0, height: 0)
         .opacity(0)
@@ -197,6 +203,17 @@ struct TodoListView: View {
         store.moveTask(id: id, toProject: name)
     }
 
+    // MARK: - Snippet references
+
+    /// ⌘O: open the selected task's first `[[snippet]]` reference, if any.
+    private func openSelectedReference() {
+        guard let id = viewModel.selectedItemID,
+              let item = items.first(where: { $0.id == id }),
+              let name = SnippetReference.names(in: item.rawLine).first
+        else { return }
+        openSnippetReference(name)
+    }
+
     // MARK: - Delete
 
     private func deleteSelected() {
@@ -248,11 +265,24 @@ private struct MoveToProjectPicker: View {
     }
 }
 
-/// One task row: checkbox, title, tag chips, due date (red when overdue).
+/// Opens the browser on Snippets with the named snippet (created there if
+/// missing). Goes through the same request path as the hotkeys.
+@MainActor
+func openSnippetReference(_ name: String) {
+    NotificationCenter.default.post(
+        name: .clipsmithRequestBrowser,
+        object: nil,
+        userInfo: BrowserOpenRequest(section: .snippets, query: name).userInfo
+    )
+}
+
+/// One task row: checkbox, title (with `[[snippet]]` references as link
+/// chips), tag chips, due date (red when overdue).
 struct TodoRowView: View {
     let item: TodoItem
     let today: String
     let onToggle: () -> Void
+    let onOpenReference: (String) -> Void
 
     private var isOverdue: Bool {
         !item.isDone && (item.dueDateString.map { $0 <= today } ?? false)
@@ -266,10 +296,24 @@ struct TodoRowView: View {
             }
             .buttonStyle(.borderless)
 
-            Text(item.title)
-                .strikethrough(item.isDone)
-                .foregroundStyle(item.isDone ? .secondary : .primary)
-                .lineLimit(1)
+            HStack(spacing: 0) {
+                ForEach(Array(SnippetReference.segments(in: item.title).enumerated()), id: \.offset) { _, segment in
+                    switch segment {
+                    case .text(let text):
+                        Text(text)
+                            .strikethrough(item.isDone)
+                            .foregroundStyle(item.isDone ? .secondary : .primary)
+                    case .reference(let name):
+                        Button { onOpenReference(name) } label: {
+                            Label(name, systemImage: "doc.text")
+                                .foregroundStyle(Color.accentColor)
+                        }
+                        .buttonStyle(.borderless)
+                        .help("Open snippet “\(name)” (⌘O)")
+                    }
+                }
+            }
+            .lineLimit(1)
 
             ForEach(chipTags, id: \.self) { tag in
                 Text(tag.value.map { "@\(tag.name)(\($0))" } ?? "@\(tag.name)")
