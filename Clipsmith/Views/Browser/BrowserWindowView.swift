@@ -39,7 +39,7 @@ struct BrowserWindowView: View {
         Group {
             switch viewModel.selectedSection {
             case .snippets:
-                SnippetsSectionView()
+                SnippetsSectionView(windowViewModel: viewModel)
             case .prompts:
                 PromptsSectionView()
             case .docs:

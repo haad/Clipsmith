@@ -32,6 +32,7 @@ One window hosts Snippets, Prompts, Docs, Claude Toolkit and Todos as sections b
 - `BrowserPanes` — shared `BrowserSearchField`, `BrowserFilterRow` (chips), `BrowserListPane`, `BrowserDetailPane`, `BrowserEmptyDetail`
 - `SnippetsSectionView`, `PromptsSectionView`, `ToolkitSectionView`, `DocsSectionView`, `TodosSectionView` — one per section; filtering logic in `SnippetFilter` / `PromptFilter`; Todos reuses `TodoListView` / `TodoWindowViewModel` from `Views/Todos/` (project tabs are chips, ⇧⌘[ / ⇧⌘] switch them)
 - `DocsBrowserViewModel` — docs search, docset scoping (sidebar), `prefix:` selection, `open(withQuery:)` prefill
+- Snippets: markdown snippets render via `MarkdownWebView` (`MarkdownRenderer` escapes everything; highlight.js comes from HighlightSwift's bundle); `pendingSnippetName` opens a snippet from a todo `[[reference]]`; renames rewrite references via `TodoStore.renameSnippetReferences`; names are unique (`SnippetStore.isNameTaken`)
 
 Opening flow (two hops, because `AppDelegate` has no `@Environment(\.openWindow)`): a caller posts `.clipsmithRequestBrowser` with `BrowserOpenRequest.userInfo` → `MenuBarView.openBrowser` puts the request in `BrowserOpenMailbox.shared`, activates the app, calls `openWindow(id: "browser")` and posts `.clipsmithOpenBrowser` → `BrowserWindowView` takes the request from the mailbox in `onAppear` (new window) or on the notification (already open). The docs hotkey captures the selected text in `AppDelegate.requestDocsBrowser()` before activation.
 

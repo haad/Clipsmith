@@ -14,6 +14,10 @@ final class BrowserWindowViewModel {
     /// sets it back to nil.
     var pendingDocsQuery: String?
 
+    /// Snippet name from a todo `[[reference]]`. The Snippets section opens
+    /// (or creates) that snippet and sets this back to nil.
+    var pendingSnippetName: String?
+
     private let defaults: UserDefaults
 
     init(defaults: UserDefaults = .standard) {
@@ -42,6 +46,11 @@ final class BrowserWindowViewModel {
             pendingDocsQuery = request.query ?? ""
         } else {
             pendingDocsQuery = nil
+        }
+        if request.section == .snippets, selectedSection == .snippets {
+            pendingSnippetName = request.query
+        } else {
+            pendingSnippetName = nil
         }
     }
 }

@@ -10,6 +10,8 @@ import SwiftData
 /// closes the window.
 struct SnippetsSectionView: View {
 
+    let windowViewModel: BrowserWindowViewModel
+
     // MARK: - Environment
 
     @Environment(PasteService.self) private var pasteService
@@ -30,6 +32,10 @@ struct SnippetsSectionView: View {
     @FocusState private var isSearchFocused: Bool
     /// Markdown snippets open rendered; ⌘E / Edit switches to the raw editor.
     @State private var isEditingMarkdown = false
+    /// Snippet that should open in edit mode once selected (a freshly
+    /// created `[[reference]]` target). Consumed by the selection change,
+    /// which otherwise resets edit mode.
+    @State private var openInEditFor: PersistentIdentifier?
     @State private var selection = SnippetSelection()
 
     // MARK: - Computed
@@ -86,12 +92,17 @@ struct SnippetsSectionView: View {
         }
         .onAppear {
             setupSnippetStore()
+            consumePendingSnippetName()
             if selectedSnippetID == nil, let first = filteredSnippets.first {
                 selectedSnippetID = first.persistentModelID
             }
         }
-        .onChange(of: selectedSnippetID) { _, _ in
-            isEditingMarkdown = false
+        .onChange(of: selectedSnippetID) { _, newID in
+            isEditingMarkdown = newID != nil && newID == openInEditFor
+            openInEditFor = nil
+        }
+        .onChange(of: windowViewModel.pendingSnippetName) { _, _ in
+            consumePendingSnippetName()
         }
         .onChange(of: filteredSnippets.count) { _, _ in
             if let id = selectedSnippetID,
@@ -248,6 +259,29 @@ struct SnippetsSectionView: View {
             await MainActor.run {
                 languageFilter = nil
                 selectedSnippetID = id
+            }
+        }
+    }
+
+    /// A todo `[[name]]` was opened: select that snippet, or create an empty
+    /// markdown one and open it for editing. Looks the name up in the store,
+    /// not `allSnippets`, which may not be loaded yet when the window opens
+    /// (a miss there would create a duplicate).
+    private func consumePendingSnippetName() {
+        guard let name = windowViewModel.pendingSnippetName else { return }
+        windowViewModel.pendingSnippetName = nil
+        searchText = ""
+        languageFilter = nil
+        setupSnippetStore()
+        Task {
+            guard let store = snippetStore else { return }
+            if let id = try? await store.findByName(name) {
+                await MainActor.run { selectedSnippetID = id }
+            } else if let id = try? await store.insert(name: name, content: "", language: "markdown", tags: []) {
+                await MainActor.run {
+                    openInEditFor = id
+                    selectedSnippetID = id
+                }
             }
         }
     }

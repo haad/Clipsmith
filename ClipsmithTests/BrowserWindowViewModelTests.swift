@@ -70,4 +70,21 @@ final class BrowserWindowViewModelTests: XCTestCase {
         vm.apply(BrowserOpenRequest(section: .todos, query: nil), docLookupEnabled: true, todoTrackingEnabled: true)
         XCTAssertEqual(vm.selectedSection, .todos)
     }
+
+    // MARK: - Snippet references
+
+    func testSnippetsRequestSetsPendingName() {
+        let vm = BrowserWindowViewModel(defaults: defaults)
+        vm.apply(BrowserOpenRequest(section: .snippets, query: "xyz"), docLookupEnabled: false, todoTrackingEnabled: true)
+        XCTAssertEqual(vm.selectedSection, .snippets)
+        XCTAssertEqual(vm.pendingSnippetName, "xyz")
+        XCTAssertNil(vm.pendingDocsQuery)
+    }
+
+    func testOtherRequestClearsPendingName() {
+        let vm = BrowserWindowViewModel(defaults: defaults)
+        vm.apply(BrowserOpenRequest(section: .snippets, query: "xyz"), docLookupEnabled: false, todoTrackingEnabled: true)
+        vm.apply(BrowserOpenRequest(section: .todos, query: nil), docLookupEnabled: false, todoTrackingEnabled: true)
+        XCTAssertNil(vm.pendingSnippetName)
+    }
 }

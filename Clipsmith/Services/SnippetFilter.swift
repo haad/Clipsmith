@@ -39,15 +39,4 @@ nonisolated enum SnippetFilter {
         }
         return dupes
     }
-
-    /// The snippet a `[[name]]` reference opens: case-insensitive match,
-    /// most recently updated wins.
-    static func bestMatch(
-        named name: String,
-        in snippets: [ClipsmithSchemaV1.Snippet]
-    ) -> ClipsmithSchemaV1.Snippet? {
-        snippets
-            .filter { $0.name.caseInsensitiveCompare(name) == .orderedSame }
-            .max { $0.updatedAt < $1.updatedAt }
-    }
 }

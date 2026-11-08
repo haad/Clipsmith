@@ -5,6 +5,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+- Markdown snippets render formatted in the browser window (headings, lists, tables, task lists, highlighted code blocks); Edit / Done or ⌘E switches to the raw markdown.
+- Selection paste: in a markdown snippet, select text and paste (⌘↩, Return or the Paste button) to send just that part. ⌘↩ now pastes from anywhere in the Snippets section.
+- Todos can reference snippets with `[[Snippet name]]`. The reference shows as a link in the list; clicking it or ⌘O opens the snippet, creating an empty markdown snippet if none has that name.
+- Renaming a snippet updates every `[[reference]]` to it in the todo file.
+- Todos: edit a task (Return, double-click or right-click → Edit), move it to another project (right-click → Move to, ⇧⌘M, or drag it onto a project chip).
+
+### Changed
+- Snippet names are unique (ignoring case): a name already in use is refused with a warning. Existing duplicates are flagged in the list.
+- Todos: the Inbox chip is replaced by All, which shows every task; project chips filter it.
+
+### Fixed
+- App Launcher on macOS 26: the border now follows the rounded corners.
+- ⌘N in Todos stopped working after visiting Snippets or Prompts.
+- Running the test suite no longer pastes snippet text into the frontmost app.
+
 ## [5.4.1] - 2026-11-02
 
 ### Changed
