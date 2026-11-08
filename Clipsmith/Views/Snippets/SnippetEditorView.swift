@@ -19,6 +19,13 @@ struct SnippetEditorView: View {
     @State private var content: String = ""
     @State private var language: String? = nil
     @State private var tagsText: String = ""
+    /// Name last written to the store. The rename rewrite uses this rather
+    /// than `snippet.name`, which lags behind saves made on the store's own
+    /// model context.
+    @State private var lastSavedName: String = ""
+    @State private var nameWarning: String?
+
+    @Environment(TodoStore.self) private var todoStore
 
     // MARK: - Language Options
 
@@ -57,6 +64,12 @@ struct SnippetEditorView: View {
                         .foregroundStyle(.secondary)
                     TextField("Snippet name", text: $name)
                         .textFieldStyle(.roundedBorder)
+                }
+                if let nameWarning {
+                    Text(nameWarning)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .padding(.leading, 68)
                 }
 
                 // Language picker + Tags on same row
@@ -129,6 +142,8 @@ struct SnippetEditorView: View {
 
     private func loadFromSnippet() {
         name = snippet.name
+        lastSavedName = snippet.name
+        nameWarning = nil
         content = snippet.content
         language = snippet.language
         tagsText = snippet.tags.joined(separator: ", ")
@@ -141,12 +156,29 @@ struct SnippetEditorView: View {
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
 
-        try? await snippetStore.update(
-            id: snippet.persistentModelID,
-            name: name.isEmpty ? "Untitled Snippet" : name,
-            content: content,
-            language: language,
-            tags: parsedTags
-        )
+        let id = snippet.persistentModelID
+        let oldName = lastSavedName
+        let trimmed = name.trimmingCharacters(in: .whitespaces)
+        var newName = trimmed.isEmpty ? oldName : trimmed
+
+        // Unique names keep [[name]] todo references unambiguous: a taken
+        // name is refused (other fields still save).
+        if (try? await snippetStore.isNameTaken(newName, excluding: id)) == true {
+            nameWarning = "Another snippet is already named “\(newName)”"
+            newName = oldName
+        } else {
+            nameWarning = nil
+        }
+
+        do {
+            try await snippetStore.update(
+                id: id, name: newName, content: content, language: language, tags: parsedTags)
+        } catch {
+            return
+        }
+        lastSavedName = newName
+        if newName != oldName {
+            todoStore.renameSnippetReferences(from: oldName, to: newName)
+        }
     }
 }

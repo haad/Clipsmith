@@ -111,8 +111,9 @@ struct SnippetsSectionView: View {
                 }
                 .frame(maxWidth: .infinity)
             } else {
+                let duplicates = SnippetFilter.duplicateNames(allSnippets.map(\.name))
                 List(filteredSnippets, selection: $selectedSnippetID) { snippet in
-                    snippetRow(snippet)
+                    snippetRow(snippet, isDuplicate: duplicates.contains(snippet.name.lowercased()))
                         .tag(snippet.persistentModelID)
                 }
                 .listStyle(.sidebar)
@@ -130,10 +131,17 @@ struct SnippetsSectionView: View {
     }
 
     @ViewBuilder
-    private func snippetRow(_ snippet: ClipsmithSchemaV1.Snippet) -> some View {
+    private func snippetRow(_ snippet: ClipsmithSchemaV1.Snippet, isDuplicate: Bool) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(snippet.name.isEmpty ? "Untitled" : snippet.name)
-                .lineLimit(1)
+            HStack(spacing: 4) {
+                Text(snippet.name.isEmpty ? "Untitled" : snippet.name)
+                    .lineLimit(1)
+                if isDuplicate {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .foregroundStyle(.orange)
+                        .help("Another snippet has the same name — rename one so [[links]] stay unambiguous")
+                }
+            }
             if let lang = snippet.language, !lang.isEmpty {
                 Text(lang)
                     .font(.caption)
@@ -209,16 +217,13 @@ struct SnippetsSectionView: View {
     private func createNewSnippet() {
         setupSnippetStore()
         Task {
-            try? await snippetStore?.insert(
-                name: "Untitled Snippet",
-                content: "",
-                language: nil,
-                tags: []
-            )
-            // New snippet sorts first (updatedAt descending).
+            guard let store = snippetStore,
+                  let name = try? await store.availableName(base: "Untitled Snippet"),
+                  let id = try? await store.insert(name: name, content: "", language: nil, tags: [])
+            else { return }
             await MainActor.run {
                 languageFilter = nil
-                selectedSnippetID = allSnippets.first?.persistentModelID
+                selectedSnippetID = id
             }
         }
     }
