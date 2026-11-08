@@ -36,9 +36,25 @@ struct HelpSettingsTab: View {
 
                 HelpSection(title: "Snippet Library", icon: "text.badge.star", color: .green) {
                     HelpRow(keys: "Return", action: "Paste selected snippet")
+                    HelpRow(keys: "⌘ Return", action: "Paste from anywhere in Snippets — markdown snippets paste just the selected text")
+                    HelpRow(keys: "⌘E", action: "Markdown snippets: switch between formatted view and raw markdown")
+                    HelpRow(keys: "⌘N", action: "New snippet")
                     HelpRow(keys: "↑ / ↓", action: "Navigate snippets")
                     HelpRow(keys: "Type", action: "Fuzzy search snippets")
+                    HelpRow(keys: "Names", action: "Unique, so todos can link to a snippet with [[Snippet name]]")
                     HelpRow(keys: "Escape", action: "Dismiss")
+                }
+
+                HelpSection(title: "Todos", icon: "checklist", color: .indigo) {
+                    HelpRow(keys: "⌘N", action: "New task in the current project")
+                    HelpRow(keys: "Return", action: "Edit selected task (also double-click)")
+                    HelpRow(keys: "Space", action: "Toggle done")
+                    HelpRow(keys: "⇧⌘M", action: "Move task to another project (or drag it onto a project chip)")
+                    HelpRow(keys: "[[name]]", action: "Link a snippet in task text — click the link or press ⌘O to open it")
+                    HelpRow(keys: "⇧⌘[ / ⇧⌘]", action: "Previous / next tab: Today, All, projects")
+                    HelpRow(keys: "⌘⌫", action: "Delete task")
+                    HelpRow(keys: "⇧⌘H", action: "Show / hide completed")
+                    HelpRow(keys: "Note", action: "Enable in General > Features")
                 }
 
                 HelpSection(title: "Prompt Library", icon: "text.book.closed", color: .teal) {
