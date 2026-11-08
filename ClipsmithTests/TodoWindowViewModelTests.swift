@@ -27,14 +27,17 @@ final class TodoWindowViewModelTests: XCTestCase {
 
     // MARK: - Tabs
 
-    func testTabsTodayFirstThenProjectsInFileOrder() {
+    func testTabsTodayAllThenProjectsInFileOrderWithoutInbox() {
         XCTAssertEqual(vm.tabs(for: sample), [
-            .today, .project("Inbox"), .project("Home"), .project("Work"),
+            .today, .all, .project("Home"), .project("Work"),
         ])
+        XCTAssertEqual(vm.tabs(for: noInbox), [.today, .all, .project("Home")])
     }
 
-    func testEmptyInboxTabHidden() {
-        XCTAssertEqual(vm.tabs(for: noInbox), [.today, .project("Home")])
+    func testAllTabShowsEveryTaskIncludingInboxHidingDone() {
+        vm.selectedTab = .all
+        XCTAssertEqual(vm.visibleItems(in: sample, today: "2026-08-31").map(\.title),
+                       ["inbox task", "overdue chore", "future chore", "review PR"])
     }
 
     func testDuplicateProjectNamesCollapseToOneTab() {
@@ -44,7 +47,7 @@ final class TodoWindowViewModelTests: XCTestCase {
         Notes:
         - second note
         """ + "\n")
-        XCTAssertEqual(vm.tabs(for: doc), [.today, .project("Notes")])
+        XCTAssertEqual(vm.tabs(for: doc), [.today, .all, .project("Notes")])
     }
 
     func testVisibleItemsAggregatesAcrossDuplicateProjectNames() {
@@ -92,7 +95,7 @@ final class TodoWindowViewModelTests: XCTestCase {
     func testCurrentProjectName() {
         vm.selectedTab = .today
         XCTAssertNil(vm.currentProjectName())
-        vm.selectedTab = .project("Inbox")
+        vm.selectedTab = .all
         XCTAssertNil(vm.currentProjectName())
         vm.selectedTab = .project("Home")
         XCTAssertEqual(vm.currentProjectName(), "Home")
@@ -134,12 +137,12 @@ final class TodoWindowViewModelTests: XCTestCase {
     // MARK: - Tab navigation (⇧⌘[ / ⇧⌘])
 
     func testMoveTabStepsThroughTabsAndClamps() {
-        let tabs = vm.tabs(for: sample)   // Today, Inbox, Home, Work
+        let tabs = vm.tabs(for: sample)   // Today, All, Home, Work
         XCTAssertEqual(vm.selectedTab, .today)
         vm.moveTab(by: -1, in: tabs)
         XCTAssertEqual(vm.selectedTab, .today, "clamps at the first tab")
         vm.moveTab(by: 1, in: tabs)
-        XCTAssertEqual(vm.selectedTab, .project("Inbox"))
+        XCTAssertEqual(vm.selectedTab, .all)
         vm.moveTab(by: 2, in: tabs)
         XCTAssertEqual(vm.selectedTab, .project("Work"))
         vm.moveTab(by: 1, in: tabs)

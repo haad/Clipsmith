@@ -98,6 +98,14 @@ final class TodoStoreTests: XCTestCase {
         XCTAssertEqual(store.document.allTasks[0].rawLine, "\t- new text @today")
     }
 
+    func testEditTaskWithEmptyTextKeepsTask() {
+        let store = makeStore(initialContent: "- keep me\n")
+        let id = store.document.allTasks[0].id
+        store.editTask(id: id, text: "   ")
+        XCTAssertEqual(store.document.allTasks.map(\.rawLine), ["- keep me"])
+        XCTAssertFalse(store.hasPendingChanges)
+    }
+
     func testDeleteTask() {
         let store = makeStore(initialContent: "- a\n- b\n")
         store.deleteTask(id: store.document.allTasks[0].id)
@@ -110,6 +118,13 @@ final class TodoStoreTests: XCTestCase {
         store.moveTask(id: store.document.allTasks[0].id, toProject: "Work")
         store.saveNow()
         XCTAssertEqual(fileContent(of: store), "Work:\n- a\n")
+    }
+
+    func testMoveTaskToItsOwnProjectIsNoOp() {
+        let store = makeStore(initialContent: "Work:\n- a\n- b\n")
+        store.moveTask(id: store.document.allTasks[0].id, toProject: "work")
+        XCTAssertEqual(store.document.allTasks.map(\.title), ["a", "b"])
+        XCTAssertFalse(store.hasPendingChanges)
     }
 
     func testAddRenameDeleteProject() {

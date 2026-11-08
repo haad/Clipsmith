@@ -71,16 +71,28 @@ struct BrowserFilterOption: Identifiable, Hashable, Sendable {
 
 /// A wrapping row of capsule chips. The leading chip ("All" unless
 /// `leadingLabel` says otherwise) is bound to `nil`.
+///
+/// `onDrop` makes chips accept dragged text: it receives the option id and
+/// the dropped strings and returns whether it took them. `acceptsDrop`
+/// limits which options are drop targets (the leading chip never is).
 struct BrowserFilterRow: View {
     let options: [BrowserFilterOption]
     @Binding var selection: String?
     var leadingLabel: String = "All"
+    var acceptsDrop: (String) -> Bool = { _ in true }
+    var onDrop: ((String, [String]) -> Bool)?
 
     var body: some View {
         BrowserFlowLayout(spacing: 6) {
-            chip(label: leadingLabel, isSelected: selection == nil) { selection = nil }
+            BrowserFilterChip(label: leadingLabel, isSelected: selection == nil) { selection = nil }
             ForEach(options) { option in
-                chip(label: option.label, isSelected: selection == option.id) {
+                BrowserFilterChip(
+                    label: option.label,
+                    isSelected: selection == option.id,
+                    onDrop: onDrop.flatMap { handler in
+                        acceptsDrop(option.id) ? { handler(option.id, $0) } : nil
+                    }
+                ) {
                     selection = option.id
                 }
             }
@@ -88,22 +100,39 @@ struct BrowserFilterRow: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
     }
+}
 
-    private func chip(label: String, isSelected: Bool, action: @escaping () -> Void) -> some View {
-        Button(action: action) {
+private struct BrowserFilterChip: View {
+    let label: String
+    let isSelected: Bool
+    var onDrop: (([String]) -> Bool)?
+    let action: () -> Void
+
+    @State private var isDropTargeted = false
+
+    var body: some View {
+        let button = Button(action: action) {
             Text(label)
                 .font(.caption)
                 .lineLimit(1)
                 .padding(.horizontal, 9)
                 .padding(.vertical, 3)
                 .background(
-                    isSelected
-                        ? AnyShapeStyle(Color.accentColor.opacity(0.25))
+                    isSelected || isDropTargeted
+                        ? AnyShapeStyle(Color.accentColor.opacity(isDropTargeted ? 0.5 : 0.25))
                         : AnyShapeStyle(Color(NSColor.controlBackgroundColor)),
                     in: Capsule()
                 )
         }
         .buttonStyle(.plain)
+
+        if let onDrop {
+            button.dropDestination(for: String.self) { items, _ in
+                onDrop(items)
+            } isTargeted: { isDropTargeted = $0 }
+        } else {
+            button
+        }
     }
 }
 

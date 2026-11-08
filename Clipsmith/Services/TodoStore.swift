@@ -212,7 +212,10 @@ final class TodoStore {
         }
     }
 
+    /// Blank text is a no-op: clearing the field must never wipe a task.
     func editTask(id: UUID, text: String) {
+        let text = text.trimmingCharacters(in: .whitespaces)
+        guard !text.isEmpty else { return }
         mutateItem(id: id) { item in
             let tabs = String(repeating: "\t", count: item.indentLevel)
             let body = text.hasPrefix("- ") ? text : "- " + text
@@ -230,8 +233,15 @@ final class TodoStore {
         }
     }
 
+    /// Moving into the task's own project is a no-op (it would otherwise
+    /// jump to the bottom of that project).
     func moveTask(id: UUID, toProject name: String) {
-        guard let item = document.allTasks.first(where: { $0.id == id }) else { return }
+        guard let item = document.allTasks.first(where: { $0.id == id }),
+              let source = document.projects.first(where: {
+                  $0.tasks.contains { $0.id == id }
+              }),
+              source.name.caseInsensitiveCompare(name) != .orderedSame
+        else { return }
         deleteTask(id: id)
         // Re-home at indent 0 in the target project, keeping text and tags.
         let trimmed = item.rawLine.trimmingCharacters(in: .whitespaces)

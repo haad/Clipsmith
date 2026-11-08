@@ -10,11 +10,13 @@ final class TodoWindowViewModel {
 
     enum Tab: Hashable {
         case today
+        case all
         case project(String)
 
         var label: String {
             switch self {
             case .today: "Today"
+            case .all: "All"
             case .project(let name): name
             }
         }
@@ -32,14 +34,15 @@ final class TodoWindowViewModel {
 
     // MARK: - Tabs
 
-    /// Today first, then projects in file order. Inbox only when it has tasks.
+    /// Today, All, then projects in file order. Inbox has no tab of its own:
+    /// its tasks (those outside any project) show under All.
     /// Legal TaskPaper can have two projects with the same name; those
     /// collapse into a single tab (first occurrence wins the position).
     func tabs(for document: TaskPaperDocument) -> [Tab] {
-        var tabs: [Tab] = [.today]
+        var tabs: [Tab] = [.today, .all]
         var seenNames = Set<String>()
         for project in document.projects {
-            if project.isInbox && project.tasks.isEmpty { continue }
+            if project.isInbox { continue }
             guard seenNames.insert(project.name).inserted else { continue }
             tabs.append(.project(project.name))
         }
@@ -56,7 +59,7 @@ final class TodoWindowViewModel {
         selectedTab = tabs[max(0, min(tabs.count - 1, current + delta))]
     }
 
-    /// Target project for a new task: nil (→ Inbox) on Today and Inbox tabs.
+    /// Target project for a new task: nil (→ Inbox) on Today and All tabs.
     func currentProjectName() -> String? {
         if case .project(let name) = selectedTab, name != "Inbox" { return name }
         return nil
@@ -74,6 +77,8 @@ final class TodoWindowViewModel {
             base = document.allTasks.filter { item in
                 item.isToday || (item.dueDateString.map { $0 <= today } ?? false)
             }
+        case .all:
+            base = document.allTasks
         case .project(let name):
             // Aggregate across ALL projects with this name (file order):
             // legal TaskPaper can repeat a project name, and every one of

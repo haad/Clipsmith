@@ -12,6 +12,10 @@ struct TodoListView: View {
     @State private var isAddingTask = false
     @State private var draftText = ""
     @FocusState private var draftFocused: Bool
+    @State private var editingID: UUID?
+    @State private var editText = ""
+    @FocusState private var editFocused: Bool
+    @State private var isMovePickerShown = false
 
     private var today: String { TodoDates.dateString() }
 
@@ -30,17 +34,64 @@ struct TodoListView: View {
                         .onExitCommand { cancelDraft() }
                 }
                 ForEach(items) { item in
-                    TodoRowView(item: item, today: today) {
-                        store.toggleDone(id: item.id)
+                    Group {
+                        if item.id == editingID {
+                            TextField("Task", text: $editText)
+                                .textFieldStyle(.plain)
+                                .focused($editFocused)
+                                .onSubmit { commitEdit() }
+                                .onExitCommand { cancelEdit() }
+                                // Clicking away saves, like a Finder rename.
+                                .onChange(of: editFocused) { _, focused in
+                                    if !focused { commitEdit() }
+                                }
+                                .padding(.leading, CGFloat(item.indentLevel) * 16)
+                        } else {
+                            TodoRowView(item: item, today: today) {
+                                store.toggleDone(id: item.id)
+                            }
+                            // Drop on a project chip to move it there.
+                            .draggable(item.id.uuidString) {
+                                Text(item.title)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(.regularMaterial, in: Capsule())
+                            }
+                        }
                     }
                     .tag(item.id)
                 }
             }
+            // Return / double-click edits; right-click offers Edit and Move to.
+            .contextMenu(forSelectionType: UUID.self) { ids in
+                if let id = ids.first {
+                    Button("Edit") { startEdit(id: id) }
+                    Menu("Move to") {
+                        ForEach(projectNames, id: \.self) { name in
+                            Button(Self.moveLabel(name)) { move(id: id, to: name) }
+                                .disabled(name == projectName(ofTask: id))
+                        }
+                    }
+                }
+            } primaryAction: { ids in
+                if let id = ids.first { startEdit(id: id) }
+            }
             .onKeyPress(.space) {
-                guard !searchFocused && !draftFocused,
+                guard !searchFocused && !draftFocused && editingID == nil,
                       let id = viewModel.selectedItemID else { return .ignored }
                 store.toggleDone(id: id)
                 return .handled
+            }
+            .popover(isPresented: $isMovePickerShown) {
+                if let id = viewModel.selectedItemID {
+                    MoveToProjectPicker(
+                        names: projectNames,
+                        current: projectName(ofTask: id)
+                    ) { name in
+                        isMovePickerShown = false
+                        move(id: id, to: name)
+                    }
+                }
             }
 
             if items.isEmpty && !isAddingTask {
@@ -59,6 +110,12 @@ struct TodoListView: View {
                 .keyboardShortcut("n", modifiers: .command)
             Button("") { deleteSelected() }
                 .keyboardShortcut(.delete, modifiers: .command)
+                .disabled(editingID != nil)
+            Button("") {
+                if viewModel.selectedItemID != nil { isMovePickerShown = true }
+            }
+                .keyboardShortcut("m", modifiers: [.command, .shift])
+                .disabled(editingID != nil)
             Button("") { viewModel.showCompleted.toggle() }
                 .keyboardShortcut("h", modifiers: [.command, .shift])
         }
@@ -67,6 +124,7 @@ struct TodoListView: View {
     }
 
     private func startDraft() {
+        cancelEdit()
         isAddingTask = true
         draftText = ""
         draftFocused = true
@@ -91,17 +149,102 @@ struct TodoListView: View {
         cancelDraft()
     }
 
+    // MARK: - Edit
+
+    /// The field holds the whole line minus the "- " marker, tags included,
+    /// so tags are edited as text.
+    private func startEdit(id: UUID) {
+        guard let item = items.first(where: { $0.id == id }) else { return }
+        cancelDraft()
+        let line = item.rawLine.trimmingCharacters(in: .whitespaces)
+        editText = line.hasPrefix("- ") ? String(line.dropFirst(2)) : line
+        editingID = id
+        viewModel.selectedItemID = id
+        editFocused = true
+    }
+
+    private func commitEdit() {
+        if let id = editingID { store.editTask(id: id, text: editText) } // blank = no-op
+        cancelEdit()
+    }
+
+    private func cancelEdit() {
+        editingID = nil
+        editText = ""
+    }
+
+    // MARK: - Move
+
+    /// Inbox first, then each project name once, in file order.
+    private var projectNames: [String] {
+        var seen = Set<String>()
+        return store.document.projects.map(\.name).filter { seen.insert($0).inserted }
+    }
+
+    /// Inbox has no chip any more; as a move target it reads "No project".
+    static func moveLabel(_ name: String) -> String {
+        name == "Inbox" ? "No project" : name
+    }
+
+    private func projectName(ofTask id: UUID) -> String? {
+        store.document.projects.first { $0.tasks.contains { $0.id == id } }?.name
+    }
+
+    private func move(id: UUID, to name: String) {
+        guard name != projectName(ofTask: id) else { return }
+        // On a project tab the task leaves the list; on Today it stays.
+        if case .project = viewModel.selectedTab { selectNeighbor(of: id) }
+        store.moveTask(id: id, toProject: name)
+    }
+
+    // MARK: - Delete
+
     private func deleteSelected() {
         guard let id = viewModel.selectedItemID else { return }
-        let current = items
-        // Move selection to the neighbor before deleting.
-        if let idx = current.firstIndex(where: { $0.id == id }) {
-            let remaining = current.enumerated().filter { $0.offset != idx }.map(\.element)
-            viewModel.selectedItemID = remaining.isEmpty
-                ? nil
-                : remaining[min(idx, remaining.count - 1)].id
-        }
+        selectNeighbor(of: id)
         store.deleteTask(id: id)
+    }
+
+    /// Moves selection to the neighbor of a task that is about to leave the list.
+    private func selectNeighbor(of id: UUID) {
+        let current = items
+        guard let idx = current.firstIndex(where: { $0.id == id }) else { return }
+        let remaining = current.enumerated().filter { $0.offset != idx }.map(\.element)
+        viewModel.selectedItemID = remaining.isEmpty
+            ? nil
+            : remaining[min(idx, remaining.count - 1)].id
+    }
+}
+
+/// ⇧⌘M popover: arrow keys pick a project, Return moves, Esc closes.
+private struct MoveToProjectPicker: View {
+    let names: [String]
+    let current: String?
+    let onPick: (String) -> Void
+
+    @State private var selection: String?
+    @FocusState private var focused: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Move to")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .padding([.top, .horizontal], 8)
+            List(names, id: \.self, selection: $selection) { name in
+                Text(TodoListView.moveLabel(name))
+                    .foregroundStyle(name == current ? .secondary : .primary)
+            }
+            .focused($focused)
+            .contextMenu(forSelectionType: String.self) { _ in } primaryAction: { picked in
+                if let name = picked.first, name != current { onPick(name) }
+            }
+        }
+        .frame(width: 220, height: min(CGFloat(names.count) * 24 + 40, 320))
+        .onAppear {
+            selection = names.first { $0 != current }
+            focused = true
+        }
     }
 }
 
