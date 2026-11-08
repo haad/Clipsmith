@@ -127,6 +127,36 @@ final class TodoStoreTests: XCTestCase {
         XCTAssertFalse(store.hasPendingChanges)
     }
 
+    func testRenameReferencesRewritesTasksAndNotes() {
+        let store = makeStore(initialContent: "- blog [[xyz]]\nWork:\n- ship [[XYZ]] @today\n\tsee [[xyz]]\n")
+        let ids = store.document.allTasks.map(\.id)
+        store.renameSnippetReferences(from: "xyz", to: "Blog notes")
+        store.saveNow()
+        XCTAssertEqual(fileContent(of: store),
+                       "- blog [[Blog notes]]\nWork:\n- ship [[Blog notes]] @today\n\tsee [[Blog notes]]\n")
+        XCTAssertEqual(store.document.allTasks.map(\.id), ids)
+    }
+
+    func testRenameReferencesNoMatchIsNoOp() {
+        let store = makeStore(initialContent: "- plain task\n")
+        store.renameSnippetReferences(from: "xyz", to: "abc")
+        XCTAssertFalse(store.hasPendingChanges)
+    }
+
+    func testRenameReferencesCaseOnly() {
+        let store = makeStore(initialContent: "- [[xyz]]\n")
+        store.renameSnippetReferences(from: "xyz", to: "XYZ")
+        XCTAssertEqual(store.document.allTasks[0].rawLine, "- [[XYZ]]")
+    }
+
+    func testRenameReferencesWhileDirty() {
+        let store = makeStore(initialContent: "- [[xyz]]\n")
+        store.addTask(text: "new [[xyz]]", projectName: nil)
+        store.renameSnippetReferences(from: "xyz", to: "abc")
+        store.saveNow()
+        XCTAssertEqual(fileContent(of: store), "- [[abc]]\n- new [[abc]]\n")
+    }
+
     func testAddRenameDeleteProject() {
         let store = makeStore(initialContent: "")
         store.addProject(name: "Alpha")

@@ -256,6 +256,29 @@ final class TodoStore {
         markDirty()
     }
 
+    /// A snippet was renamed: point every `[[oldName]]` (tasks and notes) at
+    /// the new name. Task ids are kept; dirty only if something changed.
+    func renameSnippetReferences(from oldName: String, to newName: String) {
+        var changed = false
+        for p in document.projects.indices {
+            for n in document.projects[p].nodes.indices {
+                switch document.projects[p].nodes[n] {
+                case .task(let item):
+                    let line = SnippetReference.rewriting(item.rawLine, from: oldName, to: newName)
+                    guard line != item.rawLine else { continue }
+                    document.projects[p].nodes[n] = .task(TodoItem(rawLine: line, id: item.id))
+                    changed = true
+                case .note(let text):
+                    let line = SnippetReference.rewriting(text, from: oldName, to: newName)
+                    guard line != text else { continue }
+                    document.projects[p].nodes[n] = .note(line)
+                    changed = true
+                }
+            }
+        }
+        if changed { markDirty() }
+    }
+
     // MARK: - Project CRUD
 
     func addProject(name: String) {
