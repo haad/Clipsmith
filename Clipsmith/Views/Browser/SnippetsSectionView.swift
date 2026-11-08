@@ -54,13 +54,17 @@ struct SnippetsSectionView: View {
                 } label: {
                     Image(systemName: "plus")
                 }
-                .keyboardShortcut("n", modifiers: .command)
+                // ⌘N lives in the hidden buttons below, not here: a toolbar
+                // item's shortcut can outlive the section and swallow ⌘N in
+                // other sections (Todos).
                 .help("New Snippet (⌘N)")
             }
         }
         // Hidden buttons for keyboard shortcuts
         .background {
             Group {
+                Button("") { createNewSnippet() }
+                    .keyboardShortcut("n", modifiers: .command)
                 Button("") { isSearchFocused = true }
                     .keyboardShortcut("f", modifiers: .command)
                 Button("") { deleteSelectedSnippet() }

@@ -78,7 +78,14 @@ final class AppLaunchController: NSPanel {
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .transient]
         isOpaque = false
         backgroundColor = .clear
-        hasShadow = true
+        // macOS 26: the window shadow is computed from the full rectangular
+        // frame behind Liquid Glass, leaving a square edge around the rounded
+        // panel. The glass draws its own edge, so drop the window shadow there.
+        if #available(macOS 26, *) {
+            hasShadow = false
+        } else {
+            hasShadow = true
+        }
         isMovableByWindowBackground = false
         isReleasedWhenClosed = false
 

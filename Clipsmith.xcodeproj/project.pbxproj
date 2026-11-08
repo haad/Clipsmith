@@ -36,10 +36,9 @@
 		AA0028 /* BezelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0030 /* BezelView.swift */; };
 		AA0029 /* BezelControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0031 /* BezelControllerTests.swift */; };
 		AA0034 /* SnippetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0036 /* SnippetStore.swift */; };
-		AA0039 /* SnippetEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0040 /* SnippetEditorView.swift */; };
 		AA0035 /* SnippetStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0037 /* SnippetStoreTests.swift */; };
 		AA0036 /* HighlightSwift in Frameworks */ = {isa = PBXBuildFile; productRef = SP0003 /* HighlightSwift */; };
-		AA0040 /* SnippetPasteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0041 /* SnippetPasteTests.swift */; };
+		AA0039 /* SnippetEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0040 /* SnippetEditorView.swift */; };
 		AA0043 /* HighlightedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0044 /* HighlightedTextEditor.swift */; };
 		AA0044 /* ClipsmithSchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0045 /* ClipsmithSchemaV2.swift */; };
 		AA0045 /* PromptLibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0046 /* PromptLibraryStore.swift */; };
@@ -84,12 +83,14 @@
 		AA0089 /* ExpressionEvaluatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0090 /* ExpressionEvaluatorTests.swift */; };
 		AA0090 /* UnitConversionServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0091 /* UnitConversionServiceTests.swift */; };
 		AA0091 /* CurrencyServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0092 /* CurrencyServiceTests.swift */; };
-		AA0100 /* PromptSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0100 /* PromptSyncServiceTests.swift */; };
 		AA0092 /* CommandPaletteServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0093 /* CommandPaletteServiceTests.swift */; };
 		AA0093 /* UnitConversionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0094 /* UnitConversionService.swift */; };
 		AA0094 /* CurrencyService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0095 /* CurrencyService.swift */; };
 		AA0095 /* exchange-rates-bundled.json in Resources */ = {isa = PBXBuildFile; fileRef = AF0096 /* exchange-rates-bundled.json */; };
 		AA0096 /* CommandPaletteService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0097 /* CommandPaletteService.swift */; };
+		AA0097 /* CommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0098 /* CommandPaletteView.swift */; };
+		AA0099 /* HelpSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0099 /* HelpSettingsTab.swift */; };
+		AA0100 /* PromptSyncServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0100 /* PromptSyncServiceTests.swift */; };
 		AA0101 /* TransformRegistry.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0101 /* TransformRegistry.swift */; };
 		AA0102 /* TransformRegistryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0102 /* TransformRegistryTests.swift */; };
 		AA0103 /* TaskPaperParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0103 /* TaskPaperParser.swift */; };
@@ -104,21 +105,19 @@
 		AA0112 /* TodoListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0112 /* TodoListView.swift */; };
 		AA0113 /* TodoQuickAddController.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0113 /* TodoQuickAddController.swift */; };
 		AA0114 /* TodoSettingsSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0114 /* TodoSettingsSection.swift */; };
-		AA0097 /* CommandPaletteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0098 /* CommandPaletteView.swift */; };
-		AA0099 /* HelpSettingsTab.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0099 /* HelpSettingsTab.swift */; };
 		AA0115 /* ClipsmithSchemaV3.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0115 /* ClipsmithSchemaV3.swift */; };
-		AA0118 /* BrowserSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0118 /* BrowserSectionTests.swift */; };
 		AA0116 /* BrowserSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0116 /* BrowserSection.swift */; };
 		AA0117 /* BrowserPanes.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0117 /* BrowserPanes.swift */; };
-		AA0121 /* BrowserWindowViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0121 /* BrowserWindowViewModelTests.swift */; };
+		AA0118 /* BrowserSectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0118 /* BrowserSectionTests.swift */; };
 		AA0119 /* BrowserWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0119 /* BrowserWindowViewModel.swift */; };
 		AA0120 /* BrowserWindowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0120 /* BrowserWindowView.swift */; };
-		AA0124 /* SnippetFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0124 /* SnippetFilterTests.swift */; };
+		AA0121 /* BrowserWindowViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0121 /* BrowserWindowViewModelTests.swift */; };
 		AA0122 /* SnippetsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0122 /* SnippetsSectionView.swift */; };
 		AA0123 /* SnippetFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0123 /* SnippetFilter.swift */; };
-		AA0127 /* PromptFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0127 /* PromptFilterTests.swift */; };
+		AA0124 /* SnippetFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0124 /* SnippetFilterTests.swift */; };
 		AA0125 /* PromptsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0125 /* PromptsSectionView.swift */; };
 		AA0126 /* PromptFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0126 /* PromptFilter.swift */; };
+		AA0127 /* PromptFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0127 /* PromptFilterTests.swift */; };
 		AA0128 /* DocsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0128 /* DocsSectionView.swift */; };
 		AA0129 /* DocWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0129 /* DocWebView.swift */; };
 /* End PBXBuildFile section */
@@ -168,7 +167,6 @@
 		AF0036 /* SnippetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetStore.swift; sourceTree = "<group>"; };
 		AF0037 /* SnippetStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetStoreTests.swift; sourceTree = "<group>"; };
 		AF0040 /* SnippetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorView.swift; sourceTree = "<group>"; };
-		AF0041 /* SnippetPasteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetPasteTests.swift; sourceTree = "<group>"; };
 		AF0044 /* HighlightedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedTextEditor.swift; sourceTree = "<group>"; };
 		AF0045 /* ClipsmithSchemaV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsmithSchemaV2.swift; sourceTree = "<group>"; };
 		AF0046 /* PromptLibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryStore.swift; sourceTree = "<group>"; };
@@ -213,12 +211,14 @@
 		AF0090 /* ExpressionEvaluatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExpressionEvaluatorTests.swift; sourceTree = "<group>"; };
 		AF0091 /* UnitConversionServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionServiceTests.swift; sourceTree = "<group>"; };
 		AF0092 /* CurrencyServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyServiceTests.swift; sourceTree = "<group>"; };
-		AF0100 /* PromptSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSyncServiceTests.swift; sourceTree = "<group>"; };
 		AF0093 /* CommandPaletteServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteServiceTests.swift; sourceTree = "<group>"; };
 		AF0094 /* UnitConversionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitConversionService.swift; sourceTree = "<group>"; };
 		AF0095 /* CurrencyService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyService.swift; sourceTree = "<group>"; };
 		AF0096 /* exchange-rates-bundled.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = "exchange-rates-bundled.json"; sourceTree = "<group>"; };
 		AF0097 /* CommandPaletteService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteService.swift; sourceTree = "<group>"; };
+		AF0098 /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
+		AF0099 /* HelpSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSettingsTab.swift; sourceTree = "<group>"; };
+		AF0100 /* PromptSyncServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptSyncServiceTests.swift; sourceTree = "<group>"; };
 		AF0101 /* TransformRegistry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRegistry.swift; sourceTree = "<group>"; };
 		AF0102 /* TransformRegistryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransformRegistryTests.swift; sourceTree = "<group>"; };
 		AF0103 /* TaskPaperParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParser.swift; sourceTree = "<group>"; };
@@ -233,21 +233,19 @@
 		AF0112 /* TodoListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoListView.swift; sourceTree = "<group>"; };
 		AF0113 /* TodoQuickAddController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoQuickAddController.swift; sourceTree = "<group>"; };
 		AF0114 /* TodoSettingsSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoSettingsSection.swift; sourceTree = "<group>"; };
-		AF0098 /* CommandPaletteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommandPaletteView.swift; sourceTree = "<group>"; };
-		AF0099 /* HelpSettingsTab.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpSettingsTab.swift; sourceTree = "<group>"; };
 		AF0115 /* ClipsmithSchemaV3.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsmithSchemaV3.swift; sourceTree = "<group>"; };
-		AF0118 /* BrowserSectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSectionTests.swift; sourceTree = "<group>"; };
 		AF0116 /* BrowserSection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSection.swift; sourceTree = "<group>"; };
 		AF0117 /* BrowserPanes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserPanes.swift; sourceTree = "<group>"; };
-		AF0121 /* BrowserWindowViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowViewModelTests.swift; sourceTree = "<group>"; };
+		AF0118 /* BrowserSectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserSectionTests.swift; sourceTree = "<group>"; };
 		AF0119 /* BrowserWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowViewModel.swift; sourceTree = "<group>"; };
 		AF0120 /* BrowserWindowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowView.swift; sourceTree = "<group>"; };
-		AF0124 /* SnippetFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFilterTests.swift; sourceTree = "<group>"; };
+		AF0121 /* BrowserWindowViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrowserWindowViewModelTests.swift; sourceTree = "<group>"; };
 		AF0122 /* SnippetsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetsSectionView.swift; sourceTree = "<group>"; };
 		AF0123 /* SnippetFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFilter.swift; sourceTree = "<group>"; };
-		AF0127 /* PromptFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptFilterTests.swift; sourceTree = "<group>"; };
+		AF0124 /* SnippetFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFilterTests.swift; sourceTree = "<group>"; };
 		AF0125 /* PromptsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptsSectionView.swift; sourceTree = "<group>"; };
 		AF0126 /* PromptFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptFilter.swift; sourceTree = "<group>"; };
+		AF0127 /* PromptFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptFilterTests.swift; sourceTree = "<group>"; };
 		AF0128 /* DocsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsSectionView.swift; sourceTree = "<group>"; };
 		AF0129 /* DocWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocWebView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -429,7 +427,6 @@
 				AF0028 /* BezelViewModelTests.swift */,
 				AF0031 /* BezelControllerTests.swift */,
 				AF0037 /* SnippetStoreTests.swift */,
-				AF0041 /* SnippetPasteTests.swift */,
 				AF0049 /* SchemaMigrationTests.swift */,
 				AF0050 /* PromptLibraryStoreTests.swift */,
 				AF0051 /* TemplateSubstitutorTests.swift */,
@@ -565,7 +562,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 2630;
+				LastUpgradeCheck = 2720;
 				TargetAttributes = {
 					TT0001 = {
 						CreatedOnToolsVersion = 16.2;
@@ -706,7 +703,6 @@
 				AA0026 /* BezelViewModelTests.swift in Sources */,
 				AA0029 /* BezelControllerTests.swift in Sources */,
 				AA0035 /* SnippetStoreTests.swift in Sources */,
-				AA0040 /* SnippetPasteTests.swift in Sources */,
 				AA0048 /* SchemaMigrationTests.swift in Sources */,
 				AA0049 /* PromptLibraryStoreTests.swift in Sources */,
 				AA0050 /* TemplateSubstitutorTests.swift in Sources */,
@@ -752,6 +748,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -821,6 +818,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

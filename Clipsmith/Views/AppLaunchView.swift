@@ -186,10 +186,12 @@ private struct LauncherChrome: ViewModifier {
     func body(content: Content) -> some View {
         if #available(macOS 26, *) {
             let base: Glass = bezelAlpha >= 0.5 ? .clear : .regular
-            content.glassEffect(
-                base.tint(Color(NSColor.windowBackgroundColor).opacity(1.0 - bezelAlpha)),
-                in: .rect(cornerRadius: 24)
-            )
+            content
+                .clipShape(.rect(cornerRadius: 24))
+                .glassEffect(
+                    base.tint(Color(NSColor.windowBackgroundColor).opacity(1.0 - bezelAlpha)),
+                    in: .rect(cornerRadius: 24)
+                )
         } else {
             content
                 .background(
