@@ -28,6 +28,9 @@ struct SnippetsSectionView: View {
     @State private var languageFilter: String?
     @State private var snippetStore: SnippetStore?
     @FocusState private var isSearchFocused: Bool
+    /// Markdown snippets open rendered; ⌘E / Edit switches to the raw editor.
+    @State private var isEditingMarkdown = false
+    @State private var selection = SnippetSelection()
 
     // MARK: - Computed
 
@@ -67,6 +70,14 @@ struct SnippetsSectionView: View {
                     .keyboardShortcut("n", modifiers: .command)
                 Button("") { isSearchFocused = true }
                     .keyboardShortcut("f", modifiers: .command)
+                Button("") {
+                    if selectedSnippet?.language == "markdown" { isEditingMarkdown.toggle() }
+                }
+                    .keyboardShortcut("e", modifiers: .command)
+                Button("") {
+                    if let snippet = selectedSnippet { pasteSnippet(snippet) }
+                }
+                    .keyboardShortcut(.return, modifiers: .command)
                 Button("") { deleteSelectedSnippet() }
                     .keyboardShortcut(.delete, modifiers: .command)
             }
@@ -78,6 +89,9 @@ struct SnippetsSectionView: View {
             if selectedSnippetID == nil, let first = filteredSnippets.first {
                 selectedSnippetID = first.persistentModelID
             }
+        }
+        .onChange(of: selectedSnippetID) { _, _ in
+            isEditingMarkdown = false
         }
         .onChange(of: filteredSnippets.count) { _, _ in
             if let id = selectedSnippetID,
@@ -184,9 +198,19 @@ struct SnippetsSectionView: View {
                             .foregroundStyle(Color.accentColor)
                             .clipShape(Capsule())
                     }
+                    if snippet.language == "markdown" {
+                        Spacer()
+                        Button(isEditingMarkdown ? "Done" : "Edit") { isEditingMarkdown.toggle() }
+                            .help(isEditingMarkdown ? "Show formatted (⌘E)" : "Edit markdown (⌘E)")
+                    }
                 }
             } body: {
-                SnippetEditorView(snippet: snippet, snippetStore: snippetStoreInstance)
+                SnippetEditorView(
+                    snippet: snippet,
+                    snippetStore: snippetStoreInstance,
+                    isEditing: $isEditingMarkdown,
+                    selection: selection
+                )
             } footerLeading: {
                 Text("Edited \(snippet.updatedAt, format: .relative(presentation: .named))")
                     .font(.caption)
@@ -245,10 +269,15 @@ struct SnippetsSectionView: View {
     }
 
     /// Closes the browser window, drops back to accessory and pastes into the previous app.
+    /// Markdown snippets paste only the selected text when there is a selection.
     private func pasteSnippet(_ snippet: ClipsmithSchemaV1.Snippet) {
-        let content = snippet.content
+        let full = snippet.content
+        let language = snippet.language
         let previousApp = appTracker.previousApp
         Task { @MainActor in
+            // Read the selection before the window (and its views) close.
+            let selected = language == "markdown" ? await selection.selectedText() : nil
+            let content = SnippetPaste.content(full: full, language: language, selection: selected)
             for window in NSApp.windows
             where window.identifier?.rawValue.hasPrefix("browser") == true
                 || (window.isVisible && !(window is NSPanel) && window.level == .normal) {

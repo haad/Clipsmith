@@ -40,6 +40,8 @@
 		AA0036 /* HighlightSwift in Frameworks */ = {isa = PBXBuildFile; productRef = SP0003 /* HighlightSwift */; };
 		AA0132 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = SP0006 /* Markdown */; };
 		AA0039 /* SnippetEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0040 /* SnippetEditorView.swift */; };
+		AA0136 /* MarkdownWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0136 /* MarkdownWebView.swift */; };
+		AA0135 /* SnippetSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0135 /* SnippetSelection.swift */; };
 		AA0043 /* HighlightedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0044 /* HighlightedTextEditor.swift */; };
 		AA0044 /* ClipsmithSchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0045 /* ClipsmithSchemaV2.swift */; };
 		AA0045 /* PromptLibraryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0046 /* PromptLibraryStore.swift */; };
@@ -101,6 +103,7 @@
 		AA0133 /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0133 /* MarkdownRenderer.swift */; };
 		AA0106 /* TodoStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0106 /* TodoStoreTests.swift */; };
 		AA0131 /* SnippetReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0131 /* SnippetReferenceTests.swift */; };
+		AA0137 /* SnippetSelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0137 /* SnippetSelectionTests.swift */; };
 		AA0134 /* MarkdownRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0134 /* MarkdownRendererTests.swift */; };
 		AA0107 /* TodoQuickAddParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0107 /* TodoQuickAddParser.swift */; };
 		AA0108 /* TodoQuickAddParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0108 /* TodoQuickAddParserTests.swift */; };
@@ -172,6 +175,8 @@
 		AF0036 /* SnippetStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetStore.swift; sourceTree = "<group>"; };
 		AF0037 /* SnippetStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetStoreTests.swift; sourceTree = "<group>"; };
 		AF0040 /* SnippetEditorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetEditorView.swift; sourceTree = "<group>"; };
+		AF0136 /* MarkdownWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownWebView.swift; sourceTree = "<group>"; };
+		AF0135 /* SnippetSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetSelection.swift; sourceTree = "<group>"; };
 		AF0044 /* HighlightedTextEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighlightedTextEditor.swift; sourceTree = "<group>"; };
 		AF0045 /* ClipsmithSchemaV2.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClipsmithSchemaV2.swift; sourceTree = "<group>"; };
 		AF0046 /* PromptLibraryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptLibraryStore.swift; sourceTree = "<group>"; };
@@ -233,6 +238,7 @@
 		AF0133 /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
 		AF0106 /* TodoStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStoreTests.swift; sourceTree = "<group>"; };
 		AF0131 /* SnippetReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetReferenceTests.swift; sourceTree = "<group>"; };
+		AF0137 /* SnippetSelectionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetSelectionTests.swift; sourceTree = "<group>"; };
 		AF0134 /* MarkdownRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRendererTests.swift; sourceTree = "<group>"; };
 		AF0107 /* TodoQuickAddParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoQuickAddParser.swift; sourceTree = "<group>"; };
 		AF0108 /* TodoQuickAddParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoQuickAddParserTests.swift; sourceTree = "<group>"; };
@@ -460,6 +466,7 @@
 				AF0104 /* TaskPaperParserTests.swift */,
 				AF0106 /* TodoStoreTests.swift */,
 				AF0131 /* SnippetReferenceTests.swift */,
+				AF0137 /* SnippetSelectionTests.swift */,
 				AF0134 /* MarkdownRendererTests.swift */,
 				AF0108 /* TodoQuickAddParserTests.swift */,
 				AF0110 /* TodoWindowViewModelTests.swift */,
@@ -476,6 +483,8 @@
 			isa = PBXGroup;
 			children = (
 				AF0040 /* SnippetEditorView.swift */,
+				AF0136 /* MarkdownWebView.swift */,
+				AF0135 /* SnippetSelection.swift */,
 				AF0044 /* HighlightedTextEditor.swift */,
 			);
 			path = Snippets;
@@ -652,6 +661,8 @@
 				AA0028 /* BezelView.swift in Sources */,
 				AA0034 /* SnippetStore.swift in Sources */,
 				AA0039 /* SnippetEditorView.swift in Sources */,
+				AA0136 /* MarkdownWebView.swift in Sources */,
+				AA0135 /* SnippetSelection.swift in Sources */,
 				AA0043 /* HighlightedTextEditor.swift in Sources */,
 				AA0044 /* ClipsmithSchemaV2.swift in Sources */,
 				AA0045 /* PromptLibraryStore.swift in Sources */,
@@ -742,6 +753,7 @@
 				AA0104 /* TaskPaperParserTests.swift in Sources */,
 				AA0106 /* TodoStoreTests.swift in Sources */,
 				AA0131 /* SnippetReferenceTests.swift in Sources */,
+				AA0137 /* SnippetSelectionTests.swift in Sources */,
 				AA0134 /* MarkdownRendererTests.swift in Sources */,
 				AA0108 /* TodoQuickAddParserTests.swift in Sources */,
 				AA0110 /* TodoWindowViewModelTests.swift in Sources */,

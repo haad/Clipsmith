@@ -9,6 +9,8 @@ struct HighlightedTextEditor: NSViewRepresentable {
 
     @Binding var text: String
     var language: String?
+    /// Receives the text view so a paste can read the current selection.
+    var selection: SnippetSelection?
 
     // MARK: - NSViewRepresentable
 
@@ -27,6 +29,7 @@ struct HighlightedTextEditor: NSViewRepresentable {
         textView.isEditable = true
         textView.isSelectable = true
         context.coordinator.language = language
+        selection?.textView = textView
         return scrollView
     }
 

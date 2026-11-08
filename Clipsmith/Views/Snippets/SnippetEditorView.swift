@@ -12,6 +12,9 @@ struct SnippetEditorView: View {
 
     let snippet: ClipsmithSchemaV1.Snippet
     let snippetStore: SnippetStore
+    /// Markdown snippets: false shows the rendered view, true the raw editor.
+    @Binding var isEditing: Bool
+    let selection: SnippetSelection
 
     // MARK: - State
 
@@ -97,13 +100,19 @@ struct SnippetEditorView: View {
 
             // Middle: TextEditor (editable)
             VStack(alignment: .leading, spacing: 4) {
-                Text("Source")
+                Text(showsRendered ? "Preview" : "Source")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal)
                     .padding(.top, 4)
 
-                HighlightedTextEditor(text: $content, language: language)
+                Group {
+                    if showsRendered {
+                        MarkdownWebView(markdown: content, selection: selection)
+                    } else {
+                        HighlightedTextEditor(text: $content, language: language, selection: selection)
+                    }
+                }
                     .frame(minHeight: 120)
                     .border(Color(NSColor.separatorColor), width: 0.5)
                     .padding(.horizontal)
@@ -126,6 +135,8 @@ struct SnippetEditorView: View {
     }
 
     // MARK: - Helpers
+
+    private var showsRendered: Bool { language == "markdown" && !isEditing }
 
     /// Combines all editable fields into a single string for change detection.
     private var saveKey: String {

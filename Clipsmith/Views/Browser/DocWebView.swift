@@ -67,70 +67,7 @@ struct DocWebView: NSViewRepresentable {
         <meta charset="utf-8">
         <meta name="color-scheme" content="dark light">
         <style>
-            :root {
-                color-scheme: dark light;
-            }
-            body {
-                font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-                font-size: 14px;
-                line-height: 1.7;
-                color: #d4d4d4;
-                background: #1e1e1e;
-                padding: 20px 24px;
-                margin: 0;
-                -webkit-font-smoothing: antialiased;
-            }
-            h1 { font-size: 1.6em; font-weight: 600; margin: 0 0 0.8em 0; padding-bottom: 0.3em; border-bottom: 1px solid #333; }
-            h2 { font-size: 1.3em; font-weight: 600; margin: 1.4em 0 0.5em 0; }
-            h3 { font-size: 1.1em; font-weight: 600; margin: 1.2em 0 0.4em 0; }
-            h4 { font-size: 1em; font-weight: 600; margin: 1em 0 0.3em 0; }
-            p { margin: 0.6em 0; }
-            a { color: #6cb6ff; text-decoration: none; }
-            a:hover { text-decoration: underline; }
-            code, pre {
-                font-family: ui-monospace, Menlo, "Cascadia Code", monospace;
-                font-size: 12.5px;
-            }
-            code {
-                background: #2d2d2d;
-                padding: 2px 6px;
-                border-radius: 4px;
-                color: #e8c97a;
-            }
-            pre {
-                background: #161616;
-                padding: 14px 16px;
-                border-radius: 8px;
-                border: 1px solid #2d2d2d;
-                overflow-x: auto;
-                line-height: 1.5;
-            }
-            pre code { background: none; padding: 0; color: #d4d4d4; border-radius: 0; }
-            table { border-collapse: collapse; width: 100%; margin: 0.8em 0; }
-            th, td { border: 1px solid #333; padding: 8px 12px; text-align: left; }
-            th { background: #252525; font-weight: 600; }
-            tr:nth-child(even) { background: #1a1a1a; }
-            blockquote { border-left: 3px solid #444; margin: 0.8em 0; padding: 0.4em 1em; color: #999; }
-            ul, ol { padding-left: 1.5em; }
-            li { margin: 0.3em 0; }
-            hr { border: none; border-top: 1px solid #333; margin: 1.5em 0; }
-            dt { font-weight: 600; margin-top: 0.8em; }
-            dd { margin-left: 1.5em; margin-bottom: 0.5em; }
-            img { max-width: 100%; }
-
-            @media (prefers-color-scheme: light) {
-                body { color: #24292f; background: #ffffff; }
-                h1 { border-bottom-color: #d8dee4; }
-                a { color: #0969da; }
-                code { background: #f0f2f5; color: #9a6700; }
-                pre { background: #f6f8fa; border-color: #d8dee4; }
-                pre code { color: #24292f; }
-                th, td { border-color: #d8dee4; }
-                th { background: #f6f8fa; }
-                tr:nth-child(even) { background: #f6f8fa; }
-                blockquote { border-left-color: #d8dee4; color: #656d76; }
-                hr { border-top-color: #d8dee4; }
-            }
+        \(BrowserWebStyles.docStyles)
         </style>
         </head>
         <body>\(html)</body>
@@ -152,4 +89,75 @@ struct DocWebView: NSViewRepresentable {
             return .allow
         }
     }
+}
+
+/// Stylesheet shared by the Docs page view and the rendered markdown
+/// snippet view: dark by default, light under `prefers-color-scheme`.
+enum BrowserWebStyles {
+    static let docStyles = """
+    :root {
+        color-scheme: dark light;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+        font-size: 14px;
+        line-height: 1.7;
+        color: #d4d4d4;
+        background: #1e1e1e;
+        padding: 20px 24px;
+        margin: 0;
+        -webkit-font-smoothing: antialiased;
+    }
+    h1 { font-size: 1.6em; font-weight: 600; margin: 0 0 0.8em 0; padding-bottom: 0.3em; border-bottom: 1px solid #333; }
+    h2 { font-size: 1.3em; font-weight: 600; margin: 1.4em 0 0.5em 0; }
+    h3 { font-size: 1.1em; font-weight: 600; margin: 1.2em 0 0.4em 0; }
+    h4 { font-size: 1em; font-weight: 600; margin: 1em 0 0.3em 0; }
+    p { margin: 0.6em 0; }
+    a { color: #6cb6ff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code, pre {
+        font-family: ui-monospace, Menlo, "Cascadia Code", monospace;
+        font-size: 12.5px;
+    }
+    code {
+        background: #2d2d2d;
+        padding: 2px 6px;
+        border-radius: 4px;
+        color: #e8c97a;
+    }
+    pre {
+        background: #161616;
+        padding: 14px 16px;
+        border-radius: 8px;
+        border: 1px solid #2d2d2d;
+        overflow-x: auto;
+        line-height: 1.5;
+    }
+    pre code { background: none; padding: 0; color: #d4d4d4; border-radius: 0; }
+    table { border-collapse: collapse; width: 100%; margin: 0.8em 0; }
+    th, td { border: 1px solid #333; padding: 8px 12px; text-align: left; }
+    th { background: #252525; font-weight: 600; }
+    tr:nth-child(even) { background: #1a1a1a; }
+    blockquote { border-left: 3px solid #444; margin: 0.8em 0; padding: 0.4em 1em; color: #999; }
+    ul, ol { padding-left: 1.5em; }
+    li { margin: 0.3em 0; }
+    hr { border: none; border-top: 1px solid #333; margin: 1.5em 0; }
+    dt { font-weight: 600; margin-top: 0.8em; }
+    dd { margin-left: 1.5em; margin-bottom: 0.5em; }
+    img { max-width: 100%; }
+
+    @media (prefers-color-scheme: light) {
+        body { color: #24292f; background: #ffffff; }
+        h1 { border-bottom-color: #d8dee4; }
+        a { color: #0969da; }
+        code { background: #f0f2f5; color: #9a6700; }
+        pre { background: #f6f8fa; border-color: #d8dee4; }
+        pre code { color: #24292f; }
+        th, td { border-color: #d8dee4; }
+        th { background: #f6f8fa; }
+        tr:nth-child(even) { background: #f6f8fa; }
+        blockquote { border-left-color: #d8dee4; color: #656d76; }
+        hr { border-top-color: #d8dee4; }
+    }
+    """
 }
