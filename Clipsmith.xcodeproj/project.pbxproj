@@ -38,6 +38,7 @@
 		AA0034 /* SnippetStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0036 /* SnippetStore.swift */; };
 		AA0035 /* SnippetStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0037 /* SnippetStoreTests.swift */; };
 		AA0036 /* HighlightSwift in Frameworks */ = {isa = PBXBuildFile; productRef = SP0003 /* HighlightSwift */; };
+		AA0132 /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = SP0006 /* Markdown */; };
 		AA0039 /* SnippetEditorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0040 /* SnippetEditorView.swift */; };
 		AA0043 /* HighlightedTextEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0044 /* HighlightedTextEditor.swift */; };
 		AA0044 /* ClipsmithSchemaV2.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0045 /* ClipsmithSchemaV2.swift */; };
@@ -97,8 +98,10 @@
 		AA0104 /* TaskPaperParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0104 /* TaskPaperParserTests.swift */; };
 		AA0105 /* TodoStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0105 /* TodoStore.swift */; };
 		AA0130 /* SnippetReference.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0130 /* SnippetReference.swift */; };
+		AA0133 /* MarkdownRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0133 /* MarkdownRenderer.swift */; };
 		AA0106 /* TodoStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0106 /* TodoStoreTests.swift */; };
 		AA0131 /* SnippetReferenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0131 /* SnippetReferenceTests.swift */; };
+		AA0134 /* MarkdownRendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0134 /* MarkdownRendererTests.swift */; };
 		AA0107 /* TodoQuickAddParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0107 /* TodoQuickAddParser.swift */; };
 		AA0108 /* TodoQuickAddParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0108 /* TodoQuickAddParserTests.swift */; };
 		AA0109 /* TodoWindowViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0109 /* TodoWindowViewModel.swift */; };
@@ -227,8 +230,10 @@
 		AF0104 /* TaskPaperParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskPaperParserTests.swift; sourceTree = "<group>"; };
 		AF0105 /* TodoStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStore.swift; sourceTree = "<group>"; };
 		AF0130 /* SnippetReference.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetReference.swift; sourceTree = "<group>"; };
+		AF0133 /* MarkdownRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRenderer.swift; sourceTree = "<group>"; };
 		AF0106 /* TodoStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoStoreTests.swift; sourceTree = "<group>"; };
 		AF0131 /* SnippetReferenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetReferenceTests.swift; sourceTree = "<group>"; };
+		AF0134 /* MarkdownRendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarkdownRendererTests.swift; sourceTree = "<group>"; };
 		AF0107 /* TodoQuickAddParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoQuickAddParser.swift; sourceTree = "<group>"; };
 		AF0108 /* TodoQuickAddParserTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoQuickAddParserTests.swift; sourceTree = "<group>"; };
 		AF0109 /* TodoWindowViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoWindowViewModel.swift; sourceTree = "<group>"; };
@@ -261,6 +266,7 @@
 			files = (
 				AA0016 /* KeyboardShortcuts in Frameworks */,
 				AA0036 /* HighlightSwift in Frameworks */,
+				AA0132 /* Markdown in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -345,6 +351,7 @@
 				AF0103 /* TaskPaperParser.swift */,
 				AF0105 /* TodoStore.swift */,
 				AF0130 /* SnippetReference.swift */,
+				AF0133 /* MarkdownRenderer.swift */,
 				AF0107 /* TodoQuickAddParser.swift */,
 				AF0123 /* SnippetFilter.swift */,
 				AF0126 /* PromptFilter.swift */,
@@ -453,6 +460,7 @@
 				AF0104 /* TaskPaperParserTests.swift */,
 				AF0106 /* TodoStoreTests.swift */,
 				AF0131 /* SnippetReferenceTests.swift */,
+				AF0134 /* MarkdownRendererTests.swift */,
 				AF0108 /* TodoQuickAddParserTests.swift */,
 				AF0110 /* TodoWindowViewModelTests.swift */,
 				GG0015 /* Fixtures */,
@@ -536,6 +544,7 @@
 			packageProductDependencies = (
 				SP0002 /* KeyboardShortcuts */,
 				SP0003 /* HighlightSwift */,
+				SP0006 /* Markdown */,
 			);
 			productName = Clipsmith;
 			productReference = AF0011 /* Clipsmith.app */;
@@ -591,6 +600,7 @@
 			packageReferences = (
 				SP0001 /* XCRemoteSwiftPackageReference "KeyboardShortcuts" */,
 				SP0004 /* XCRemoteSwiftPackageReference "HighlightSwift" */,
+				SP0005 /* XCRemoteSwiftPackageReference "swift-markdown" */,
 			);
 			productRefGroup = GG0007 /* Products */;
 			projectDirPath = "";
@@ -679,6 +689,7 @@
 				AA0103 /* TaskPaperParser.swift in Sources */,
 				AA0105 /* TodoStore.swift in Sources */,
 				AA0130 /* SnippetReference.swift in Sources */,
+				AA0133 /* MarkdownRenderer.swift in Sources */,
 				AA0107 /* TodoQuickAddParser.swift in Sources */,
 				AA0109 /* TodoWindowViewModel.swift in Sources */,
 				AA0111 /* TodosSectionView.swift in Sources */,
@@ -731,6 +742,7 @@
 				AA0104 /* TaskPaperParserTests.swift in Sources */,
 				AA0106 /* TodoStoreTests.swift in Sources */,
 				AA0131 /* SnippetReferenceTests.swift in Sources */,
+				AA0134 /* MarkdownRendererTests.swift in Sources */,
 				AA0108 /* TodoQuickAddParserTests.swift in Sources */,
 				AA0110 /* TodoWindowViewModelTests.swift in Sources */,
 				AA0118 /* BrowserSectionTests.swift in Sources */,
@@ -1021,6 +1033,14 @@
 				minimumVersion = 1.1.0;
 			};
 		};
+		SP0005 /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/swiftlang/swift-markdown";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.9.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1033,6 +1053,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = SP0004 /* XCRemoteSwiftPackageReference "HighlightSwift" */;
 			productName = HighlightSwift;
+		};
+		SP0006 /* Markdown */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = SP0005 /* XCRemoteSwiftPackageReference "swift-markdown" */;
+			productName = Markdown;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
