@@ -19,6 +19,9 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 ### Code Snippets
 - Save frequently used code as named snippets organized into folders
 - Syntax-highlighted editor with language detection
+- Markdown snippets read as formatted notes (headings, lists, tables, task lists, highlighted code blocks); `⌘E` switches to the raw markdown
+- Select part of a markdown snippet and paste just that part
+- Snippet names are unique, so todos can link to them with `[[Snippet name]]`
 - Quick access via keyboard shortcut
 
 ### Prompt Library
@@ -38,7 +41,9 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 
 ### Todo Tracking (Experimental)
 - Keyboard-first todos backed by a plain-text [TaskPaper](https://www.taskpaper.com/) file you own — edit it with any editor, external changes are picked up live
-- Todos section of the browser window: Today view (`@today` plus overdue/due items), one chip per project (⇧⌘[ / ⇧⌘] to switch), fuzzy search with `@tag` terms, show/hide completed
+- Todos section of the browser window: Today view (`@today` plus overdue/due items), All (every task), one chip per project (⇧⌘[ / ⇧⌘] to switch), fuzzy search with `@tag` terms, show/hide completed
+- Edit a task in place (`⏎`, double-click or right-click → Edit); move it to another project (right-click → Move to, `⇧⌘M`, or drag it onto a project chip)
+- Link a task to a snippet with `[[Snippet name]]` — click the link or press `⌘O` to open it (a missing snippet is created); renaming the snippet updates the link
 - Global quick-add bezel with inline syntax: `Fix pricing page #project @due(2026-09-05) @today`
 - Default file `~/Library/Application Support/Clipsmith/todos.taskpaper`, changeable in Settings > Todos
 
@@ -84,9 +89,14 @@ All shortcuts are configurable in Settings > Shortcuts.
 | Move docset selection (Docs) | `⌥↑` `⌥↓` |
 | Navigate results | `↑` `↓` |
 | Paste selected (Snippets, Prompts) | `⏎` |
+| Paste from anywhere in Snippets (markdown: just the selection) | `⌘⏎` |
+| Formatted / raw markdown (Snippets) | `⌘E` |
 | Open in browser (Docs) | `⌘⏎` |
 | New snippet / prompt / task | `⌘N` |
 | Previous / next project tab (Todos) | `⇧⌘[` `⇧⌘]` |
+| Edit task / toggle done (Todos) | `⏎` / `Space` |
+| Move task to project (Todos) | `⇧⌘M` |
+| Open the task's `[[snippet]]` (Todos) | `⌘O` |
 | Close window | `Esc` |
 
 ## Requirements
@@ -108,6 +118,7 @@ Build the `Clipsmith` scheme in Xcode 16+. The app runs as a menu bar utility �
 
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) — global hotkey registration
 - [HighlightSwift](https://github.com/appstefan/HighlightSwift) — syntax highlighting in snippet editor
+- [swift-markdown](https://github.com/swiftlang/swift-markdown) — markdown parsing for markdown snippets
 
 ## Configuration
 
