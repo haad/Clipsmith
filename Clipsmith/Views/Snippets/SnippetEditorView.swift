@@ -22,10 +22,6 @@ struct SnippetEditorView: View {
     @State private var content: String = ""
     @State private var language: String? = nil
     @State private var tagsText: String = ""
-    /// Name last written to the store. The rename rewrite uses this rather
-    /// than `snippet.name`, which lags behind saves made on the store's own
-    /// model context.
-    @State private var lastSavedName: String = ""
     @State private var nameWarning: String?
 
     @Environment(TodoStore.self) private var todoStore
@@ -153,7 +149,6 @@ struct SnippetEditorView: View {
 
     private func loadFromSnippet() {
         name = snippet.name
-        lastSavedName = snippet.name
         nameWarning = nil
         content = snippet.content
         language = snippet.language
@@ -162,34 +157,32 @@ struct SnippetEditorView: View {
 
     @MainActor
     private func saveSnippet() async {
-        let parsedTags = tagsText
+        // Everything is captured before the await: the view is reused across
+        // selections, so after the hop `name`/`content` may belong to
+        // another snippet.
+        let id = snippet.persistentModelID
+        let requestedName = name
+        let content = content
+        let language = language
+        let tags = tagsText
             .split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
 
-        let id = snippet.persistentModelID
-        let oldName = lastSavedName
-        let trimmed = name.trimmingCharacters(in: .whitespaces)
-        var newName = trimmed.isEmpty ? oldName : trimmed
+        // One actor call checks uniqueness and writes, so nothing can
+        // interleave. A taken name is refused; other fields still save.
+        guard let result = try? await snippetStore.save(
+            id: id, requestedName: requestedName, content: content, language: language, tags: tags)
+        else { return }
 
-        // Unique names keep [[name]] todo references unambiguous: a taken
-        // name is refused (other fields still save).
-        if (try? await snippetStore.isNameTaken(newName, excluding: id)) == true {
-            nameWarning = "Another snippet is already named “\(newName)”"
-            newName = oldName
-        } else {
-            nameWarning = nil
+        // The rewrite is correct whichever snippet is on screen now:
+        // previousName comes from the store, not from view state.
+        if result.savedName != result.previousName {
+            todoStore.renameSnippetReferences(from: result.previousName, to: result.savedName)
         }
-
-        do {
-            try await snippetStore.update(
-                id: id, name: newName, content: content, language: language, tags: parsedTags)
-        } catch {
-            return
-        }
-        lastSavedName = newName
-        if newName != oldName {
-            todoStore.renameSnippetReferences(from: oldName, to: newName)
-        }
+        guard snippet.persistentModelID == id else { return }
+        nameWarning = result.nameRefused
+            ? "Another snippet is already named “\(requestedName.trimmingCharacters(in: .whitespaces))”"
+            : nil
     }
 }

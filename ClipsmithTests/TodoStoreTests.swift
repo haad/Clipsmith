@@ -157,6 +157,17 @@ final class TodoStoreTests: XCTestCase {
         XCTAssertEqual(fileContent(of: store), "- [[abc]]\n- new [[abc]]\n")
     }
 
+    func testRenameReferencesLoadsAnUnloadedStore() {
+        // Todos feature off → the store was never loaded; a snippet rename
+        // must still reach the file.
+        let url = tempDir.appending(path: "todos.taskpaper")
+        try? Data("- read [[xyz]]\n".utf8).write(to: url)
+        let store = TodoStore(fileURL: url, saveDelay: .milliseconds(10))
+        store.renameSnippetReferences(from: "xyz", to: "abc")
+        store.saveNow()
+        XCTAssertEqual(fileContent(of: store), "- read [[abc]]\n")
+    }
+
     func testAddRenameDeleteProject() {
         let store = makeStore(initialContent: "")
         store.addProject(name: "Alpha")

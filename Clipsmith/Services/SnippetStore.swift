@@ -58,6 +58,48 @@ actor SnippetStore {
         return snippet.persistentModelID
     }
 
+    // MARK: - Atomic save / create
+
+    /// Check-and-write in one actor call, so a rename can't interleave with
+    /// another save or a selection change in the editor. A blank or taken
+    /// name keeps the stored one (`nameRefused` only for taken); every other
+    /// field is saved regardless. `previousName` is read from this context,
+    /// so it is the authoritative source for rewriting todo references.
+    func save(
+        id: PersistentIdentifier,
+        requestedName: String,
+        content: String,
+        language: String?,
+        tags: [String]
+    ) throws -> SnippetSaveResult {
+        guard let snippet = modelContext.model(for: id) as? ClipsmithSchemaV1.Snippet else {
+            return SnippetSaveResult(previousName: "", savedName: "", nameRefused: false)
+        }
+        let previous = snippet.name
+        let trimmed = requestedName.trimmingCharacters(in: .whitespaces)
+        var saved = trimmed.isEmpty ? previous : trimmed
+        let refused = try isNameTaken(saved, excluding: id)
+        if refused { saved = previous }
+        snippet.name = saved
+        snippet.content = content
+        snippet.language = language
+        snippet.tags = tags
+        snippet.updatedAt = .now
+        try modelContext.save()
+        return SnippetSaveResult(previousName: previous, savedName: saved, nameRefused: refused)
+    }
+
+    /// Inserts with the first free name from `base` ("<base>", "<base> 2", ...).
+    func insertUnique(base: String, content: String, language: String?, tags: [String]) throws -> PersistentIdentifier {
+        try insert(name: availableName(base: base), content: content, language: language, tags: tags)
+    }
+
+    /// The snippet a todo `[[name]]` opens; created (empty) when missing.
+    func findOrCreate(name: String, language: String?) throws -> (id: PersistentIdentifier, created: Bool) {
+        if let id = try findByName(name) { return (id, false) }
+        return (try insert(name: name, content: "", language: language, tags: []), true)
+    }
+
     // MARK: - Unique names
 
     /// Names are unique case-insensitively so `[[name]]` todo references are
@@ -209,4 +251,12 @@ actor SnippetStore {
             updatedAt: snippet.updatedAt
         )
     }
+}
+
+/// Outcome of `SnippetStore.save`: what the name was, what it is now, and
+/// whether the requested name was refused because another snippet has it.
+struct SnippetSaveResult: Equatable, Sendable {
+    let previousName: String
+    let savedName: String
+    let nameRefused: Bool
 }

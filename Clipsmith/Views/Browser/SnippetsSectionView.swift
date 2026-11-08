@@ -253,8 +253,7 @@ struct SnippetsSectionView: View {
         setupSnippetStore()
         Task {
             guard let store = snippetStore,
-                  let name = try? await store.availableName(base: "Untitled Snippet"),
-                  let id = try? await store.insert(name: name, content: "", language: nil, tags: [])
+                  let id = try? await store.insertUnique(base: "Untitled Snippet", content: "", language: nil, tags: [])
             else { return }
             await MainActor.run {
                 languageFilter = nil
@@ -274,14 +273,13 @@ struct SnippetsSectionView: View {
         languageFilter = nil
         setupSnippetStore()
         Task {
-            guard let store = snippetStore else { return }
-            if let id = try? await store.findByName(name) {
-                await MainActor.run { selectedSnippetID = id }
-            } else if let id = try? await store.insert(name: name, content: "", language: "markdown", tags: []) {
-                await MainActor.run {
-                    openInEditFor = id
-                    selectedSnippetID = id
-                }
+            // One actor call, so two quick clicks can't both create it.
+            guard let store = snippetStore,
+                  let (id, created) = try? await store.findOrCreate(name: name, language: "markdown")
+            else { return }
+            await MainActor.run {
+                if created { openInEditFor = id }
+                selectedSnippetID = id
             }
         }
     }

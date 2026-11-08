@@ -236,4 +236,57 @@ final class SnippetStoreTests: XCTestCase {
         let found = try await store.findByName("Dup")
         XCTAssertEqual(found, older)
     }
+
+    // MARK: - Atomic save / create (one actor hop, no interleaving)
+
+    func testSaveRenamesAndReportsPreviousName() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        let id = try await store.insert(name: "A", content: "", language: nil, tags: [])
+        let result = try await store.save(id: id, requestedName: "A2", content: "body", language: "markdown", tags: [])
+        XCTAssertEqual(result, SnippetSaveResult(previousName: "A", savedName: "A2", nameRefused: false))
+        let info = await store.snippet(for: id)
+        XCTAssertEqual(info?.content, "body")
+    }
+
+    func testSaveRefusesTakenNameButSavesOtherFields() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        try await store.insert(name: "A", content: "", language: nil, tags: [])
+        let b = try await store.insert(name: "B", content: "", language: nil, tags: [])
+        let result = try await store.save(id: b, requestedName: "a", content: "new", language: nil, tags: [])
+        XCTAssertEqual(result, SnippetSaveResult(previousName: "B", savedName: "B", nameRefused: true))
+        let info = await store.snippet(for: b)
+        XCTAssertEqual(info?.content, "new")
+    }
+
+    func testSaveWithBlankNameKeepsCurrentName() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        let id = try await store.insert(name: "Keep", content: "", language: nil, tags: [])
+        let result = try await store.save(id: id, requestedName: "  ", content: "", language: nil, tags: [])
+        XCTAssertEqual(result.savedName, "Keep")
+        XCTAssertFalse(result.nameRefused)
+    }
+
+    func testInsertUniqueNeverRepeatsANameUnderConcurrency() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        async let first = store.insertUnique(base: "Untitled Snippet", content: "", language: nil, tags: [])
+        async let second = store.insertUnique(base: "Untitled Snippet", content: "", language: nil, tags: [])
+        let ids = try await [first, second]
+        let a = await store.snippet(for: ids[0])
+        let b = await store.snippet(for: ids[1])
+        XCTAssertNotEqual(a?.name.lowercased(), b?.name.lowercased())
+    }
+
+    func testFindOrCreateReturnsExistingOrCreatesOnce() async throws {
+        let store = SnippetStore(modelContainer: try makeTestContainer())
+        let existing = try await store.insert(name: "Notes", content: "x", language: nil, tags: [])
+        let found = try await store.findOrCreate(name: "notes", language: "markdown")
+        XCTAssertEqual(found.id, existing)
+        XCTAssertFalse(found.created)
+
+        async let one = store.findOrCreate(name: "xyz", language: "markdown")
+        async let two = store.findOrCreate(name: "xyz", language: "markdown")
+        let results = try await [one, two]
+        XCTAssertEqual(results[0].id, results[1].id)
+        XCTAssertEqual(results.filter(\.created).count, 1)
+    }
 }

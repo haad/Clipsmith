@@ -258,7 +258,10 @@ final class TodoStore {
 
     /// A snippet was renamed: point every `[[oldName]]` (tasks and notes) at
     /// the new name. Task ids are kept; dirty only if something changed.
+    /// Loads first: with the Todos feature off the store is never loaded,
+    /// and the rename must still reach the file.
     func renameSnippetReferences(from oldName: String, to newName: String) {
+        loadIfNeeded()
         var changed = false
         for p in document.projects.indices {
             for n in document.projects[p].nodes.indices {
