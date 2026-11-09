@@ -44,10 +44,10 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 - Todos section of the browser window: Today view (`@today` plus overdue/due items), All (every task), one chip per project (⇧⌘[ / ⇧⌘] to switch), fuzzy search with `@tag` terms, show/hide completed
 - Edit a task in place (`⏎`, double-click or right-click → Edit); move it to another project (right-click → Move to, `⇧⌘M`, or drag it onto a project chip)
 - Link a task to a snippet with `[[Snippet name]]` — click the link or press `⌘O` to open it (a missing snippet is created); renaming the snippet updates the link
-- Global quick-add bezel with inline syntax: `Fix pricing page #project @due(2026-09-05) @today`
+- Global quick-add bezel with inline syntax: `Fix pricing page #project @due(fri) @today [[Pricing notes]]`
 - Due dates in plain words (`@due(fri)`, `@due(tomorrow)`, `@due(+3d)`) are saved as ISO dates; `@every(week)` repeats a task when you complete it
 - A notification on the due day (default 09:00, Settings > Todos)
-- Quick-add attaches the selected text and the current browser tab's URL as a note
+- Quick-add attaches the selected text and, in Safari or a Chromium browser (Chrome, Brave, Edge, Arc, Vivaldi), the current tab's URL as a note under the new task; `×` drops it, Settings > Todos turns it off
 - Default file `~/.config/clipsmith/todos.taskpaper` (the data folder is set in Settings > General; a custom todo file in Settings > Todos)
 
 ### Text Transforms
@@ -59,16 +59,43 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 - Export clipboard history to JSON, CSV, or plain text
 - Import history from exported files
 
+## Your Files
+
+Snippets and todos are plain files in one data folder, `~/.config/clipsmith` by default (Settings > General > Data Folder):
+
+```
+~/.config/clipsmith/
+├── todos.taskpaper          # TaskPaper: projects, "- task @tag @due(2026-11-14)"
+└── snippets/
+    ├── Blog notes.md        # one file per snippet: <name>.<extension for its language>
+    ├── Config.swift
+    └── drain.sh
+```
+
+- The file name is the snippet name, so names are unique (ignoring case) and `/` or `:` in a name become `-`.
+- Tags live in a three-line header, written only when a snippet has tags (Obsidian reads it too):
+  ```
+  ---
+  tags: [work, blog]
+  ---
+  ```
+- Edit, add or delete files with any editor; Clipsmith watches the folder and picks up changes. When both sides change at once, the last save wins.
+- `rg kubectl ~/.config/clipsmith` searches everything; the folder can be a git repo or live in iCloud Drive.
+- Changing the data folder switches to the new location; it does not move existing files.
+- Upgrading from an earlier version: on first launch, snippets are copied out of the app database (kept as a backup) and the todo file moves from `~/Library/Application Support/Clipsmith/` unless you chose a custom path.
+
+Clipboard history and prompts stay in the app's database.
+
 ## Keyboard Shortcuts
 
 All shortcuts are configurable in Settings > Shortcuts.
 
 | Action | Default Shortcut |
 |---|---|
-| Open Clipboard | `⇧⌘B` |
+| Open Snippets (browser window) | `⇧⌘B` |
 | Prompt Library | `⇧⌘P` |
 | Documentation Lookup | `⇧⌘D` |
-| Open browser (Snippets) | `⇧⌘S` |
+| Activate Clipboard, Search, App Launcher, Save Clipboard as Snippet, Open Todos, Todo Quick-Add | not set — assign in Settings > Shortcuts |
 
 ### Inside the Bezel
 
@@ -100,12 +127,15 @@ All shortcuts are configurable in Settings > Shortcuts.
 | Edit task / toggle done (Todos) | `⏎` / `Space` |
 | Move task to project (Todos) | `⇧⌘M` |
 | Open the task's `[[snippet]]` (Todos) | `⌘O` |
+| Complete a snippet name after `[[` (Todos, quick-add) | `↑` `↓`, then `Tab` or `⏎` |
+| Delete snippet (to the Trash) / task | `⌘⌫` |
 | Close window | `Esc` |
 
 ## Requirements
 
 - macOS 15 (Sequoia) or later
 - Accessibility permission (System Settings > Privacy & Security > Accessibility)
+- Optional, asked for on first use: Notifications (todo reminders) and Automation for your browser (quick-add reads the current tab URL)
 
 ## Building from Source
 
@@ -127,11 +157,11 @@ Build the `Clipsmith` scheme in Xcode 16+. The app runs as a menu bar utility �
 
 ### Settings Tabs
 
-- **General** — history size, paste behavior, bezel appearance, menu bar options, feature flags
+- **General** — history size, paste behavior, data folder, bezel appearance, menu bar options, feature flags
 - **Shortcuts** — record custom keyboard shortcuts for all features
 - **Prompts** — manage prompt library, sync URL, template variables
 - **Docsets** — browse DevDocs catalog, download/delete documentation sets
-- **Todos** — todo file location (choose, reveal in Finder, reset to default)
+- **Todos** — todo file location (choose, reveal in Finder, reset to default), due-day reminders and their time, quick-add context capture
 
 ### Feature Flags
 
@@ -142,7 +172,7 @@ Some features are behind experimental flags in Settings > General > Features:
 
 ## Privacy
 
-All data stays on your Mac. No cloud sync, no analytics, no tracking.
+All data stays on your Mac. No cloud sync, no analytics, no tracking. Snippets and todos are plain files in a folder you choose; syncing them is up to you (git, iCloud Drive).
 
 ## Changelog
 

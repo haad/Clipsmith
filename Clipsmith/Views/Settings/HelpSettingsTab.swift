@@ -42,8 +42,10 @@ struct HelpSettingsTab: View {
                     HelpRow(keys: "↑ / ↓", action: "Navigate snippets")
                     HelpRow(keys: "Type", action: "Fuzzy search snippets")
                     HelpRow(keys: "Names", action: "Unique, so todos and other snippets can link with [[Snippet name]]")
-                    HelpRow(keys: "[[", action: "Suggests snippet names — ↑ / ↓, then Tab or Return")
-                    HelpRow(keys: "Files", action: "One file per snippet in ~/.config/clipsmith/snippets (folder set in General > Data Folder)")
+                    HelpRow(keys: "[[Other note]]", action: "In a markdown snippet: a link to another snippet in the formatted view")
+                    HelpRow(keys: "Referenced by", action: "Footer menu: the todos and snippets that link here")
+                    HelpRow(keys: "Rename", action: "Updates [[links]] in todos and in other snippets")
+                    HelpRow(keys: "⌘⌫", action: "Delete snippet (its file goes to the Trash)")
                     HelpRow(keys: "Escape", action: "Dismiss")
                 }
 
@@ -53,13 +55,24 @@ struct HelpSettingsTab: View {
                     HelpRow(keys: "Space", action: "Toggle done")
                     HelpRow(keys: "⇧⌘M", action: "Move task to another project (or drag it onto a project chip)")
                     HelpRow(keys: "[[name]]", action: "Link a snippet in task text — click the link or press ⌘O to open it")
+                    HelpRow(keys: "[[", action: "Suggests snippet names — ↑ / ↓, then Tab or Return")
                     HelpRow(keys: "@due(fri)", action: "Plain-word dates (tomorrow, fri, +3d, +2w) are saved as dates")
                     HelpRow(keys: "@every(week)", action: "Completing the task adds the next one (day, month, 3d…)")
                     HelpRow(keys: "Reminders", action: "Notification on the due day — time in the Todos tab")
                     HelpRow(keys: "⇧⌘[ / ⇧⌘]", action: "Previous / next tab: Today, All, projects")
                     HelpRow(keys: "⌘⌫", action: "Delete task")
                     HelpRow(keys: "⇧⌘H", action: "Show / hide completed")
-                    HelpRow(keys: "Note", action: "Enable in General > Features")
+                    HelpRow(keys: "Quick add", action: "Fix pricing #project @due(fri) @today — Return saves, Escape cancels")
+                    HelpRow(keys: "Quick add note", action: "Selected text and browser tab URL are attached; × drops them")
+                    HelpRow(keys: "Note", action: "Enable in General > Features; quick-add needs a hotkey in Shortcuts")
+                }
+
+                HelpSection(title: "Your Files", icon: "folder", color: .orange) {
+                    HelpRow(keys: "Data folder", action: "~/.config/clipsmith by default — change it in General > Data Folder")
+                    HelpRow(keys: "snippets/", action: "One file per snippet: <name>.<ext>, e.g. Blog notes.md, Config.swift")
+                    HelpRow(keys: "todos.taskpaper", action: "All todos, plain TaskPaper (a custom file can be set in the Todos tab)")
+                    HelpRow(keys: "Tags", action: "Three-line header: ---, tags: [a, b], --- (only when there are tags)")
+                    HelpRow(keys: "Edit anywhere", action: "Changes made in other editors show up live; grep it, keep it in git")
                 }
 
                 HelpSection(title: "Prompt Library", icon: "text.book.closed", color: .teal) {
@@ -76,7 +89,10 @@ struct HelpSettingsTab: View {
                 }
 
                 HelpSection(title: "Hotkeys", icon: "keyboard", color: .secondary) {
-                    HelpRow(keys: "All hotkeys", action: "Configure in the Shortcuts tab — none are set by default")
+                    HelpRow(keys: "⇧⌘B", action: "Open Snippets (browser window)")
+                    HelpRow(keys: "⇧⌘P", action: "Prompt Library")
+                    HelpRow(keys: "⇧⌘D", action: "Documentation lookup (when enabled)")
+                    HelpRow(keys: "Others", action: "Clipboard, search, launcher, todos and more: assign in the Shortcuts tab")
                 }
             }
             .padding(20)
