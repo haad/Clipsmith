@@ -87,4 +87,13 @@ final class BrowserWindowViewModelTests: XCTestCase {
         vm.apply(BrowserOpenRequest(section: .todos, query: nil), docLookupEnabled: false, todoTrackingEnabled: true)
         XCTAssertNil(vm.pendingSnippetName)
     }
+
+    func testTodosRequestWithTaskIdSetsPendingTodo() {
+        let vm = BrowserWindowViewModel(defaults: defaults)
+        let id = UUID()
+        vm.apply(BrowserOpenRequest(section: .todos, query: id.uuidString), docLookupEnabled: false, todoTrackingEnabled: true)
+        XCTAssertEqual(vm.pendingTodoID, id)
+        vm.apply(BrowserOpenRequest(section: .todos, query: id.uuidString), docLookupEnabled: false, todoTrackingEnabled: false)
+        XCTAssertNil(vm.pendingTodoID)
+    }
 }

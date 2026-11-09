@@ -12,7 +12,30 @@ private let logger = Logger(
 @MainActor
 @Observable
 final class TodoQuickAddModel {
-    var text = ""
+    var text = "" {
+        didSet { if text != oldValue { highlighted = 0 } }
+    }
+    /// Snippet names for `[[` completion (set by the controller).
+    @ObservationIgnored var snippetNames: () -> [String] = { [] }
+    var highlighted = 0
+
+    var suggestions: [String] {
+        SnippetReference.suggestions(for: text, names: snippetNames())
+    }
+
+    /// Completes the trailing `[[partial` with the highlighted name.
+    func acceptSuggestion() -> Bool {
+        let list = suggestions
+        guard !list.isEmpty else { return false }
+        text = SnippetReference.completing(text, with: list[min(highlighted, list.count - 1)])
+        return true
+    }
+
+    func moveHighlight(by delta: Int) {
+        let count = suggestions.count
+        guard count > 0 else { return }
+        highlighted = (highlighted + delta + count) % count
+    }
 }
 
 /// Single-field quick-add view hosted inside the panel.
@@ -21,18 +44,30 @@ struct TodoQuickAddView: View {
     let onCommit: () -> Void
 
     var body: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "plus.circle.fill")
-                .foregroundStyle(.secondary)
-            TextField(
-                "Add todo — e.g. Fix pricing #lara @due(2026-09-05) @today",
-                text: $model.text
-            )
-            .textFieldStyle(.plain)
-            .font(.title3)
-            .onSubmit(onCommit)
+        VStack(alignment: .leading, spacing: 6) {
+            HStack(spacing: 8) {
+                Image(systemName: "plus.circle.fill")
+                    .foregroundStyle(.secondary)
+                TextField(
+                    "Add todo — e.g. Fix pricing #lara @due(2026-09-05) @today",
+                    text: $model.text
+                )
+                .textFieldStyle(.plain)
+                .font(.title3)
+                .onSubmit(onCommit)
+            }
+            // `[[` completion: ↑/↓ pick, Tab or Return completes.
+            ForEach(Array(model.suggestions.enumerated()), id: \.element) { index, name in
+                Label(name, systemImage: "doc.text")
+                    .padding(.horizontal, 8)
+                    .frame(maxWidth: .infinity, minHeight: TodoQuickAddController.suggestionRowHeight,
+                           alignment: .leading)
+                    .background(index == model.highlighted ? Color.accentColor.opacity(0.25) : .clear,
+                                in: RoundedRectangle(cornerRadius: 6))
+            }
         }
         .padding(14)
+        .frame(maxHeight: .infinity, alignment: .top)
         .background(.regularMaterial, in: RoundedRectangle(cornerRadius: 12))
     }
 }
@@ -45,6 +80,14 @@ final class TodoQuickAddController: NSPanel {
 
     /// Injected by AppDelegate before first show().
     var todoStore: TodoStore?
+    var snippetStore: SnippetStore? {
+        didSet {
+            model.snippetNames = { [weak store = snippetStore] in store?.snippets.map(\.name) ?? [] }
+        }
+    }
+
+    static let baseHeight: CGFloat = 56
+    static let suggestionRowHeight: CGFloat = 24
 
     private let model = TodoQuickAddModel()
     private var globalMonitor: Any?
@@ -91,6 +134,24 @@ final class TodoQuickAddController: NSPanel {
 
     /// Intercept Escape/Return before the hosted TextField swallows them.
     override func sendEvent(_ event: NSEvent) {
+        guard event.type == .keyDown else { super.sendEvent(event); return }
+        if !model.suggestions.isEmpty {
+            switch event.keyCode {
+            case 48, 36, 76:    // Tab, Return, Enter: complete [[name]]
+                _ = model.acceptSuggestion()
+                fitToContent()
+                return
+            case 126:           // Up
+                model.moveHighlight(by: -1)
+                return
+            case 125:           // Down
+                model.moveHighlight(by: 1)
+                return
+            default:
+                break
+            }
+        }
+        defer { fitToContent() }
         if event.type == .keyDown {
             switch event.keyCode {
             case 53:            // Escape
@@ -110,11 +171,23 @@ final class TodoQuickAddController: NSPanel {
         hide()
     }
 
+    /// Grows downward for the suggestion rows, keeping the top edge put.
+    private func fitToContent() {
+        let rows = CGFloat(model.suggestions.count)
+        let height = Self.baseHeight + (rows > 0 ? rows * (Self.suggestionRowHeight + 6) : 0)
+        guard abs(frame.height - height) > 0.5 else { return }
+        var f = frame
+        f.origin.y = frame.maxY - height
+        f.size.height = height
+        setFrame(f, display: true)
+    }
+
     // MARK: - show / hide
 
     func show() {
         todoStore?.loadIfNeeded()
         model.text = ""
+        fitToContent()
         centerOnScreen()
         makeKeyAndOrderFront(nil)
         registerClickOutsideMonitor()

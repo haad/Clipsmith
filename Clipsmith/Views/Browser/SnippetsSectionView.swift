@@ -16,6 +16,8 @@ struct SnippetsSectionView: View {
     @Environment(PasteService.self) private var pasteService
     @Environment(AppTracker.self) private var appTracker
     @Environment(SnippetStore.self) private var snippetStore
+    @Environment(TodoStore.self) private var todoStore
+    @AppStorage(AppSettingsKeys.todoTrackingEnabled) private var todoTrackingEnabled = false
 
     private var allSnippets: [Snippet] { snippetStore.snippets }
 
@@ -86,6 +88,7 @@ struct SnippetsSectionView: View {
             .opacity(0)
         }
         .onAppear {
+            if todoTrackingEnabled { todoStore.loadIfNeeded() }
             consumePendingSnippetName()
             if selectedSnippetID == nil, let first = filteredSnippets.first {
                 selectedSnippetID = first.id
@@ -216,9 +219,12 @@ struct SnippetsSectionView: View {
                     selection: selection
                 )
             } footerLeading: {
-                Text("Edited \(snippet.updatedAt, format: .relative(presentation: .named))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 12) {
+                    Text("Edited \(snippet.updatedAt, format: .relative(presentation: .named))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    backlinksMenu(for: snippet)
+                }
             } footerTrailing: {
                 Button("Paste ↩") {
                     pasteSnippet(snippet)
@@ -227,6 +233,44 @@ struct SnippetsSectionView: View {
             }
         } else {
             BrowserEmptyDetail(systemImage: "curlybraces", message: "Select a snippet")
+        }
+    }
+
+    // MARK: - Backlinks
+
+    private var backlinkTasks: [TodoItem] {
+        guard todoTrackingEnabled, let snippet = selectedSnippet else { return [] }
+        return todoStore.document.allTasks.filter { SnippetReference.mentions($0.rawLine, name: snippet.name) }
+    }
+
+    private var backlinkSnippets: [Snippet] {
+        guard let snippet = selectedSnippet else { return [] }
+        return allSnippets.filter { $0.id != snippet.id && SnippetReference.mentions($0.content, name: snippet.name) }
+    }
+
+    /// Todos and snippets whose text links here with `[[name]]`.
+    @ViewBuilder
+    private func backlinksMenu(for snippet: Snippet) -> some View {
+        let tasks = backlinkTasks
+        let notes = backlinkSnippets
+        if !tasks.isEmpty || !notes.isEmpty {
+            Menu("Referenced by \(tasks.count + notes.count)") {
+                ForEach(tasks) { task in
+                    Button { openTodo(task.id) } label: {
+                        Label(task.title, systemImage: task.isDone ? "checkmark.circle" : "circle")
+                    }
+                }
+                if !tasks.isEmpty && !notes.isEmpty { Divider() }
+                ForEach(notes) { note in
+                    Button { selectedSnippetID = note.id } label: {
+                        Label(note.name, systemImage: "doc.text")
+                    }
+                }
+            }
+            .menuStyle(.borderlessButton)
+            .fixedSize()
+            .font(.caption)
+            .help("Todos and snippets that link here with [[\(snippet.name)]]")
         }
     }
 

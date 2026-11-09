@@ -44,4 +44,22 @@ final class MarkdownRendererTests: XCTestCase {
         XCTAssertTrue(html.contains(#"<input type="checkbox" disabled checked>"#), html)
         XCTAssertTrue(html.contains("<blockquote>"), html)
     }
+
+    func testSnippetReferencesBecomeLinks() {
+        let html = MarkdownRenderer.bodyHTML(from: "See [[Blog notes]] & *[[a<b]]*\n")
+        XCTAssertTrue(html.contains(#"<a class="snippet-link" href="clipsmith-snippet:Blog%20notes">Blog notes</a> &amp; "#), html)
+        XCTAssertTrue(html.contains(#"<em><a class="snippet-link" href="clipsmith-snippet:a%3Cb">a&lt;b</a></em>"#), html)
+    }
+
+    func testSnippetReferencesInCodeStayText() {
+        let html = MarkdownRenderer.bodyHTML(from: "`[[x]]`\n\n```\n[[y]]\n```\n")
+        XCTAssertFalse(html.contains("snippet-link"), html)
+        XCTAssertTrue(html.contains("<code>[[x]]</code>"), html)
+    }
+
+    func testSnippetNameFromURL() throws {
+        let url = try XCTUnwrap(URL(string: "clipsmith-snippet:Blog%20notes"))
+        XCTAssertEqual(MarkdownRenderer.snippetName(from: url), "Blog notes")
+        XCTAssertNil(MarkdownRenderer.snippetName(from: try XCTUnwrap(URL(string: "https://x.dev"))))
+    }
 }

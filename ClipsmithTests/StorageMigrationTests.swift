@@ -34,8 +34,9 @@ final class StorageMigrationTests: XCTestCase {
         StorageMigration.migrateSnippets(from: container, into: store, defaults: defaults)
         StorageMigration.migrateSnippets(from: container, into: store, defaults: defaults)
 
-        XCTAssertEqual(Set(store.snippets.map(\.name)), ["Config", "config 2"])
-        XCTAssertEqual(store.snippets.first { $0.name == "Config" }?.tags, ["a"])
+        // Fetch order decides which one gets " 2"; both survive either way.
+        XCTAssertEqual(Set(store.snippets.map { $0.name.lowercased() }), ["config", "config 2"])
+        XCTAssertEqual(store.snippets.first { $0.language == "swift" }?.tags, ["a"])
         XCTAssertEqual(try container.mainContext.fetchCount(FetchDescriptor<ClipsmithSchemaV1.Snippet>()), 2)
     }
 

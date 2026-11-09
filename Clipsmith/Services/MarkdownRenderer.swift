@@ -8,11 +8,55 @@ import Markdown
 /// escapes nothing, so `a < b` or `<div>` in a code block would become
 /// markup. Here all text is escaped and raw HTML in the note is shown as
 /// text. Fenced code blocks come out as `<pre><code class="language-<lang>">`.
+/// `[[Name]]` in ordinary text (not code) becomes a link with the
+/// `clipsmith-snippet:` scheme, which the web view opens in-app.
 enum MarkdownRenderer {
+    static let snippetLinkScheme = "clipsmith-snippet"
+
     static func bodyHTML(from markdown: String) -> String {
         var renderer = EscapingHTMLRenderer()
-        renderer.visit(Document(parsing: markdown))
-        return renderer.result
+        let clean = markdown.filter { $0 != textStart && $0 != textEnd }
+        renderer.visit(Document(parsing: clean))
+        return linkingTextRuns(renderer.result)
+    }
+
+    /// Text nodes are emitted raw between these markers. The parser splits
+    /// `[[a]]` into several text nodes at the brackets, so adjacent runs are
+    /// joined first, then each run is escaped with references turned into links.
+    fileprivate static let textStart: Character = "\u{E000}"
+    fileprivate static let textEnd: Character = "\u{E001}"
+
+    private static func linkingTextRuns(_ html: String) -> String {
+        let joined = html.replacingOccurrences(of: "\(textEnd)\(textStart)", with: "")
+        var out = ""
+        var rest = Substring(joined)
+        while let start = rest.firstIndex(of: textStart) {
+            out += rest[..<start]
+            let afterStart = rest.index(after: start)
+            let end = rest[afterStart...].firstIndex(of: textEnd) ?? rest.endIndex
+            out += linked(String(rest[afterStart..<end]))
+            rest = end == rest.endIndex ? "" : rest[rest.index(after: end)...]
+        }
+        return out + rest
+    }
+
+    private static func linked(_ text: String) -> String {
+        SnippetReference.segments(in: text).map { segment in
+            switch segment {
+            case .text(let t):
+                return EscapingHTMLRenderer.escape(t)
+            case .reference(let name):
+                let encoded = name.addingPercentEncoding(withAllowedCharacters: .alphanumerics) ?? ""
+                return "<a class=\"snippet-link\" href=\"\(snippetLinkScheme):\(encoded)\">\(EscapingHTMLRenderer.escape(name))</a>"
+            }
+        }.joined()
+    }
+
+    /// The snippet name in a `clipsmith-snippet:` URL, or nil for other URLs.
+    static func snippetName(from url: URL) -> String? {
+        guard url.scheme == snippetLinkScheme else { return nil }
+        let raw = url.absoluteString.dropFirst(snippetLinkScheme.count + 1)
+        return String(raw).removingPercentEncoding
     }
 }
 
@@ -89,7 +133,9 @@ private struct EscapingHTMLRenderer: MarkupWalker {
 
     // MARK: Inlines
 
-    mutating func visitText(_ text: Markdown.Text) { result += Self.escape(text.string) }
+    mutating func visitText(_ text: Markdown.Text) {
+        result += "\(MarkdownRenderer.textStart)\(text.string)\(MarkdownRenderer.textEnd)"
+    }
     mutating func visitInlineHTML(_ html: InlineHTML) { result += Self.escape(html.rawHTML) }
     mutating func visitInlineCode(_ code: InlineCode) { result += "<code>\(Self.escape(code.code))</code>" }
     mutating func visitEmphasis(_ emphasis: Emphasis) { wrap("em", emphasis, newline: false) }

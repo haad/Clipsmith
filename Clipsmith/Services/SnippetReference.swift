@@ -50,4 +50,36 @@ enum SnippetReference {
                 : String(text[match.range])
         }
     }
+
+    /// Whether `text` links to `name` (case-insensitive).
+    static func mentions(_ text: String, name: String) -> Bool {
+        names(in: text).contains { $0.caseInsensitiveCompare(name) == .orderedSame }
+    }
+
+    /// The partial name being typed after a trailing unclosed `[[`
+    /// ("" right after `[[`), or nil when the text doesn't end in one.
+    static func openQuery(in text: String) -> String? {
+        guard let open = text.range(of: "[[", options: .backwards) else { return nil }
+        let tail = text[open.upperBound...]
+        guard !tail.contains("]"), !tail.contains("[") else { return nil }
+        return String(tail)
+    }
+
+    /// Replaces the trailing `[[partial` with `[[name]] `.
+    static func completing(_ text: String, with name: String) -> String {
+        guard openQuery(in: text) != nil,
+              let open = text.range(of: "[[", options: .backwards) else { return text }
+        return text[..<open.lowerBound] + "[[\(name)]] "
+    }
+
+    /// Names to offer while a `[[partial` is being typed: prefix matches
+    /// first, then other substring matches, case-insensitive.
+    static func suggestions(for text: String, names: [String], limit: Int = 6) -> [String] {
+        guard let query = openQuery(in: text)?.trimmingCharacters(in: .whitespaces) else { return [] }
+        let unique = Array(Set(names)).sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+        guard !query.isEmpty else { return Array(unique.prefix(limit)) }
+        let prefix = unique.filter { $0.lowercased().hasPrefix(query.lowercased()) }
+        let rest = unique.filter { !prefix.contains($0) && $0.localizedCaseInsensitiveContains(query) }
+        return Array((prefix + rest).prefix(limit))
+    }
 }

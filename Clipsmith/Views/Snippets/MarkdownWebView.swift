@@ -71,6 +71,7 @@ struct MarkdownWebView: NSViewRepresentable {
     .hljs-type, .hljs-title.class_ { color: #4ec9b0; }
     .hljs-attr, .hljs-variable, .hljs-params { color: #9cdcfe; }
     .hljs-meta { color: #d7ba7d; }
+    a.snippet-link { text-decoration: none; border-bottom: 1px dashed currentColor; }
     @media (prefers-color-scheme: light) {
         .hljs-keyword, .hljs-selector-tag, .hljs-built_in { color: #af00db; }
         .hljs-string, .hljs-attr-value, .hljs-regexp { color: #a31515; }
@@ -87,10 +88,15 @@ struct MarkdownWebView: NSViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate {
         var lastMarkdown: String?
 
-        /// Links open in the default browser, never inside the snippet view.
+        /// `[[snippet]]` links open in Clipsmith; other links in the default
+        /// browser, never inside the snippet view.
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction) async -> WKNavigationActionPolicy {
             if navigationAction.navigationType == .linkActivated, let url = navigationAction.request.url {
-                NSWorkspace.shared.open(url)
+                if let name = MarkdownRenderer.snippetName(from: url) {
+                    openSnippetReference(name)
+                } else {
+                    NSWorkspace.shared.open(url)
+                }
                 return .cancel
             }
             return .allow

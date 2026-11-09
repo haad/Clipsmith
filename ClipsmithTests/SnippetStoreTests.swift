@@ -184,3 +184,19 @@ final class SnippetStoreTests: XCTestCase {
         XCTAssertEqual(reloaded.snippets.last?.updatedAt, old)
     }
 }
+
+@MainActor
+final class SnippetStoreLinkTests: XCTestCase {
+    func testRenameRewritesLinksInOtherSnippets() throws {
+        let dir = FileManager.default.temporaryDirectory.appending(path: "SnippetLinks-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: dir) }
+        let store = SnippetStore(folderURL: dir, watches: false)
+        store.load()
+        let target = try XCTUnwrap(store.insert(base: "xyz", content: "", language: "markdown", tags: []))
+        let other = try XCTUnwrap(store.insert(base: "index", content: "see [[XYZ]] and [[abc]]", language: "markdown", tags: ["t"]))
+        _ = store.save(id: target, requestedName: "Blog", content: "", language: "markdown", tags: [])
+        XCTAssertEqual(store.snippet(id: other)?.content, "see [[Blog]] and [[abc]]")
+        XCTAssertEqual(try String(contentsOf: dir.appending(path: "index.md"), encoding: .utf8),
+                       "---\ntags: [t]\n---\nsee [[Blog]] and [[abc]]")
+    }
+}

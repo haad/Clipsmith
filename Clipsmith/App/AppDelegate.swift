@@ -206,6 +206,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         todoQuickAddController = TodoQuickAddController()
         todoQuickAddController.todoStore = todoStore
+        todoQuickAddController.snippetStore = snippetStore
 
         // Re-point TodoStore when Settings changes the todo file path.
         NotificationCenter.default.addObserver(

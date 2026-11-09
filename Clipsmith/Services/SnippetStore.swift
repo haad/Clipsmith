@@ -177,8 +177,20 @@ final class SnippetStore {
         snippets[index] = Snippet(id: id, name: name, content: content, language: normalized(language),
                                   tags: tags, createdAt: old.createdAt, updatedAt: dates.modified,
                                   fileURL: url)
+        if name != old.name { rewriteReferences(from: old.name, to: name) }
         snippets.sort { $0.updatedAt > $1.updatedAt }
         return SnippetSaveResult(previousName: old.name, savedName: name, nameRefused: refused)
+    }
+
+    /// A rename points every `[[old]]` in every snippet at the new name.
+    private func rewriteReferences(from oldName: String, to newName: String) {
+        for i in snippets.indices {
+            let rewritten = SnippetReference.rewriting(snippets[i].content, from: oldName, to: newName)
+            guard rewritten != snippets[i].content,
+                  write(content: rewritten, tags: snippets[i].tags, to: snippets[i].fileURL) else { continue }
+            snippets[i].content = rewritten
+            snippets[i].updatedAt = fileDates(snippets[i].fileURL).modified
+        }
     }
 
     /// Moves the file to the Trash, so a deleted note can be recovered.

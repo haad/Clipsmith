@@ -17,6 +17,8 @@ final class BrowserWindowViewModel {
     /// Snippet name from a todo `[[reference]]`. The Snippets section opens
     /// (or creates) that snippet and sets this back to nil.
     var pendingSnippetName: String?
+    /// Task id (from a snippet backlink) the Todos section should select.
+    var pendingTodoID: UUID?
 
     private let defaults: UserDefaults
 
@@ -46,6 +48,11 @@ final class BrowserWindowViewModel {
             pendingDocsQuery = request.query ?? ""
         } else {
             pendingDocsQuery = nil
+        }
+        if request.section == .todos, selectedSection == .todos {
+            pendingTodoID = request.query.flatMap(UUID.init(uuidString:))
+        } else {
+            pendingTodoID = nil
         }
         if request.section == .snippets, selectedSection == .snippets {
             pendingSnippetName = request.query

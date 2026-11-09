@@ -95,6 +95,13 @@ struct BrowserWindowView: View {
         .onChange(of: todoTrackingEnabled) { _, enabled in
             viewModel.apply(BrowserOpenRequest(section: nil, query: nil), docLookupEnabled: docLookupEnabled, todoTrackingEnabled: enabled)
         }
+        .onChange(of: viewModel.pendingTodoID) { _, id in
+            guard let id else { return }
+            viewModel.pendingTodoID = nil
+            todosViewModel.selectedTab = .all
+            todosViewModel.searchText = ""
+            todosViewModel.selectedItemID = id
+        }
         .onReceive(NotificationCenter.default.publisher(for: .clipsmithOpenBrowser)) { _ in
             guard let request = BrowserOpenMailbox.shared.take() else { return }
             viewModel.apply(request, docLookupEnabled: docLookupEnabled, todoTrackingEnabled: todoTrackingEnabled)

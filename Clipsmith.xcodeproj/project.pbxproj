@@ -134,6 +134,7 @@
 		AA0141 /* StorageMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0141 /* StorageMigration.swift */; };
 		AA0142 /* SnippetFileFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0142 /* SnippetFileFormatTests.swift */; };
 		AA0143 /* StorageMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0143 /* StorageMigrationTests.swift */; };
+		AA0144 /* SnippetLinkSuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0144 /* SnippetLinkSuggestions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -275,6 +276,7 @@
 		AF0141 /* StorageMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageMigration.swift; sourceTree = "<group>"; };
 		AF0142 /* SnippetFileFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFileFormatTests.swift; sourceTree = "<group>"; };
 		AF0143 /* StorageMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageMigrationTests.swift; sourceTree = "<group>"; };
+		AF0144 /* SnippetLinkSuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetLinkSuggestions.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -503,6 +505,7 @@
 				AF0040 /* SnippetEditorView.swift */,
 				AF0136 /* MarkdownWebView.swift */,
 				AF0135 /* SnippetSelection.swift */,
+				AF0144 /* SnippetLinkSuggestions.swift */,
 				AF0044 /* HighlightedTextEditor.swift */,
 			);
 			path = Snippets;
@@ -681,6 +684,7 @@
 				AA0039 /* SnippetEditorView.swift in Sources */,
 				AA0136 /* MarkdownWebView.swift in Sources */,
 				AA0135 /* SnippetSelection.swift in Sources */,
+				AA0144 /* SnippetLinkSuggestions.swift in Sources */,
 				AA0043 /* HighlightedTextEditor.swift in Sources */,
 				AA0044 /* ClipsmithSchemaV2.swift in Sources */,
 				AA0045 /* PromptLibraryStore.swift in Sources */,

@@ -29,6 +29,7 @@ struct TodoListView: View {
                 if isAddingTask {
                     TextField("New task — tags like @today welcome", text: $draftText)
                         .textFieldStyle(.plain)
+                        .snippetLinkSuggestions(for: draftText)
                         .focused($draftFocused)
                         .onSubmit { commitDraft() }
                         .onExitCommand { cancelDraft() }
@@ -38,6 +39,7 @@ struct TodoListView: View {
                         if item.id == editingID {
                             TextField("Task", text: $editText)
                                 .textFieldStyle(.plain)
+                                .snippetLinkSuggestions(for: editText)
                                 .focused($editFocused)
                                 .onSubmit { commitEdit() }
                                 .onExitCommand { cancelEdit() }
@@ -273,6 +275,16 @@ func openSnippetReference(_ name: String) {
         name: .clipsmithRequestBrowser,
         object: nil,
         userInfo: BrowserOpenRequest(section: .snippets, query: name).userInfo
+    )
+}
+
+/// Opens the browser on Todos (All) with the task selected.
+@MainActor
+func openTodo(_ id: UUID) {
+    NotificationCenter.default.post(
+        name: .clipsmithRequestBrowser,
+        object: nil,
+        userInfo: BrowserOpenRequest(section: .todos, query: id.uuidString).userInfo
     )
 }
 
