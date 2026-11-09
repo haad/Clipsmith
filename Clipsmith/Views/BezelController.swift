@@ -658,10 +658,13 @@ final class BezelController: NSPanel {
         let expandedDir = NSString(string: saveDir).expandingTildeInPath
         let path = (expandedDir as NSString).appendingPathComponent(filename)
         do {
+            // The configured folder may not exist yet (typed path, removed folder).
+            try FileManager.default.createDirectory(atPath: expandedDir, withIntermediateDirectories: true)
             try content.write(toFile: path, atomically: true, encoding: .utf8)
             logger.info("Saved clipping to \(path, privacy: .public)")
         } catch {
             logger.error("Failed to save clipping: \(error.localizedDescription, privacy: .public)")
+            return // never delete a clipping that wasn't written
         }
         if deleteAfter {
             Task { @MainActor in await self.deleteCurrentClipping() }
