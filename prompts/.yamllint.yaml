@@ -1,0 +1,27 @@
+---
+extends: default
+
+rules:
+  comments:
+    min-spaces-from-content: 2
+  indentation:
+    spaces: 2
+    indent-sequences: true
+  line-length:
+    max: 200
+    allow-non-breakable-words: true
+    allow-non-breakable-inline-mappings: true
+  truthy:
+    allowed-values: ['true', 'false', 'yes', 'no']
+  document-start: disable
+  braces:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+
+ignore:
+  - .venv/
+  - node_modules/
+  - web-ui/
