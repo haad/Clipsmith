@@ -11,8 +11,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - Todos can reference snippets with `[[Snippet name]]`. The reference shows as a link in the list; clicking it or ⌘O opens the snippet, creating an empty markdown snippet if none has that name.
 - Renaming a snippet updates every `[[reference]]` to it in the todo file.
 - Todos: edit a task (Return, double-click or right-click → Edit), move it to another project (right-click → Move to, ⇧⌘M, or drag it onto a project chip).
+- Snippets link to each other: `[[Other note]]` in a markdown snippet is a link in the formatted view. Renames rewrite links in every snippet too.
+- Backlinks: the snippet footer shows "Referenced by N" with the todos and snippets that link to it.
+- Typing `[[` in a todo field or quick-add suggests snippet names (↑/↓, Tab or Return completes).
+- Due reminders: a notification at a set time (default 09:00, Settings > Todos) on the due day of each open task; clicking it opens the task.
+- Natural due dates: `@due(tomorrow)`, `@due(fri)`, `@due(+3d)`, `@due(+2w)` are saved as ISO dates.
+- Repeating tasks: completing a task tagged `@every(week)` (also `day`, `month`, `year`, `3d`, `2w`…) adds the next occurrence.
+- Quick-add attaches the selected text and, in Safari or Chromium browsers, the current tab URL as a note under the new task (× to drop it; can be turned off in Settings > Todos).
 
 ### Changed
+- Snippets and todos are plain files in one data folder, default `~/.config/clipsmith` (Settings > General > Data Folder): each snippet is `snippets/<name>.<ext>` (tags in a three-line header), todos are `todos.taskpaper`. Grep them, keep them in git; edits made in other editors show up live. On first launch existing snippets are copied out of the database (which is kept as a backup) and the todo file moves from Application Support unless you chose a custom path. Deleting a snippet moves its file to the Trash.
 - Snippet names are unique (ignoring case): a name already in use is refused with a warning. Existing duplicates are flagged in the list.
 - Todos: the Inbox chip is replaced by All, which shows every task; project chips filter it.
 
@@ -20,6 +28,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - App Launcher on macOS 26: the border now follows the rounded corners.
 - ⌘N in Todos stopped working after visiting Snippets or Prompts.
 - Running the test suite no longer pastes snippet text into the frontmost app.
+- Saving a clipping to a file creates the "Save clippings to" folder if it is missing, and the S (save and delete) key no longer deletes the clipping when the save fails.
 
 ## [5.4.1] - 2026-11-02
 

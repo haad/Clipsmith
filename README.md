@@ -17,11 +17,11 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 - Configurable history size, duplicate removal, and password-length filtering
 
 ### Code Snippets
-- Save frequently used code as named snippets organized into folders
+- Save frequently used code and notes as named snippets, stored as plain files in `~/.config/clipsmith/snippets/` (one file per snippet, e.g. `Blog notes.md`): grep them, keep them in git, edit them in any editor
 - Syntax-highlighted editor with language detection
 - Markdown snippets read as formatted notes (headings, lists, tables, task lists, highlighted code blocks); `⌘E` switches to the raw markdown
 - Select part of a markdown snippet and paste just that part
-- Snippet names are unique, so todos can link to them with `[[Snippet name]]`
+- Snippet names are unique, so todos and other snippets can link to them with `[[Snippet name]]`; type `[[` to pick a name, and the footer lists what links to a snippet
 - Quick access via keyboard shortcut
 
 ### Prompt Library
@@ -45,7 +45,10 @@ Clipsmith keeps your clipboard history, code snippets, AI prompts, and offline d
 - Edit a task in place (`⏎`, double-click or right-click → Edit); move it to another project (right-click → Move to, `⇧⌘M`, or drag it onto a project chip)
 - Link a task to a snippet with `[[Snippet name]]` — click the link or press `⌘O` to open it (a missing snippet is created); renaming the snippet updates the link
 - Global quick-add bezel with inline syntax: `Fix pricing page #project @due(2026-09-05) @today`
-- Default file `~/Library/Application Support/Clipsmith/todos.taskpaper`, changeable in Settings > Todos
+- Due dates in plain words (`@due(fri)`, `@due(tomorrow)`, `@due(+3d)`) are saved as ISO dates; `@every(week)` repeats a task when you complete it
+- A notification on the due day (default 09:00, Settings > Todos)
+- Quick-add attaches the selected text and the current browser tab's URL as a note
+- Default file `~/.config/clipsmith/todos.taskpaper` (the data folder is set in Settings > General; a custom todo file in Settings > Todos)
 
 ### Text Transforms
 - 26 transforms: case conversions (camelCase, snake_case…), Base64, JSON pretty print, JWT decode, sort/dedupe lines, extract URLs/emails, timestamps, and more

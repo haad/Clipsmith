@@ -32,7 +32,7 @@ One window hosts Snippets, Prompts, Docs, Claude Toolkit and Todos as sections b
 - `BrowserPanes` — shared `BrowserSearchField`, `BrowserFilterRow` (chips), `BrowserListPane`, `BrowserDetailPane`, `BrowserEmptyDetail`
 - `SnippetsSectionView`, `PromptsSectionView`, `ToolkitSectionView`, `DocsSectionView`, `TodosSectionView` — one per section; filtering logic in `SnippetFilter` / `PromptFilter`; Todos reuses `TodoListView` / `TodoWindowViewModel` from `Views/Todos/` (project tabs are chips, ⇧⌘[ / ⇧⌘] switch them)
 - `DocsBrowserViewModel` — docs search, docset scoping (sidebar), `prefix:` selection, `open(withQuery:)` prefill
-- Snippets: markdown snippets render via `MarkdownWebView` (`MarkdownRenderer` escapes everything; highlight.js comes from HighlightSwift's bundle); `pendingSnippetName` opens a snippet from a todo `[[reference]]`; renames rewrite references via `TodoStore.renameSnippetReferences`; names are unique (`SnippetStore.isNameTaken`)
+- Snippets: markdown snippets render via `MarkdownWebView` (`MarkdownRenderer` escapes everything; highlight.js comes from HighlightSwift's bundle); `pendingSnippetName` opens a snippet from a todo `[[reference]]`; renames rewrite references via `TodoStore.renameSnippetReferences` and in other snippets; names are unique (`SnippetStore.isNameTaken`); `[[name]]` links render as `clipsmith-snippet:` URLs; backlinks in the detail footer
 
 Opening flow (two hops, because `AppDelegate` has no `@Environment(\.openWindow)`): a caller posts `.clipsmithRequestBrowser` with `BrowserOpenRequest.userInfo` → `MenuBarView.openBrowser` puts the request in `BrowserOpenMailbox.shared`, activates the app, calls `openWindow(id: "browser")` and posts `.clipsmithOpenBrowser` → `BrowserWindowView` takes the request from the mailbox in `onAppear` (new window) or on the notification (already open). The docs hotkey captures the selected text in `AppDelegate.requestDocsBrowser()` before activation.
 
@@ -58,7 +58,8 @@ Both bezels use `.nonactivatingPanel` (don't steal focus). Documentation is a se
 
 ### Data Storage
 - **Clippings & Prompts** — SwiftData (`ClipsmithSchemaV1` → `V2` → `V3`; V3 dropped `GistRecord`, migrations are lightweight)
-- **Snippets** — SwiftData
+- **Snippets** — plain files, `<data folder>/snippets/<name>.<ext>` (`SnippetStore`, `SnippetFileFormat`, FSEvents via `FolderWatcher`); data folder = `DataFolder.resolve()` (default `~/.config/clipsmith`, setting `dataFolderPath`). SwiftData `Snippet` rows are only read by `StorageMigration`
+- **Todos** — `<data folder>/todos.taskpaper` unless `todoFilePath` is set; reminders in `TodoReminderScheduler`
 - **DevDocs metadata** — JSON in `~/Library/Application Support/Clipsmith/devdocs-meta.json`
 - **DevDocs content** — `index.json` + `db.json` per doc in `~/Library/Application Support/Clipsmith/DevDocs/{slug}/`
 - **Settings** — UserDefaults via `@AppStorage` (keys in `AppSettingsKeys`)

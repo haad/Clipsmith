@@ -41,7 +41,9 @@ struct HelpSettingsTab: View {
                     HelpRow(keys: "⌘N", action: "New snippet")
                     HelpRow(keys: "↑ / ↓", action: "Navigate snippets")
                     HelpRow(keys: "Type", action: "Fuzzy search snippets")
-                    HelpRow(keys: "Names", action: "Unique, so todos can link to a snippet with [[Snippet name]]")
+                    HelpRow(keys: "Names", action: "Unique, so todos and other snippets can link with [[Snippet name]]")
+                    HelpRow(keys: "[[", action: "Suggests snippet names — ↑ / ↓, then Tab or Return")
+                    HelpRow(keys: "Files", action: "One file per snippet in ~/.config/clipsmith/snippets (folder set in General > Data Folder)")
                     HelpRow(keys: "Escape", action: "Dismiss")
                 }
 
@@ -51,6 +53,9 @@ struct HelpSettingsTab: View {
                     HelpRow(keys: "Space", action: "Toggle done")
                     HelpRow(keys: "⇧⌘M", action: "Move task to another project (or drag it onto a project chip)")
                     HelpRow(keys: "[[name]]", action: "Link a snippet in task text — click the link or press ⌘O to open it")
+                    HelpRow(keys: "@due(fri)", action: "Plain-word dates (tomorrow, fri, +3d, +2w) are saved as dates")
+                    HelpRow(keys: "@every(week)", action: "Completing the task adds the next one (day, month, 3d…)")
+                    HelpRow(keys: "Reminders", action: "Notification on the due day — time in the Todos tab")
                     HelpRow(keys: "⇧⌘[ / ⇧⌘]", action: "Previous / next tab: Today, All, projects")
                     HelpRow(keys: "⌘⌫", action: "Delete task")
                     HelpRow(keys: "⇧⌘H", action: "Show / hide completed")
