@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 
 /// Snippets section of the browser window.
 ///
@@ -16,37 +15,33 @@ struct SnippetsSectionView: View {
 
     @Environment(PasteService.self) private var pasteService
     @Environment(AppTracker.self) private var appTracker
-    @Environment(\.modelContext) private var modelContext
+    @Environment(SnippetStore.self) private var snippetStore
 
-    // MARK: - Query
-
-    @Query(sort: \ClipsmithSchemaV1.Snippet.updatedAt, order: .reverse)
-    private var allSnippets: [ClipsmithSchemaV1.Snippet]
+    private var allSnippets: [Snippet] { snippetStore.snippets }
 
     // MARK: - State
 
     @State private var searchText: String = ""
-    @State private var selectedSnippetID: PersistentIdentifier?
+    @State private var selectedSnippetID: UUID?
     @State private var languageFilter: String?
-    @State private var snippetStore: SnippetStore?
     @FocusState private var isSearchFocused: Bool
     /// Markdown snippets open rendered; ⌘E / Edit switches to the raw editor.
     @State private var isEditingMarkdown = false
     /// Snippet that should open in edit mode once selected (a freshly
     /// created `[[reference]]` target). Consumed by the selection change,
     /// which otherwise resets edit mode.
-    @State private var openInEditFor: PersistentIdentifier?
+    @State private var openInEditFor: UUID?
     @State private var selection = SnippetSelection()
 
     // MARK: - Computed
 
-    private var filteredSnippets: [ClipsmithSchemaV1.Snippet] {
+    private var filteredSnippets: [Snippet] {
         SnippetFilter.apply(allSnippets, query: searchText, language: languageFilter)
     }
 
-    private var selectedSnippet: ClipsmithSchemaV1.Snippet? {
+    private var selectedSnippet: Snippet? {
         guard let id = selectedSnippetID else { return nil }
-        return allSnippets.first { $0.persistentModelID == id }
+        return allSnippets.first { $0.id == id }
     }
 
     // MARK: - Body
@@ -91,10 +86,9 @@ struct SnippetsSectionView: View {
             .opacity(0)
         }
         .onAppear {
-            setupSnippetStore()
             consumePendingSnippetName()
             if selectedSnippetID == nil, let first = filteredSnippets.first {
-                selectedSnippetID = first.persistentModelID
+                selectedSnippetID = first.id
             }
         }
         .onChange(of: selectedSnippetID) { _, newID in
@@ -106,8 +100,8 @@ struct SnippetsSectionView: View {
         }
         .onChange(of: filteredSnippets.count) { _, _ in
             if let id = selectedSnippetID,
-               !allSnippets.contains(where: { $0.persistentModelID == id }) {
-                selectedSnippetID = filteredSnippets.first?.persistentModelID
+               !allSnippets.contains(where: { $0.id == id }) {
+                selectedSnippetID = filteredSnippets.first?.id
             }
         }
     }
@@ -139,7 +133,7 @@ struct SnippetsSectionView: View {
                 let duplicates = SnippetFilter.duplicateNames(allSnippets.map(\.name))
                 List(filteredSnippets, selection: $selectedSnippetID) { snippet in
                     snippetRow(snippet, isDuplicate: duplicates.contains(snippet.name.lowercased()))
-                        .tag(snippet.persistentModelID)
+                        .tag(snippet.id)
                 }
                 .listStyle(.sidebar)
                 .onKeyPress(.return) {
@@ -156,7 +150,7 @@ struct SnippetsSectionView: View {
     }
 
     @ViewBuilder
-    private func snippetRow(_ snippet: ClipsmithSchemaV1.Snippet, isDuplicate: Bool) -> some View {
+    private func snippetRow(_ snippet: Snippet, isDuplicate: Bool) -> some View {
         VStack(alignment: .leading, spacing: 2) {
             HStack(spacing: 4) {
                 Text(snippet.name.isEmpty ? "Untitled" : snippet.name)
@@ -181,7 +175,7 @@ struct SnippetsSectionView: View {
             pasteSnippet(snippet)
         }
         .onTapGesture(count: 1) {
-            selectedSnippetID = snippet.persistentModelID
+            selectedSnippetID = snippet.id
         }
         .contextMenu {
             Button("Delete", role: .destructive) {
@@ -218,7 +212,6 @@ struct SnippetsSectionView: View {
             } body: {
                 SnippetEditorView(
                     snippet: snippet,
-                    snippetStore: snippetStoreInstance,
                     isEditing: $isEditingMarkdown,
                     selection: selection
                 )
@@ -239,60 +232,30 @@ struct SnippetsSectionView: View {
 
     // MARK: - Actions
 
-    private func setupSnippetStore() {
-        guard snippetStore == nil else { return }
-        snippetStore = SnippetStore(modelContainer: modelContext.container)
-    }
-
-    private var snippetStoreInstance: SnippetStore {
-        if let store = snippetStore { return store }
-        return SnippetStore(modelContainer: modelContext.container)
-    }
-
     private func createNewSnippet() {
-        setupSnippetStore()
-        Task {
-            guard let store = snippetStore,
-                  let id = try? await store.insertUnique(base: "Untitled Snippet", content: "", language: nil, tags: [])
-            else { return }
-            await MainActor.run {
-                languageFilter = nil
-                selectedSnippetID = id
-            }
-        }
+        guard let id = snippetStore.insert(base: "Untitled Snippet", content: "", language: nil, tags: [])
+        else { return }
+        languageFilter = nil
+        selectedSnippetID = id
     }
 
     /// A todo `[[name]]` was opened: select that snippet, or create an empty
-    /// markdown one and open it for editing. Looks the name up in the store,
-    /// not `allSnippets`, which may not be loaded yet when the window opens
-    /// (a miss there would create a duplicate).
+    /// markdown one and open it for editing.
     private func consumePendingSnippetName() {
         guard let name = windowViewModel.pendingSnippetName else { return }
         windowViewModel.pendingSnippetName = nil
         searchText = ""
         languageFilter = nil
-        setupSnippetStore()
-        Task {
-            // One actor call, so two quick clicks can't both create it.
-            guard let store = snippetStore,
-                  let (id, created) = try? await store.findOrCreate(name: name, language: "markdown")
-            else { return }
-            await MainActor.run {
-                if created { openInEditFor = id }
-                selectedSnippetID = id
-            }
-        }
+        guard let (id, created) = snippetStore.findOrCreate(name: name, language: "markdown") else { return }
+        if created { openInEditFor = id }
+        selectedSnippetID = id
     }
 
-    private func deleteSnippet(_ snippet: ClipsmithSchemaV1.Snippet) {
-        setupSnippetStore()
-        let id = snippet.persistentModelID
-        if selectedSnippetID == id {
+    private func deleteSnippet(_ snippet: Snippet) {
+        if selectedSnippetID == snippet.id {
             selectedSnippetID = nil
         }
-        Task {
-            try? await snippetStore?.delete(id: id)
-        }
+        snippetStore.delete(id: snippet.id)
     }
 
     private func deleteSelectedSnippet() {
@@ -302,7 +265,7 @@ struct SnippetsSectionView: View {
 
     /// Closes the browser window, drops back to accessory and pastes into the previous app.
     /// Markdown snippets paste only the selected text when there is a selection.
-    private func pasteSnippet(_ snippet: ClipsmithSchemaV1.Snippet) {
+    private func pasteSnippet(_ snippet: Snippet) {
         let full = snippet.content
         let language = snippet.language
         let previousApp = appTracker.previousApp

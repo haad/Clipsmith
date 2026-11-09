@@ -40,6 +40,11 @@ final class TodoStore {
     // MARK: - Path resolution
 
     static func defaultFileURL() -> URL {
+        DataFolder.resolve().appending(path: "todos.taskpaper")
+    }
+
+    /// Where the file lived before the data folder existed.
+    static func legacyDefaultFileURL() -> URL {
         FileManager.default
             .urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
             .appending(path: "Clipsmith/todos.taskpaper")

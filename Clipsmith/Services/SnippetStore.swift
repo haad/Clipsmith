@@ -1,5 +1,5 @@
-import SwiftData
 import Foundation
+import Observation
 import OSLog
 
 private let logger = Logger(
@@ -7,250 +7,16 @@ private let logger = Logger(
     category: "SnippetStore"
 )
 
-// MARK: - SnippetInfo
-
-/// Sendable value type for cross-actor transfer of Snippet data.
-///
-/// Mirrors the ClippingInfo pattern: carries PersistentIdentifier (safe cross-actor reference)
-/// plus copied fields for display and paste without re-fetching the @Model.
-struct SnippetInfo: Sendable, Identifiable {
-    let id: PersistentIdentifier
-    let name: String
-    let content: String
-    let language: String?
-    let tags: [String]
-    let createdAt: Date
-    let updatedAt: Date
-}
-
-// MARK: - SnippetStore
-
-/// Background data store for code snippet CRUD operations.
-///
-/// Mirrors the ClipboardStore @ModelActor pattern:
-/// - All mutations happen on the model actor's background executor
-/// - Returns `PersistentIdentifier` (Sendable) for cross-actor references
-/// - Calls `modelContext.save()` immediately after every mutation (PITFALL 3)
-@ModelActor
-actor SnippetStore {
-
-    // MARK: - Insert
-
-    /// Inserts a new snippet with name, content, language, and tags.
-    ///
-    /// Always saves immediately to ensure the PersistentIdentifier is permanent (PITFALL 3).
-    @discardableResult
-    func insert(
-        name: String,
-        content: String,
-        language: String?,
-        tags: [String]
-    ) throws -> PersistentIdentifier {
-        let snippet = ClipsmithSchemaV1.Snippet(
-            name: name,
-            content: content,
-            language: language,
-            tags: tags
-        )
-        modelContext.insert(snippet)
-        try modelContext.save()
-        logger.debug("Snippet inserted: \(name, privacy: .public)")
-        return snippet.persistentModelID
-    }
-
-    // MARK: - Atomic save / create
-
-    /// Check-and-write in one actor call, so a rename can't interleave with
-    /// another save or a selection change in the editor. A blank or taken
-    /// name keeps the stored one (`nameRefused` only for taken); every other
-    /// field is saved regardless. `previousName` is read from this context,
-    /// so it is the authoritative source for rewriting todo references.
-    func save(
-        id: PersistentIdentifier,
-        requestedName: String,
-        content: String,
-        language: String?,
-        tags: [String]
-    ) throws -> SnippetSaveResult {
-        guard let snippet = modelContext.model(for: id) as? ClipsmithSchemaV1.Snippet else {
-            return SnippetSaveResult(previousName: "", savedName: "", nameRefused: false)
-        }
-        let previous = snippet.name
-        let trimmed = requestedName.trimmingCharacters(in: .whitespaces)
-        var saved = trimmed.isEmpty ? previous : trimmed
-        let refused = try isNameTaken(saved, excluding: id)
-        if refused { saved = previous }
-        snippet.name = saved
-        snippet.content = content
-        snippet.language = language
-        snippet.tags = tags
-        snippet.updatedAt = .now
-        try modelContext.save()
-        return SnippetSaveResult(previousName: previous, savedName: saved, nameRefused: refused)
-    }
-
-    /// Inserts with the first free name from `base` ("<base>", "<base> 2", ...).
-    func insertUnique(base: String, content: String, language: String?, tags: [String]) throws -> PersistentIdentifier {
-        try insert(name: availableName(base: base), content: content, language: language, tags: tags)
-    }
-
-    /// The snippet a todo `[[name]]` opens; created (empty) when missing.
-    func findOrCreate(name: String, language: String?) throws -> (id: PersistentIdentifier, created: Bool) {
-        if let id = try findByName(name) { return (id, false) }
-        return (try insert(name: name, content: "", language: language, tags: []), true)
-    }
-
-    // MARK: - Unique names
-
-    /// Names are unique case-insensitively so `[[name]]` todo references are
-    /// unambiguous. Compared in Swift: the set is small and #Predicate has no
-    /// reliable case-insensitive equality.
-    func isNameTaken(_ name: String, excluding id: PersistentIdentifier?) throws -> Bool {
-        try modelContext.fetch(FetchDescriptor<ClipsmithSchemaV1.Snippet>()).contains {
-            $0.persistentModelID != id && $0.name.caseInsensitiveCompare(name) == .orderedSame
-        }
-    }
-
-    /// `base` if free, else "<base> 2", "<base> 3", ...
-    func availableName(base: String) throws -> String {
-        guard try isNameTaken(base, excluding: nil) else { return base }
-        var n = 2
-        while try isNameTaken("\(base) \(n)", excluding: nil) { n += 1 }
-        return "\(base) \(n)"
-    }
-
-    /// Case-insensitive match; with legacy duplicates, the most recently updated.
-    func findByName(_ name: String) throws -> PersistentIdentifier? {
-        let descriptor = FetchDescriptor<ClipsmithSchemaV1.Snippet>(
-            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
-        )
-        return try modelContext.fetch(descriptor)
-            .first { $0.name.caseInsensitiveCompare(name) == .orderedSame }?
-            .persistentModelID
-    }
-
-    // MARK: - Fetch All
-
-    /// Returns all snippet persistent IDs sorted by updatedAt descending (most recently edited first).
-    func fetchAll() throws -> [PersistentIdentifier] {
-        let descriptor = FetchDescriptor<ClipsmithSchemaV1.Snippet>(
-            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
-        )
-        return try modelContext.fetch(descriptor).map(\.persistentModelID)
-    }
-
-    // MARK: - Fetch By Language
-
-    /// Returns snippet persistent IDs filtered by a specific language, sorted by updatedAt descending.
-    func fetchByLanguage(_ language: String) throws -> [PersistentIdentifier] {
-        let descriptor = FetchDescriptor<ClipsmithSchemaV1.Snippet>(
-            predicate: #Predicate { $0.language == language },
-            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
-        )
-        return try modelContext.fetch(descriptor).map(\.persistentModelID)
-    }
-
-    // MARK: - Search
-
-    /// Searches snippets by name, content, or tags.
-    ///
-    /// - Empty query returns all snippets (sorted by updatedAt descending).
-    /// - Non-empty query matches name/content via `localizedStandardContains` (case-insensitive, locale-aware).
-    /// - Tag matching is performed in-memory since SwiftData #Predicate does not support
-    ///   `.contains()` on `[String]` arrays.
-    func search(query: String) throws -> [PersistentIdentifier] {
-        if query.isEmpty {
-            return try fetchAll()
-        }
-
-        // Fetch name + content matches via predicate (SQLite-level filtering)
-        let descriptor = FetchDescriptor<ClipsmithSchemaV1.Snippet>(
-            predicate: #Predicate { snippet in
-                snippet.name.localizedStandardContains(query)
-                    || snippet.content.localizedStandardContains(query)
-            },
-            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
-        )
-        var matched = try modelContext.fetch(descriptor)
-
-        // Fetch all snippets and filter for tag matches in-memory (tags: [String] not SQLite-filterable)
-        let allDescriptor = FetchDescriptor<ClipsmithSchemaV1.Snippet>(
-            sortBy: [SortDescriptor(\.updatedAt, order: .reverse)]
-        )
-        let all = try modelContext.fetch(allDescriptor)
-        let tagMatches = all.filter { snippet in
-            snippet.tags.contains { tag in
-                tag.localizedStandardContains(query)
-            }
-        }
-
-        // Merge, deduplicate by persistentModelID, preserve updatedAt ordering
-        let matchedIDs = Set(matched.map(\.persistentModelID))
-        for tagMatch in tagMatches where !matchedIDs.contains(tagMatch.persistentModelID) {
-            matched.append(tagMatch)
-        }
-
-        // Re-sort merged result by updatedAt descending
-        matched.sort { $0.updatedAt > $1.updatedAt }
-
-        return matched.map(\.persistentModelID)
-    }
-
-    // MARK: - Update
-
-    /// Updates an existing snippet's fields and refreshes updatedAt.
-    func update(
-        id: PersistentIdentifier,
-        name: String,
-        content: String,
-        language: String?,
-        tags: [String]
-    ) throws {
-        guard let snippet = modelContext.model(for: id) as? ClipsmithSchemaV1.Snippet else {
-            logger.warning("update: snippet not found for id \(id.hashValue, privacy: .public)")
-            return
-        }
-        snippet.name = name
-        snippet.content = content
-        snippet.language = language
-        snippet.tags = tags
-        snippet.updatedAt = .now
-        try modelContext.save()
-        logger.debug("Snippet updated: \(name, privacy: .public)")
-    }
-
-    // MARK: - Delete
-
-    /// Deletes a snippet by its persistent ID.
-    func delete(id: PersistentIdentifier) throws {
-        guard let snippet = modelContext.model(for: id) as? ClipsmithSchemaV1.Snippet else { return }
-        modelContext.delete(snippet)
-        try modelContext.save()
-        logger.debug("Snippet deleted")
-    }
-
-    // MARK: - Accessors
-
-    /// Returns the plain-text content for a snippet by its persistent ID.
-    func content(for id: PersistentIdentifier) -> String? {
-        return (modelContext.model(for: id) as? ClipsmithSchemaV1.Snippet)?.content
-    }
-
-    /// Returns a SnippetInfo value for a snippet by its persistent ID.
-    ///
-    /// Returns nil if the snippet is not found in this model context.
-    func snippet(for id: PersistentIdentifier) -> SnippetInfo? {
-        guard let snippet = modelContext.model(for: id) as? ClipsmithSchemaV1.Snippet else { return nil }
-        return SnippetInfo(
-            id: snippet.persistentModelID,
-            name: snippet.name,
-            content: snippet.content,
-            language: snippet.language,
-            tags: snippet.tags,
-            createdAt: snippet.createdAt,
-            updatedAt: snippet.updatedAt
-        )
-    }
+/// One snippet = one file in the snippets folder (see `SnippetFileFormat`).
+struct Snippet: Identifiable, Equatable, Sendable {
+    let id: UUID
+    var name: String
+    var content: String
+    var language: String?
+    var tags: [String]
+    var createdAt: Date
+    var updatedAt: Date
+    var fileURL: URL
 }
 
 /// Outcome of `SnippetStore.save`: what the name was, what it is now, and
@@ -259,4 +25,242 @@ struct SnippetSaveResult: Equatable, Sendable {
     let previousName: String
     let savedName: String
     let nameRefused: Bool
+}
+
+/// Snippets as plain files in a folder the user owns (grepable, git-able).
+/// The folder is the source of truth: FSEvents trigger a rescan, so edits
+/// made in an editor show up. Ids are in-memory and stable per file path.
+@MainActor
+@Observable
+final class SnippetStore {
+
+    /// Most recently updated first.
+    private(set) var snippets: [Snippet] = []
+    private(set) var folderURL: URL
+    var lastError: String?
+
+    @ObservationIgnored private var watcher: FolderWatcher?
+    @ObservationIgnored private let watches: Bool
+
+    init(folderURL: URL, watches: Bool = true) {
+        self.folderURL = folderURL
+        self.watches = watches
+    }
+
+    // MARK: - Load
+
+    func load() {
+        do {
+            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+        } catch {
+            lastError = "Could not create \(folderURL.path): \(error.localizedDescription)"
+        }
+        if watches {
+            watcher = FolderWatcher(url: folderURL) { [weak self] in self?.rescan() }
+        }
+        rescan()
+    }
+
+    func updateFolder(_ url: URL) {
+        watcher = nil
+        folderURL = url
+        snippets = []
+        load()
+    }
+
+    /// Re-reads files whose modification date changed; keeps the rest.
+    func rescan() {
+        let keys: [URLResourceKey] = [.isRegularFileKey, .contentModificationDateKey, .creationDateKey]
+        guard let urls = try? FileManager.default.contentsOfDirectory(
+            at: folderURL, includingPropertiesForKeys: keys, options: [.skipsHiddenFiles])
+        else { return }
+        var byPath = Dictionary(snippets.map { ($0.fileURL.standardizedFileURL.path, $0) },
+                                uniquingKeysWith: { a, _ in a })
+        var result: [Snippet] = []
+        for url in urls {
+            guard let values = try? url.resourceValues(forKeys: Set(keys)),
+                  values.isRegularFile == true else { continue }
+            let path = url.standardizedFileURL.path
+            let modified = values.contentModificationDate ?? .distantPast
+            if let known = byPath.removeValue(forKey: path), known.updatedAt == modified {
+                result.append(known)
+                continue
+            }
+            guard let text = try? String(contentsOf: url, encoding: .utf8) else { continue }
+            let (content, tags) = SnippetFileFormat.decode(text)
+            let ext = url.pathExtension
+            result.append(Snippet(
+                id: snippets.first { $0.fileURL.standardizedFileURL.path == path }?.id ?? UUID(),
+                name: ext.isEmpty ? url.lastPathComponent : url.deletingPathExtension().lastPathComponent,
+                content: content,
+                language: SnippetFileFormat.language(forExtension: ext),
+                tags: tags,
+                createdAt: values.creationDate ?? modified,
+                updatedAt: modified,
+                fileURL: url))
+        }
+        result.sort { $0.updatedAt > $1.updatedAt }
+        if result != snippets { snippets = result }
+    }
+
+    // MARK: - Lookup
+
+    func snippet(id: UUID) -> Snippet? {
+        snippets.first { $0.id == id }
+    }
+
+    /// Case-insensitive, like macOS file names; `[[name]]` must be unambiguous.
+    func isNameTaken(_ name: String, excluding id: UUID?) -> Bool {
+        snippets.contains { $0.id != id && $0.name.caseInsensitiveCompare(name) == .orderedSame }
+    }
+
+    /// `base` if free, else "<base> 2", "<base> 3", ...
+    func availableName(base: String) -> String {
+        guard isNameTaken(base, excluding: nil) else { return base }
+        var n = 2
+        while isNameTaken("\(base) \(n)", excluding: nil) { n += 1 }
+        return "\(base) \(n)"
+    }
+
+    /// With duplicates on disk (same stem, two extensions), the most recent.
+    func findByName(_ name: String) -> UUID? {
+        snippets.first { $0.name.caseInsensitiveCompare(name) == .orderedSame }?.id
+    }
+
+    // MARK: - Mutations
+
+    /// Always gets a free name derived from `base` (blank → "Untitled Snippet").
+    @discardableResult
+    func insert(base: String, content: String, language: String?, tags: [String]) -> UUID? {
+        var clean = SnippetFileFormat.sanitizedName(base)
+        if clean.isEmpty { clean = "Untitled Snippet" }
+        let name = availableName(base: clean)
+        let url = fileURL(name: name, language: language, keepingExtensionOf: nil)
+        guard write(content: content, tags: tags, to: url) else { return nil }
+        let id = UUID()
+        let dates = fileDates(url)
+        snippets.insert(Snippet(id: id, name: name, content: content, language: normalized(language),
+                                tags: tags, createdAt: dates.created, updatedAt: dates.modified,
+                                fileURL: url), at: 0)
+        return id
+    }
+
+    /// The snippet a `[[name]]` link opens; created (empty) when missing.
+    func findOrCreate(name: String, language: String?) -> (id: UUID, created: Bool)? {
+        if let id = findByName(name) { return (id, false) }
+        return insert(base: name, content: "", language: language, tags: []).map { ($0, true) }
+    }
+
+    /// Writes all fields; a rename or language change renames the file. A
+    /// blank or taken name keeps the current one (`nameRefused` only for taken).
+    func save(id: UUID, requestedName: String, content: String,
+              language: String?, tags: [String]) -> SnippetSaveResult {
+        guard let index = snippets.firstIndex(where: { $0.id == id }) else {
+            return SnippetSaveResult(previousName: "", savedName: "", nameRefused: false)
+        }
+        let old = snippets[index]
+        let requested = SnippetFileFormat.sanitizedName(requestedName)
+        var name = requested.isEmpty ? old.name : requested
+        let refused = isNameTaken(name, excluding: id)
+        if refused { name = old.name }
+
+        let url = fileURL(name: name, language: language, keepingExtensionOf: old.fileURL)
+        if url.lastPathComponent != old.fileURL.lastPathComponent {
+            guard move(old.fileURL, to: url) else {
+                return SnippetSaveResult(previousName: old.name, savedName: old.name, nameRefused: refused)
+            }
+        }
+        guard write(content: content, tags: tags, to: url) else {
+            return SnippetSaveResult(previousName: old.name, savedName: old.name, nameRefused: refused)
+        }
+        let dates = fileDates(url)
+        snippets[index] = Snippet(id: id, name: name, content: content, language: normalized(language),
+                                  tags: tags, createdAt: old.createdAt, updatedAt: dates.modified,
+                                  fileURL: url)
+        snippets.sort { $0.updatedAt > $1.updatedAt }
+        return SnippetSaveResult(previousName: old.name, savedName: name, nameRefused: refused)
+    }
+
+    /// Moves the file to the Trash, so a deleted note can be recovered.
+    func delete(id: UUID) {
+        guard let snippet = snippet(id: id) else { return }
+        do {
+            try FileManager.default.trashItem(at: snippet.fileURL, resultingItemURL: nil)
+        } catch {
+            try? FileManager.default.removeItem(at: snippet.fileURL)
+        }
+        snippets.removeAll { $0.id == id }
+    }
+
+    /// Migration: keeps the original dates so ordering survives.
+    func importSnippet(name: String, content: String, language: String?, tags: [String],
+                       createdAt: Date, updatedAt: Date) {
+        guard let id = insert(base: name, content: content, language: language, tags: tags),
+              let url = snippet(id: id)?.fileURL else { return }
+        try? FileManager.default.setAttributes(
+            [.creationDate: createdAt, .modificationDate: updatedAt], ofItemAtPath: url.path)
+        if let i = snippets.firstIndex(where: { $0.id == id }) {
+            snippets[i].createdAt = createdAt
+            snippets[i].updatedAt = fileDates(url).modified
+            snippets.sort { $0.updatedAt > $1.updatedAt }
+        }
+    }
+
+    // MARK: - Files
+
+    private func normalized(_ language: String?) -> String? {
+        guard let language, !language.isEmpty else { return nil }
+        return language
+    }
+
+    /// Plain text keeps an unknown extension it was loaded with (`.toml`).
+    private func fileURL(name: String, language: String?, keepingExtensionOf existing: URL?) -> URL {
+        var ext = SnippetFileFormat.fileExtension(for: language)
+        if normalized(language) == nil, let existing,
+           !SnippetFileFormat.isKnownExtension(existing.pathExtension) {
+            ext = existing.pathExtension
+        }
+        return folderURL.appending(path: ext.isEmpty ? name : "\(name).\(ext)")
+    }
+
+    private func write(content: String, tags: [String], to url: URL) -> Bool {
+        do {
+            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+            try Data(SnippetFileFormat.encode(content: content, tags: tags).utf8)
+                .write(to: url, options: .atomic)
+            lastError = nil
+            return true
+        } catch {
+            lastError = "Could not save \(url.lastPathComponent): \(error.localizedDescription)"
+            logger.error("write failed: \(error.localizedDescription, privacy: .public)")
+            return false
+        }
+    }
+
+    /// Case-only renames go through a temporary name: the volume is
+    /// usually case-insensitive, so `foo.md` → `Foo.md` is "already exists".
+    private func move(_ from: URL, to: URL) -> Bool {
+        let fm = FileManager.default
+        do {
+            if from.path.caseInsensitiveCompare(to.path) == .orderedSame {
+                let temp = folderURL.appending(path: ".rename-\(UUID().uuidString)")
+                try fm.moveItem(at: from, to: temp)
+                try fm.moveItem(at: temp, to: to)
+            } else {
+                try fm.moveItem(at: from, to: to)
+            }
+            return true
+        } catch {
+            lastError = "Could not rename \(from.lastPathComponent): \(error.localizedDescription)"
+            return false
+        }
+    }
+
+    private func fileDates(_ url: URL) -> (created: Date, modified: Date) {
+        var url = url
+        url.removeAllCachedResourceValues() // URL caches values; we just wrote the file
+        let values = try? url.resourceValues(forKeys: [.creationDateKey, .contentModificationDateKey])
+        let modified = values?.contentModificationDate ?? .now
+        return (values?.creationDate ?? modified, modified)
+    }
 }

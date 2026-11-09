@@ -68,6 +68,7 @@ struct ClipsmithApp: App {
             .environment(appDelegate.pasteService)
             .environment(appDelegate.appTracker)
             .environment(appDelegate.todoStore)
+            .environment(appDelegate.snippetStore)
             .frame(minWidth: 800, minHeight: 500)
         }
         .modelContainer(ClipsmithApp.sharedModelContainer)

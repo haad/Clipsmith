@@ -64,4 +64,8 @@ enum AppSettingsKeys {
     static let todoTrackingEnabled = "todoTrackingEnabled"
     static let todoFilePath = "todoFilePath"
     static let todoShowCompleted = "todoShowCompleted"
+
+    // Plain-file storage: folder for todos.taskpaper and snippets/ (empty = ~/.config/clipsmith)
+    static let dataFolderPath = "dataFolderPath"
+    static let snippetsMigratedToFiles = "snippetsMigratedToFiles"
 }

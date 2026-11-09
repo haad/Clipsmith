@@ -107,6 +107,10 @@ struct GeneralSettingsTab: View {
                 }
             }
 
+            // MARK: - Data folder (snippets + todos as plain files)
+
+            DataFolderSettingsSection()
+
             // MARK: - Bezel Appearance (Bugs #14, #16, #17)
 
             Section("Bezel Appearance") {
@@ -291,5 +295,54 @@ struct GeneralSettingsTab: View {
             // Revert toggle to reflect actual system state
             launchAtLogin = SMAppService.mainApp.status == .enabled
         }
+    }
+}
+
+/// Where snippets (`snippets/`) and todos (`todos.taskpaper`) live as plain
+/// files. Changing it switches both stores; nothing is moved.
+private struct DataFolderSettingsSection: View {
+    @AppStorage(AppSettingsKeys.dataFolderPath) private var dataFolderPath: String = ""
+
+    var body: some View {
+        Section("Data Folder") {
+            LabeledContent("Location") {
+                Text(DataFolder.resolve().path)
+                    .lineLimit(1)
+                    .truncationMode(.middle)
+                    .foregroundStyle(.secondary)
+            }
+            HStack {
+                Button("Choose…") { choose() }
+                Button("Reveal in Finder") {
+                    NSWorkspace.shared.activateFileViewerSelecting([DataFolder.resolve()])
+                }
+                Button("Reset to Default") {
+                    dataFolderPath = ""
+                    changed()
+                }
+                .disabled(dataFolderPath.isEmpty)
+            }
+            Text("Snippets are plain files in snippets/, todos in todos.taskpaper. Grep them, keep them in git. Changing the folder does not move existing files.")
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func choose() {
+        let panel = NSOpenPanel()
+        panel.title = "Choose Data Folder"
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = false
+        panel.canCreateDirectories = true
+        panel.directoryURL = DataFolder.resolve()
+        panel.begin { response in
+            guard response == .OK, let url = panel.url else { return }
+            dataFolderPath = url.path
+            changed()
+        }
+    }
+
+    private func changed() {
+        NotificationCenter.default.post(name: .clipsmithDataFolderChanged, object: nil)
     }
 }

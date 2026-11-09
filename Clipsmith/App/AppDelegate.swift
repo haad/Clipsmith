@@ -111,7 +111,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         // 1. Initialize ClipboardStore and SnippetStore with the shared model container.
         clipboardStore = ClipboardStore(modelContainer: ClipsmithApp.sharedModelContainer)
-        snippetStore = SnippetStore(modelContainer: ClipsmithApp.sharedModelContainer)
+        // Snippets are files in the data folder (~/.config/clipsmith/snippets).
+        // The one-time migration copies SwiftData snippets out (rows are kept).
+        snippetStore = SnippetStore(folderURL: DataFolder.snippetsURL())
+        snippetStore.load()
+        if !DataFolder.isRunningTests {
+            StorageMigration.migrateSnippets(from: ClipsmithApp.sharedModelContainer, into: snippetStore)
+            StorageMigration.moveLegacyTodoFile()
+        }
 
         // Pre-warm the main model context so @Query in MenuBarView/BezelView
         // is instant on first open. Without this, the SQLite connection opens
@@ -205,6 +212,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self,
             selector: #selector(handleTodoFilePathChanged),
             name: .clipsmithTodoFilePathChanged,
+            object: nil
+        )
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleDataFolderChanged),
+            name: .clipsmithDataFolderChanged,
             object: nil
         )
 
@@ -372,7 +385,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                     .components(separatedBy: .newlines)
                     .first { !$0.trimmingCharacters(in: .whitespaces).isEmpty } ?? content
                 let name = String(firstLine.prefix(50))
-                try? await self.snippetStore.insert(name: name, content: content, language: nil, tags: [])
+                self.snippetStore.insert(base: name, content: content, language: nil, tags: [])
             }
         }
 
@@ -465,6 +478,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// Settings changed the todo file path: flush pending changes to the old
     /// file, then load the new one.
     @objc private func handleTodoFilePathChanged() {
+        todoStore?.updateFileURL(TodoStore.resolveFileURL())
+    }
+
+    /// Settings changed the data folder: both stores switch (files are not moved).
+    @objc private func handleDataFolderChanged() {
+        snippetStore?.updateFolder(DataFolder.snippetsURL())
         todoStore?.updateFileURL(TodoStore.resolveFileURL())
     }
 

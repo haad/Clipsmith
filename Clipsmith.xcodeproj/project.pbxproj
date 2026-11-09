@@ -128,6 +128,12 @@
 		AA0127 /* PromptFilterTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0127 /* PromptFilterTests.swift */; };
 		AA0128 /* DocsSectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0128 /* DocsSectionView.swift */; };
 		AA0129 /* DocWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0129 /* DocWebView.swift */; };
+		AA0138 /* DataFolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0138 /* DataFolder.swift */; };
+		AA0139 /* SnippetFileFormat.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0139 /* SnippetFileFormat.swift */; };
+		AA0140 /* FolderWatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0140 /* FolderWatcher.swift */; };
+		AA0141 /* StorageMigration.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0141 /* StorageMigration.swift */; };
+		AA0142 /* SnippetFileFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0142 /* SnippetFileFormatTests.swift */; };
+		AA0143 /* StorageMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0143 /* StorageMigrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -263,6 +269,12 @@
 		AF0127 /* PromptFilterTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PromptFilterTests.swift; sourceTree = "<group>"; };
 		AF0128 /* DocsSectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocsSectionView.swift; sourceTree = "<group>"; };
 		AF0129 /* DocWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DocWebView.swift; sourceTree = "<group>"; };
+		AF0138 /* DataFolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataFolder.swift; sourceTree = "<group>"; };
+		AF0139 /* SnippetFileFormat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFileFormat.swift; sourceTree = "<group>"; };
+		AF0140 /* FolderWatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FolderWatcher.swift; sourceTree = "<group>"; };
+		AF0141 /* StorageMigration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageMigration.swift; sourceTree = "<group>"; };
+		AF0142 /* SnippetFileFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFileFormatTests.swift; sourceTree = "<group>"; };
+		AF0143 /* StorageMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageMigrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -357,6 +369,10 @@
 				AF0103 /* TaskPaperParser.swift */,
 				AF0105 /* TodoStore.swift */,
 				AF0130 /* SnippetReference.swift */,
+				AF0141 /* StorageMigration.swift */,
+				AF0140 /* FolderWatcher.swift */,
+				AF0139 /* SnippetFileFormat.swift */,
+				AF0138 /* DataFolder.swift */,
 				AF0133 /* MarkdownRenderer.swift */,
 				AF0107 /* TodoQuickAddParser.swift */,
 				AF0123 /* SnippetFilter.swift */,
@@ -466,6 +482,8 @@
 				AF0104 /* TaskPaperParserTests.swift */,
 				AF0106 /* TodoStoreTests.swift */,
 				AF0131 /* SnippetReferenceTests.swift */,
+				AF0143 /* StorageMigrationTests.swift */,
+				AF0142 /* SnippetFileFormatTests.swift */,
 				AF0137 /* SnippetSelectionTests.swift */,
 				AF0134 /* MarkdownRendererTests.swift */,
 				AF0108 /* TodoQuickAddParserTests.swift */,
@@ -700,6 +718,10 @@
 				AA0103 /* TaskPaperParser.swift in Sources */,
 				AA0105 /* TodoStore.swift in Sources */,
 				AA0130 /* SnippetReference.swift in Sources */,
+				AA0141 /* StorageMigration.swift in Sources */,
+				AA0140 /* FolderWatcher.swift in Sources */,
+				AA0139 /* SnippetFileFormat.swift in Sources */,
+				AA0138 /* DataFolder.swift in Sources */,
 				AA0133 /* MarkdownRenderer.swift in Sources */,
 				AA0107 /* TodoQuickAddParser.swift in Sources */,
 				AA0109 /* TodoWindowViewModel.swift in Sources */,
@@ -753,6 +775,8 @@
 				AA0104 /* TaskPaperParserTests.swift in Sources */,
 				AA0106 /* TodoStoreTests.swift in Sources */,
 				AA0131 /* SnippetReferenceTests.swift in Sources */,
+				AA0143 /* StorageMigrationTests.swift in Sources */,
+				AA0142 /* SnippetFileFormatTests.swift in Sources */,
 				AA0137 /* SnippetSelectionTests.swift in Sources */,
 				AA0134 /* MarkdownRendererTests.swift in Sources */,
 				AA0108 /* TodoQuickAddParserTests.swift in Sources */,

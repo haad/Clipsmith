@@ -4,7 +4,7 @@ import Foundation
 nonisolated enum SnippetFilter {
 
     /// Distinct, non-empty languages sorted case-insensitively. `id == label == language`.
-    static func languages(in snippets: [ClipsmithSchemaV1.Snippet]) -> [BrowserFilterOption] {
+    static func languages(in snippets: [Snippet]) -> [BrowserFilterOption] {
         let distinct = Set(snippets.compactMap { snippet -> String? in
             guard let language = snippet.language, !language.isEmpty else { return nil }
             return language
@@ -16,10 +16,10 @@ nonisolated enum SnippetFilter {
 
     /// Case-insensitive match on name, content or any tag, AND the language chip.
     static func apply(
-        _ snippets: [ClipsmithSchemaV1.Snippet],
+        _ snippets: [Snippet],
         query: String,
         language: String?
-    ) -> [ClipsmithSchemaV1.Snippet] {
+    ) -> [Snippet] {
         snippets.filter { snippet in
             let languageMatch = language == nil || snippet.language == language
             let textMatch = query.isEmpty

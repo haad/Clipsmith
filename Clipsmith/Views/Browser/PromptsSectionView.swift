@@ -10,6 +10,7 @@ struct PromptsSectionView: View {
 
     // MARK: - Environment
 
+    @Environment(SnippetStore.self) private var snippetStore
     @Environment(PasteService.self) private var pasteService
     @Environment(AppTracker.self) private var appTracker
     @Environment(\.modelContext) private var modelContext
@@ -25,7 +26,6 @@ struct PromptsSectionView: View {
     @State private var selectedPromptID: PersistentIdentifier?
     @State private var chipID: String?
     @State private var promptStore: PromptLibraryStore?
-    @State private var snippetStore: SnippetStore?
     @FocusState private var isSearchFocused: Bool
     @FocusState private var isListFocused: Bool
 
@@ -317,7 +317,6 @@ struct PromptsSectionView: View {
     private func setupStores() {
         guard promptStore == nil else { return }
         promptStore = PromptLibraryStore(modelContainer: modelContext.container)
-        snippetStore = SnippetStore(modelContainer: modelContext.container)
     }
 
     private func createNewPrompt() {
@@ -414,14 +413,7 @@ struct PromptsSectionView: View {
         let title = editedTitle.isEmpty ? prompt.title : editedTitle
         let content = editedContent.isEmpty ? prompt.content : editedContent
         let category = prompt.isUserCreated ? "My Prompts" : prompt.category
-        Task {
-            try? await snippetStore?.insert(
-                name: title,
-                content: content,
-                language: nil,
-                tags: ["prompt", category]
-            )
-        }
+        snippetStore.insert(base: title, content: content, language: nil, tags: ["prompt", category])
     }
 
     private func pastePrompt(_ prompt: ClipsmithSchemaV2.PromptLibraryItem) {

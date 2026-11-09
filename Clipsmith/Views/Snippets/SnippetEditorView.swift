@@ -10,8 +10,7 @@ struct SnippetEditorView: View {
 
     // MARK: - Input
 
-    let snippet: ClipsmithSchemaV1.Snippet
-    let snippetStore: SnippetStore
+    let snippet: Snippet
     /// Markdown snippets: false shows the rendered view, true the raw editor.
     @Binding var isEditing: Bool
     let selection: SnippetSelection
@@ -25,6 +24,7 @@ struct SnippetEditorView: View {
     @State private var nameWarning: String?
 
     @Environment(TodoStore.self) private var todoStore
+    @Environment(SnippetStore.self) private var snippetStore
 
     // MARK: - Language Options
 
@@ -118,7 +118,13 @@ struct SnippetEditorView: View {
         .onAppear {
             loadFromSnippet()
         }
-        .onChange(of: snippet.persistentModelID) { _, _ in
+        .onChange(of: snippet.id) { _, _ in
+            loadFromSnippet()
+        }
+        // The file changed on disk (an editor, git pull): take the new
+        // version unless there are unsaved edits here (those win on save).
+        .onChange(of: snippet) { old, new in
+            guard old.id == new.id, isUnchanged(from: old) else { return }
             loadFromSnippet()
         }
         // Auto-save with debounce via .task(id:)
@@ -126,7 +132,7 @@ struct SnippetEditorView: View {
             guard saveKey != initialSaveKey else { return }
             try? await Task.sleep(for: .milliseconds(500))
             guard !Task.isCancelled else { return }
-            await saveSnippet()
+            saveSnippet()
         }
     }
 
@@ -136,7 +142,7 @@ struct SnippetEditorView: View {
 
     /// Combines all editable fields into a single string for change detection.
     private var saveKey: String {
-        "\(snippet.persistentModelID.hashValue)|\(name)|\(content)|\(language ?? "")|\(tagsText)"
+        "\(snippet.id.uuidString)|\(name)|\(content)|\(language ?? "")|\(tagsText)"
     }
 
     /// The key that represents the initially loaded state — used to skip the first
@@ -144,7 +150,12 @@ struct SnippetEditorView: View {
     private var initialSaveKey: String {
         let lang = snippet.language ?? ""
         let tags = snippet.tags.joined(separator: ", ")
-        return "\(snippet.persistentModelID.hashValue)|\(snippet.name)|\(snippet.content)|\(lang)|\(tags)"
+        return "\(snippet.id.uuidString)|\(snippet.name)|\(snippet.content)|\(lang)|\(tags)"
+    }
+
+    private func isUnchanged(from old: Snippet) -> Bool {
+        name == old.name && content == old.content && language == old.language
+            && tagsText == old.tags.joined(separator: ", ")
     }
 
     private func loadFromSnippet() {
@@ -155,34 +166,24 @@ struct SnippetEditorView: View {
         tagsText = snippet.tags.joined(separator: ", ")
     }
 
-    @MainActor
-    private func saveSnippet() async {
-        // Everything is captured before the await: the view is reused across
-        // selections, so after the hop `name`/`content` may belong to
-        // another snippet.
-        let id = snippet.persistentModelID
+    private func saveSnippet() {
         let requestedName = name
-        let content = content
-        let language = language
         let tags = tagsText
             .split(separator: ",")
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .filter { !$0.isEmpty }
-
-        // One actor call checks uniqueness and writes, so nothing can
-        // interleave. A taken name is refused; other fields still save.
-        guard let result = try? await snippetStore.save(
-            id: id, requestedName: requestedName, content: content, language: language, tags: tags)
-        else { return }
-
-        // The rewrite is correct whichever snippet is on screen now:
-        // previousName comes from the store, not from view state.
+        // One call checks uniqueness and writes. A taken name is refused;
+        // other fields still save.
+        let result = snippetStore.save(
+            id: snippet.id, requestedName: requestedName, content: content, language: language, tags: tags)
         if result.savedName != result.previousName {
             todoStore.renameSnippetReferences(from: result.previousName, to: result.savedName)
         }
-        guard snippet.persistentModelID == id else { return }
-        nameWarning = result.nameRefused
-            ? "Another snippet is already named “\(requestedName.trimmingCharacters(in: .whitespaces))”"
-            : nil
+        let trimmed = requestedName.trimmingCharacters(in: .whitespaces)
+        nameWarning = result.nameRefused ? "Another snippet is already named “\(trimmed)”" : nil
+        // "a/b" is stored as "a-b" (it is a file name): show what was saved.
+        if !result.nameRefused, !trimmed.isEmpty, result.savedName != trimmed {
+            name = result.savedName
+        }
     }
 }

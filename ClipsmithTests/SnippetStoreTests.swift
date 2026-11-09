@@ -1,292 +1,186 @@
 import XCTest
-import SwiftData
 @testable import Clipsmith
 
+@MainActor
 final class SnippetStoreTests: XCTestCase {
 
-    // MARK: - testInsertAndFetch
+    private var dir: URL!
 
-    func testInsertAndFetch() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(
-            name: "My Snippet",
-            content: "let x = 42",
-            language: "swift",
-            tags: ["swift", "basics"]
-        )
-
-        let ids = try await store.fetchAll()
-        XCTAssertEqual(ids.count, 1)
-
-        let info = await store.snippet(for: ids[0])
-        XCTAssertNotNil(info)
-        XCTAssertEqual(info?.name, "My Snippet")
-        XCTAssertEqual(info?.content, "let x = 42")
-        XCTAssertEqual(info?.language, "swift")
-        XCTAssertEqual(info?.tags, ["swift", "basics"])
+    override func setUp() {
+        super.setUp()
+        dir = FileManager.default.temporaryDirectory
+            .appending(path: "SnippetStoreTests-\(UUID().uuidString)", directoryHint: .isDirectory)
     }
 
-    // MARK: - testFetchByLanguage
-
-    func testFetchByLanguage() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "Swift One", content: "let a = 1", language: "swift", tags: [])
-        try await store.insert(name: "Python One", content: "a = 1", language: "python", tags: [])
-        try await store.insert(name: "Swift Two", content: "let b = 2", language: "swift", tags: [])
-
-        let swiftIDs = try await store.fetchByLanguage("swift")
-        XCTAssertEqual(swiftIDs.count, 2, "fetchByLanguage should return only swift snippets")
-
-        let pythonIDs = try await store.fetchByLanguage("python")
-        XCTAssertEqual(pythonIDs.count, 1, "fetchByLanguage should return only python snippets")
-
-        let rustIDs = try await store.fetchByLanguage("rust")
-        XCTAssertEqual(rustIDs.count, 0, "fetchByLanguage should return empty for unknown language")
+    override func tearDown() {
+        try? FileManager.default.removeItem(at: dir)
+        super.tearDown()
     }
 
-    // MARK: - testSearchByName
-
-    func testSearchByName() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "kubectl get pods", content: "kubectl get pods -n default", language: "bash", tags: [])
-        try await store.insert(name: "jq filter", content: "jq '.[] | .name'", language: "bash", tags: [])
-        try await store.insert(name: "Swift hello world", content: "print(\"Hello\")", language: "swift", tags: [])
-
-        let results = try await store.search(query: "kubectl")
-        XCTAssertEqual(results.count, 1)
-
-        let info = await store.snippet(for: results[0])
-        XCTAssertEqual(info?.name, "kubectl get pods")
+    private func makeStore() -> SnippetStore {
+        let store = SnippetStore(folderURL: dir, watches: false)
+        store.load()
+        return store
     }
 
-    // MARK: - testSearchByContent
-
-    func testSearchByContent() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "Snippet A", content: "docker run --rm -it ubuntu bash", language: "bash", tags: [])
-        try await store.insert(name: "Snippet B", content: "git commit -m 'feat: add feature'", language: "bash", tags: [])
-        try await store.insert(name: "Snippet C", content: "npm install --save-dev typescript", language: "bash", tags: [])
-
-        let results = try await store.search(query: "docker")
-        XCTAssertEqual(results.count, 1)
-
-        let info = await store.snippet(for: results[0])
-        XCTAssertEqual(info?.name, "Snippet A")
+    private func file(_ name: String) -> String? {
+        try? String(contentsOf: dir.appending(path: name), encoding: .utf8)
     }
 
-    // MARK: - testSearchByTag
-
-    func testSearchByTag() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "Snippet A", content: "content A", language: nil, tags: ["kubernetes", "ops"])
-        try await store.insert(name: "Snippet B", content: "content B", language: nil, tags: ["docker", "ops"])
-        try await store.insert(name: "Snippet C", content: "content C", language: nil, tags: ["swift", "ios"])
-
-        let results = try await store.search(query: "kubernetes")
-        XCTAssertEqual(results.count, 1)
-
-        let info = await store.snippet(for: results[0])
-        XCTAssertEqual(info?.name, "Snippet A")
+    private func files() -> [String] {
+        ((try? FileManager.default.contentsOfDirectory(atPath: dir.path)) ?? []).sorted()
     }
 
-    // MARK: - testSearchEmptyQueryReturnsAll
+    // MARK: - Files
 
-    func testSearchEmptyQueryReturnsAll() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "A", content: "aaa", language: nil, tags: [])
-        try await store.insert(name: "B", content: "bbb", language: nil, tags: [])
-        try await store.insert(name: "C", content: "ccc", language: nil, tags: [])
-
-        let results = try await store.search(query: "")
-        XCTAssertEqual(results.count, 3, "Empty search query should return all snippets")
+    func testInsertWritesFileNamedAfterSnippet() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "Config", content: "let x = 1", language: "swift", tags: []))
+        XCTAssertEqual(file("Config.swift"), "let x = 1")
+        XCTAssertEqual(store.snippet(id: id)?.name, "Config")
     }
 
-    // MARK: - testUpdate
-
-    func testUpdate() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "Original", content: "original content", language: "swift", tags: ["old"])
-
-        let ids = try await store.fetchAll()
-        XCTAssertEqual(ids.count, 1)
-
-        let originalInfo = await store.snippet(for: ids[0])
-        let originalUpdatedAt = originalInfo?.updatedAt ?? Date.distantPast
-
-        // Small sleep to ensure distinct timestamps
-        try await Task.sleep(nanoseconds: 10_000_000) // 10ms
-
-        try await store.update(
-            id: ids[0],
-            name: "Updated Name",
-            content: "updated content",
-            language: "python",
-            tags: ["new", "updated"]
-        )
-
-        let updatedInfo = await store.snippet(for: ids[0])
-        XCTAssertEqual(updatedInfo?.name, "Updated Name")
-        XCTAssertEqual(updatedInfo?.content, "updated content")
-        XCTAssertEqual(updatedInfo?.language, "python")
-        XCTAssertEqual(updatedInfo?.tags, ["new", "updated"])
-        XCTAssertGreaterThan(updatedInfo?.updatedAt ?? Date.distantPast, originalUpdatedAt,
-                             "updatedAt should be updated after mutation")
+    func testTagsGoInHeaderAndLoadBack() {
+        let store = makeStore()
+        store.insert(base: "Notes", content: "# Hi", language: "markdown", tags: ["work", "blog"])
+        XCTAssertEqual(file("Notes.md"), "---\ntags: [work, blog]\n---\n# Hi")
+        let reloaded = makeStore()
+        XCTAssertEqual(reloaded.snippets.map(\.tags), [["work", "blog"]])
+        XCTAssertEqual(reloaded.snippets.map(\.content), ["# Hi"])
+        XCTAssertEqual(reloaded.snippets.map(\.language), ["markdown"])
     }
 
-    // MARK: - testDelete
-
-    func testDelete() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "Keep Me", content: "keep", language: nil, tags: [])
-        try await store.insert(name: "Delete Me", content: "delete", language: nil, tags: [])
-
-        var ids = try await store.fetchAll()
-        XCTAssertEqual(ids.count, 2)
-
-        // Delete the first one (newest, at index 0)
-        try await store.delete(id: ids[0])
-
-        ids = try await store.fetchAll()
-        XCTAssertEqual(ids.count, 1)
-
-        let remaining = await store.snippet(for: ids[0])
-        XCTAssertNotNil(remaining)
+    func testLoadsFilesWrittenByAnEditor() throws {
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        try Data("echo hi".utf8).write(to: dir.appending(path: "greet.sh"))
+        try Data("a = 1".utf8).write(to: dir.appending(path: "conf.toml"))
+        try Data("x".utf8).write(to: dir.appending(path: ".hidden.md"))
+        let store = makeStore()
+        XCTAssertEqual(Set(store.snippets.map(\.name)), ["greet", "conf"])
+        XCTAssertEqual(store.snippets.first { $0.name == "greet" }?.language, "bash")
+        XCTAssertNil(store.snippets.first { $0.name == "conf" }?.language)
     }
 
-    // MARK: - testFetchAllSortedByUpdatedAtDescending
-
-    func testFetchAllSortedByUpdatedAtDescending() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "First", content: "first", language: nil, tags: [])
-        try await Task.sleep(nanoseconds: 10_000_000) // 10ms
-        try await store.insert(name: "Second", content: "second", language: nil, tags: [])
-        try await Task.sleep(nanoseconds: 10_000_000) // 10ms
-        try await store.insert(name: "Third", content: "third", language: nil, tags: [])
-
-        let ids = try await store.fetchAll()
-        XCTAssertEqual(ids.count, 3)
-
-        // Most recently inserted/updated is at index 0
-        let first = await store.snippet(for: ids[0])
-        let last = await store.snippet(for: ids[2])
-        XCTAssertEqual(first?.name, "Third", "Most recently edited snippet should be first")
-        XCTAssertEqual(last?.name, "First", "Oldest snippet should be last")
+    func testRescanPicksUpExternalEditKeepingId() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "a", content: "old", language: nil, tags: []))
+        let url = dir.appending(path: "a.txt")
+        try Data("new".utf8).write(to: url)
+        try FileManager.default.setAttributes([.modificationDate: Date.now.addingTimeInterval(5)],
+                                              ofItemAtPath: url.path)
+        store.rescan()
+        XCTAssertEqual(store.snippet(id: id)?.content, "new")
     }
 
-    // MARK: - testContentAccessor
-
-    func testContentAccessor() async throws {
-        let container = try makeTestContainer()
-        let store = SnippetStore(modelContainer: container)
-
-        try await store.insert(name: "Content Test", content: "print(\"hello world\")", language: "swift", tags: [])
-
-        let ids = try await store.fetchAll()
-        let content = await store.content(for: ids[0])
-        XCTAssertEqual(content, "print(\"hello world\")")
+    func testRescanDropsDeletedFiles() throws {
+        let store = makeStore()
+        store.insert(base: "gone", content: "", language: nil, tags: [])
+        try FileManager.default.removeItem(at: dir.appending(path: "gone.txt"))
+        store.rescan()
+        XCTAssertTrue(store.snippets.isEmpty)
     }
 
-    // MARK: - Unique names
+    // MARK: - Save
 
-    func testNameTakenIsCaseInsensitive() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        try await store.insert(name: "Blog Notes", content: "", language: nil, tags: [])
-        let taken = try await store.isNameTaken("blog notes", excluding: nil)
-        XCTAssertTrue(taken)
+    func testSaveRenamesFileAndReportsPreviousName() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "xyz", content: "", language: "markdown", tags: []))
+        let result = store.save(id: id, requestedName: "Blog notes", content: "body", language: "markdown", tags: [])
+        XCTAssertEqual(result, SnippetSaveResult(previousName: "xyz", savedName: "Blog notes", nameRefused: false))
+        XCTAssertEqual(files(), ["Blog notes.md"])
+        XCTAssertEqual(file("Blog notes.md"), "body")
     }
 
-    func testNameTakenIgnoresSelf() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        let id = try await store.insert(name: "xyz", content: "", language: nil, tags: [])
-        let taken = try await store.isNameTaken("XYZ", excluding: id)
-        XCTAssertFalse(taken)
+    func testCaseOnlyRename() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "foo", content: "x", language: nil, tags: []))
+        _ = store.save(id: id, requestedName: "Foo", content: "x", language: nil, tags: [])
+        XCTAssertEqual(files(), ["Foo.txt"])
     }
 
-    func testAvailableNameAppendsCounter() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        try await store.insert(name: "Untitled Snippet", content: "", language: nil, tags: [])
-        try await store.insert(name: "Untitled Snippet 2", content: "", language: nil, tags: [])
-        let name = try await store.availableName(base: "Untitled Snippet")
-        XCTAssertEqual(name, "Untitled Snippet 3")
+    func testLanguageChangeChangesExtension() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "s", content: "x", language: nil, tags: []))
+        _ = store.save(id: id, requestedName: "s", content: "x", language: "python", tags: [])
+        XCTAssertEqual(files(), ["s.py"])
     }
 
-    func testFindByNamePicksMostRecentlyUpdated() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        let older = try await store.insert(name: "dup", content: "old", language: nil, tags: [])
-        try await store.insert(name: "DUP", content: "new", language: nil, tags: [])
-        try await store.update(id: older, name: "dup", content: "old!", language: nil, tags: [])
-        let found = try await store.findByName("Dup")
-        XCTAssertEqual(found, older)
+    func testPlainTextKeepsUnknownExtension() throws {
+        try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        try Data("a = 1".utf8).write(to: dir.appending(path: "conf.toml"))
+        let store = makeStore()
+        let id = try XCTUnwrap(store.snippets.first?.id)
+        _ = store.save(id: id, requestedName: "conf", content: "a = 2", language: nil, tags: [])
+        XCTAssertEqual(files(), ["conf.toml"])
     }
 
-    // MARK: - Atomic save / create (one actor hop, no interleaving)
-
-    func testSaveRenamesAndReportsPreviousName() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        let id = try await store.insert(name: "A", content: "", language: nil, tags: [])
-        let result = try await store.save(id: id, requestedName: "A2", content: "body", language: "markdown", tags: [])
-        XCTAssertEqual(result, SnippetSaveResult(previousName: "A", savedName: "A2", nameRefused: false))
-        let info = await store.snippet(for: id)
-        XCTAssertEqual(info?.content, "body")
+    func testSaveRefusesTakenNameButSavesOtherFields() throws {
+        let store = makeStore()
+        store.insert(base: "Taken", content: "", language: nil, tags: [])
+        let id = try XCTUnwrap(store.insert(base: "Mine", content: "", language: nil, tags: []))
+        let result = store.save(id: id, requestedName: "taken", content: "new", language: nil, tags: [])
+        XCTAssertTrue(result.nameRefused)
+        XCTAssertEqual(result.savedName, "Mine")
+        XCTAssertEqual(file("Mine.txt"), "new")
     }
 
-    func testSaveRefusesTakenNameButSavesOtherFields() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        try await store.insert(name: "A", content: "", language: nil, tags: [])
-        let b = try await store.insert(name: "B", content: "", language: nil, tags: [])
-        let result = try await store.save(id: b, requestedName: "a", content: "new", language: nil, tags: [])
-        XCTAssertEqual(result, SnippetSaveResult(previousName: "B", savedName: "B", nameRefused: true))
-        let info = await store.snippet(for: b)
-        XCTAssertEqual(info?.content, "new")
+    func testSaveWithBlankNameKeepsName() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "Keep", content: "", language: nil, tags: []))
+        XCTAssertEqual(store.save(id: id, requestedName: "  ", content: "", language: nil, tags: []).savedName, "Keep")
     }
 
-    func testSaveWithBlankNameKeepsCurrentName() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        let id = try await store.insert(name: "Keep", content: "", language: nil, tags: [])
-        let result = try await store.save(id: id, requestedName: "  ", content: "", language: nil, tags: [])
-        XCTAssertEqual(result.savedName, "Keep")
-        XCTAssertFalse(result.nameRefused)
+    func testSaveSanitizesName() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "a", content: "", language: nil, tags: []))
+        XCTAssertEqual(store.save(id: id, requestedName: "a/b", content: "", language: nil, tags: []).savedName, "a-b")
+        XCTAssertEqual(files(), ["a-b.txt"])
     }
 
-    func testInsertUniqueNeverRepeatsANameUnderConcurrency() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        async let first = store.insertUnique(base: "Untitled Snippet", content: "", language: nil, tags: [])
-        async let second = store.insertUnique(base: "Untitled Snippet", content: "", language: nil, tags: [])
-        let ids = try await [first, second]
-        let a = await store.snippet(for: ids[0])
-        let b = await store.snippet(for: ids[1])
-        XCTAssertNotEqual(a?.name.lowercased(), b?.name.lowercased())
+    // MARK: - Names
+
+    func testInsertNeverRepeatsAName() {
+        let store = makeStore()
+        for _ in 0..<3 { store.insert(base: "Untitled Snippet", content: "", language: nil, tags: []) }
+        XCTAssertEqual(Set(store.snippets.map(\.name)), ["Untitled Snippet", "Untitled Snippet 2", "Untitled Snippet 3"])
     }
 
-    func testFindOrCreateReturnsExistingOrCreatesOnce() async throws {
-        let store = SnippetStore(modelContainer: try makeTestContainer())
-        let existing = try await store.insert(name: "Notes", content: "x", language: nil, tags: [])
-        let found = try await store.findOrCreate(name: "notes", language: "markdown")
-        XCTAssertEqual(found.id, existing)
-        XCTAssertFalse(found.created)
+    func testNameTakenIsCaseInsensitiveAndIgnoresSelf() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "Deploy", content: "", language: nil, tags: []))
+        XCTAssertTrue(store.isNameTaken("deploy", excluding: nil))
+        XCTAssertFalse(store.isNameTaken("deploy", excluding: id))
+    }
 
-        async let one = store.findOrCreate(name: "xyz", language: "markdown")
-        async let two = store.findOrCreate(name: "xyz", language: "markdown")
-        let results = try await [one, two]
-        XCTAssertEqual(results[0].id, results[1].id)
-        XCTAssertEqual(results.filter(\.created).count, 1)
+    func testFindOrCreateReturnsExistingOrCreatesOnce() throws {
+        let store = makeStore()
+        let first = try XCTUnwrap(store.findOrCreate(name: "xyz", language: "markdown"))
+        let second = try XCTUnwrap(store.findOrCreate(name: "XYZ", language: "markdown"))
+        XCTAssertTrue(first.created)
+        XCTAssertFalse(second.created)
+        XCTAssertEqual(first.id, second.id)
+        XCTAssertEqual(files(), ["xyz.md"])
+    }
+
+    // MARK: - Delete / import
+
+    func testDeleteRemovesFile() throws {
+        let store = makeStore()
+        let id = try XCTUnwrap(store.insert(base: "bye", content: "", language: nil, tags: []))
+        store.delete(id: id)
+        XCTAssertTrue(store.snippets.isEmpty)
+        XCTAssertEqual(files(), [])
+    }
+
+    func testImportKeepsDatesAndOrder() {
+        let store = makeStore()
+        let old = Date(timeIntervalSince1970: 1_000_000)
+        let newer = Date(timeIntervalSince1970: 2_000_000)
+        store.importSnippet(name: "old", content: "", language: nil, tags: [], createdAt: old, updatedAt: old)
+        store.importSnippet(name: "new", content: "", language: nil, tags: [], createdAt: newer, updatedAt: newer)
+        XCTAssertEqual(store.snippets.map(\.name), ["new", "old"])
+        let reloaded = makeStore()
+        XCTAssertEqual(reloaded.snippets.map(\.name), ["new", "old"])
+        XCTAssertEqual(reloaded.snippets.last?.updatedAt, old)
     }
 }
