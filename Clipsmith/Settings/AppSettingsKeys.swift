@@ -64,6 +64,11 @@ enum AppSettingsKeys {
     static let todoTrackingEnabled = "todoTrackingEnabled"
     static let todoFilePath = "todoFilePath"
     static let todoShowCompleted = "todoShowCompleted"
+    static let todoRemindersEnabled = "todoRemindersEnabled"
+    /// Reminder time on the due day, minutes after midnight (540 = 09:00).
+    static let todoReminderMinutes = "todoReminderMinutes"
+    /// Quick-add attaches the selected text / browser URL as a note.
+    static let todoCaptureContext = "todoCaptureContext"
 
     // Plain-file storage: folder for todos.taskpaper and snippets/ (empty = ~/.config/clipsmith)
     static let dataFolderPath = "dataFolderPath"

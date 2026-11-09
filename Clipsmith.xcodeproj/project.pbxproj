@@ -135,6 +135,11 @@
 		AA0142 /* SnippetFileFormatTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0142 /* SnippetFileFormatTests.swift */; };
 		AA0143 /* StorageMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0143 /* StorageMigrationTests.swift */; };
 		AA0144 /* SnippetLinkSuggestions.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0144 /* SnippetLinkSuggestions.swift */; };
+		AA0145 /* TodoNaturalDates.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0145 /* TodoNaturalDates.swift */; };
+		AA0146 /* TodoNaturalDatesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0146 /* TodoNaturalDatesTests.swift */; };
+		AA0147 /* TodoReminderScheduler.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0147 /* TodoReminderScheduler.swift */; };
+		AA0148 /* TodoReminderPlannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0148 /* TodoReminderPlannerTests.swift */; };
+		AA0149 /* QuickAddContextService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AF0149 /* QuickAddContextService.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -277,6 +282,11 @@
 		AF0142 /* SnippetFileFormatTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetFileFormatTests.swift; sourceTree = "<group>"; };
 		AF0143 /* StorageMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageMigrationTests.swift; sourceTree = "<group>"; };
 		AF0144 /* SnippetLinkSuggestions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnippetLinkSuggestions.swift; sourceTree = "<group>"; };
+		AF0145 /* TodoNaturalDates.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoNaturalDates.swift; sourceTree = "<group>"; };
+		AF0146 /* TodoNaturalDatesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoNaturalDatesTests.swift; sourceTree = "<group>"; };
+		AF0147 /* TodoReminderScheduler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoReminderScheduler.swift; sourceTree = "<group>"; };
+		AF0148 /* TodoReminderPlannerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TodoReminderPlannerTests.swift; sourceTree = "<group>"; };
+		AF0149 /* QuickAddContextService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuickAddContextService.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -371,6 +381,9 @@
 				AF0103 /* TaskPaperParser.swift */,
 				AF0105 /* TodoStore.swift */,
 				AF0130 /* SnippetReference.swift */,
+				AF0149 /* QuickAddContextService.swift */,
+				AF0147 /* TodoReminderScheduler.swift */,
+				AF0145 /* TodoNaturalDates.swift */,
 				AF0141 /* StorageMigration.swift */,
 				AF0140 /* FolderWatcher.swift */,
 				AF0139 /* SnippetFileFormat.swift */,
@@ -484,6 +497,8 @@
 				AF0104 /* TaskPaperParserTests.swift */,
 				AF0106 /* TodoStoreTests.swift */,
 				AF0131 /* SnippetReferenceTests.swift */,
+				AF0148 /* TodoReminderPlannerTests.swift */,
+				AF0146 /* TodoNaturalDatesTests.swift */,
 				AF0143 /* StorageMigrationTests.swift */,
 				AF0142 /* SnippetFileFormatTests.swift */,
 				AF0137 /* SnippetSelectionTests.swift */,
@@ -722,6 +737,9 @@
 				AA0103 /* TaskPaperParser.swift in Sources */,
 				AA0105 /* TodoStore.swift in Sources */,
 				AA0130 /* SnippetReference.swift in Sources */,
+				AA0149 /* QuickAddContextService.swift in Sources */,
+				AA0147 /* TodoReminderScheduler.swift in Sources */,
+				AA0145 /* TodoNaturalDates.swift in Sources */,
 				AA0141 /* StorageMigration.swift in Sources */,
 				AA0140 /* FolderWatcher.swift in Sources */,
 				AA0139 /* SnippetFileFormat.swift in Sources */,
@@ -779,6 +797,8 @@
 				AA0104 /* TaskPaperParserTests.swift in Sources */,
 				AA0106 /* TodoStoreTests.swift in Sources */,
 				AA0131 /* SnippetReferenceTests.swift in Sources */,
+				AA0148 /* TodoReminderPlannerTests.swift in Sources */,
+				AA0146 /* TodoNaturalDatesTests.swift in Sources */,
 				AA0143 /* StorageMigrationTests.swift in Sources */,
 				AA0142 /* SnippetFileFormatTests.swift in Sources */,
 				AA0137 /* SnippetSelectionTests.swift in Sources */,

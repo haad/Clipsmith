@@ -181,6 +181,9 @@ struct GeneralSettingsTab: View {
                     .help("Enable keyboard-driven app launcher (no default hotkey — configure in Shortcuts tab).")
                 Toggle("Todo Tracking", isOn: $todoTrackingEnabled)
                     .help("Keyboard-first todos backed by a plain-text TaskPaper file. Configure the file location in the Todos tab.")
+                    .onChange(of: todoTrackingEnabled) { _, _ in
+                        NotificationCenter.default.post(name: .clipsmithTodoRemindersChanged, object: nil)
+                    }
 
                 Toggle("Command Palette", isOn: $commandPaletteEnabled)
                     .help("Type the prefix character (default \"=\") in the App Launcher to evaluate math, units, and currency. Requires App Launcher to be enabled.")

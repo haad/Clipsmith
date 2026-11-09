@@ -17,6 +17,12 @@ final class TodoQuickAddModel {
     }
     /// Snippet names for `[[` completion (set by the controller).
     @ObservationIgnored var snippetNames: () -> [String] = { [] }
+    /// Selected text / browser URL captured when the panel opened; saved
+    /// as a note under the task. Cleared with the × button.
+    var context: String? {
+        didSet { onResize?() }
+    }
+    @ObservationIgnored var onResize: (() -> Void)?
     var highlighted = 0
 
     var suggestions: [String] {
@@ -56,6 +62,21 @@ struct TodoQuickAddView: View {
                 .font(.title3)
                 .onSubmit(onCommit)
             }
+            if let context = model.context {
+                HStack(alignment: .top, spacing: 6) {
+                    Image(systemName: "text.quote")
+                    Text(context)
+                        .lineLimit(2)
+                        .truncationMode(.middle)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    Button { model.context = nil } label: { Image(systemName: "xmark.circle.fill") }
+                        .buttonStyle(.borderless)
+                        .help("Don't attach this note")
+                }
+                .font(.callout)
+                .foregroundStyle(.secondary)
+                .frame(height: TodoQuickAddController.contextHeight, alignment: .top)
+            }
             // `[[` completion: ↑/↓ pick, Tab or Return completes.
             ForEach(Array(model.suggestions.enumerated()), id: \.element) { index, name in
                 Label(name, systemImage: "doc.text")
@@ -88,6 +109,7 @@ final class TodoQuickAddController: NSPanel {
 
     static let baseHeight: CGFloat = 56
     static let suggestionRowHeight: CGFloat = 24
+    static let contextHeight: CGFloat = 36
 
     private let model = TodoQuickAddModel()
     private var globalMonitor: Any?
@@ -127,6 +149,7 @@ final class TodoQuickAddController: NSPanel {
             rootView: TodoQuickAddView(model: model) { [weak self] in self?.commit() })
         hostingView.sizingOptions = []   // CRITICAL: prevents constraint-loop crash
         contentView = hostingView
+        model.onResize = { [weak self] in self?.fitToContent() }
     }
 
     override var canBecomeKey: Bool { true }
@@ -174,7 +197,9 @@ final class TodoQuickAddController: NSPanel {
     /// Grows downward for the suggestion rows, keeping the top edge put.
     private func fitToContent() {
         let rows = CGFloat(model.suggestions.count)
-        let height = Self.baseHeight + (rows > 0 ? rows * (Self.suggestionRowHeight + 6) : 0)
+        let height = Self.baseHeight
+            + (rows > 0 ? rows * (Self.suggestionRowHeight + 6) : 0)
+            + (model.context != nil ? Self.contextHeight + 6 : 0)
         guard abs(frame.height - height) > 0.5 else { return }
         var f = frame
         f.origin.y = frame.maxY - height
@@ -187,6 +212,9 @@ final class TodoQuickAddController: NSPanel {
     func show() {
         todoStore?.loadIfNeeded()
         model.text = ""
+        model.context = UserDefaults.standard.bool(forKey: AppSettingsKeys.todoCaptureContext)
+            ? QuickAddContextService.capture(from: NSWorkspace.shared.frontmostApplication)
+            : nil
         fitToContent()
         centerOnScreen()
         makeKeyAndOrderFront(nil)
@@ -198,6 +226,7 @@ final class TodoQuickAddController: NSPanel {
         orderOut(nil)
         removeClickOutsideMonitor()
         model.text = ""
+        model.context = nil
     }
 
     // MARK: - Commit
@@ -221,7 +250,8 @@ final class TodoQuickAddController: NSPanel {
         todoStore?.addTask(
             text: result.title,
             projectName: result.projectName,
-            tags: result.tags)
+            tags: result.tags,
+            note: model.context)
         hide()
     }
 

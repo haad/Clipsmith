@@ -10,7 +10,12 @@ import Observation
 @Observable
 final class TodoStore {
 
-    private(set) var document: TaskPaperDocument = .empty
+    private(set) var document: TaskPaperDocument = .empty {
+        didSet { if document != oldValue { onDocumentChange?() } }
+    }
+    /// Called after every change (load, edit, external reload); the
+    /// reminder scheduler hangs off this.
+    @ObservationIgnored var onDocumentChange: (() -> Void)?
     private(set) var hasPendingChanges = false
     private(set) var fileURL: URL
     /// Last I/O error, surfaced as a non-blocking notice in the todo window.
@@ -180,27 +185,33 @@ final class TodoStore {
 
     // MARK: - Task CRUD
 
-    func addTask(text: String, projectName: String?, tags: [TodoTag] = []) {
+    /// `note` (captured selection, URL) goes in as indented note lines
+    /// under the task. `@due(fri)` and friends become ISO dates.
+    func addTask(text: String, projectName: String?, tags: [TodoTag] = [], note: String? = nil) {
         var line = text.hasPrefix("- ") ? text : "- " + text
         for tag in tags {
             line += tag.value.map { " @\(tag.name)(\($0))" } ?? " @\(tag.name)"
         }
-        let item = TodoItem(rawLine: line)
+        let item = TodoItem(rawLine: TodoNaturalDates.normalizingDue(in: line))
+        let nodes: [TodoNode] = [.task(item)] + Self.noteLines(note)
         let target = projectName ?? "Inbox"
         if let idx = document.projects.firstIndex(where: {
             $0.name.caseInsensitiveCompare(target) == .orderedSame
         }) {
-            document.projects[idx].nodes.append(.task(item))
+            document.projects[idx].nodes.append(contentsOf: nodes)
         } else if let projectName {
             // projectName == nil always matches the synthetic Inbox (index 0)
             // above, so reaching here implies projectName is non-nil.
             document.projects.append(TodoProject(
-                name: projectName, rawLine: "\(projectName):", nodes: [.task(item)]))
+                name: projectName, rawLine: "\(projectName):", nodes: nodes))
         }
         markDirty()
     }
 
+    /// Completing an `@every(...)` task appends the next occurrence right
+    /// after it, due date advanced from the old one (or from today).
     func toggleDone(id: UUID) {
+        let wasOpen = document.allTasks.first { $0.id == id }.map { !$0.isDone } ?? false
         mutateItem(id: id) { item in
             if item.isDone {
                 // Anchored to start-of-line/whitespace like
@@ -215,6 +226,37 @@ final class TodoStore {
                     id: item.id)
             }
         }
+        if wasOpen { appendNextOccurrence(of: id) }
+    }
+
+    private func appendNextOccurrence(of id: UUID) {
+        guard let p = document.projects.firstIndex(where: { $0.tasks.contains { $0.id == id } }),
+              let n = document.projects[p].nodes.firstIndex(where: { isTask($0, id: id) }),
+              case .task(let item) = document.projects[p].nodes[n],
+              let every = item.tag(named: "every")?.value,
+              let next = TodoNaturalDates.advance(item.dueDateString ?? TodoDates.dateString(), every: every)
+        else { return }
+        var line = item.rawLine.replacing(/(?:^|\s)@done(?:\([^()]*\))?/, with: "")
+        if item.dueDateString != nil {
+            line = line.replacing(/@due\([^()]*\)/, with: "@due(\(next))")
+        } else {
+            line += " @due(\(next))"
+        }
+        // Past the task's own note lines, so the copy doesn't adopt them.
+        var insertAt = n + 1
+        while insertAt < document.projects[p].nodes.count,
+              case .note(let text) = document.projects[p].nodes[insertAt],
+              text.hasPrefix(String(repeating: "\t", count: item.indentLevel + 1)) {
+            insertAt += 1
+        }
+        document.projects[p].nodes.insert(.task(TodoItem(rawLine: line)), at: insertAt)
+        markDirty()
+    }
+
+    static func noteLines(_ note: String?) -> [TodoNode] {
+        guard let note = note?.trimmingCharacters(in: .whitespacesAndNewlines), !note.isEmpty else { return [] }
+        return note.split(separator: "\n", omittingEmptySubsequences: true)
+            .map { .note("\t" + $0.trimmingCharacters(in: .whitespaces)) }
     }
 
     /// Blank text is a no-op: clearing the field must never wipe a task.
@@ -224,7 +266,7 @@ final class TodoStore {
         mutateItem(id: id) { item in
             let tabs = String(repeating: "\t", count: item.indentLevel)
             let body = text.hasPrefix("- ") ? text : "- " + text
-            return TodoItem(rawLine: tabs + body, id: item.id)
+            return TodoItem(rawLine: TodoNaturalDates.normalizingDue(in: tabs + body), id: item.id)
         }
     }
 

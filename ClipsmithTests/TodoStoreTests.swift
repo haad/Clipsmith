@@ -168,6 +168,44 @@ final class TodoStoreTests: XCTestCase {
         XCTAssertEqual(fileContent(of: store), "- read [[abc]]\n")
     }
 
+    // MARK: - Natural dates, repeats, notes
+
+    func testAddAndEditNormalizeNaturalDueDates() {
+        let store = makeStore()
+        store.addTask(text: "ship @due(tomorrow)", projectName: nil)
+        let tomorrow = TodoDates.dateString(from: Calendar.current.date(byAdding: .day, value: 1, to: .now)!)
+        XCTAssertEqual(store.document.allTasks[0].dueDateString, tomorrow)
+        store.editTask(id: store.document.allTasks[0].id, text: "ship @due(today)")
+        XCTAssertEqual(store.document.allTasks[0].dueDateString, TodoDates.dateString())
+    }
+
+    func testCompletingRepeatingTaskAddsNextOccurrence() {
+        let store = makeStore(initialContent: "Home:\n- water plants @every(week) @due(2026-11-09)\n\tnote\n- other\n")
+        store.toggleDone(id: store.document.allTasks[0].id)
+        let lines = store.document.projects[1].nodes.map { node -> String in
+            switch node { case .task(let t): t.rawLine; case .note(let n): n }
+        }
+        XCTAssertEqual(lines, [
+            "- water plants @every(week) @due(2026-11-09) @done(\(TodoDates.dateString()))",
+            "\tnote",
+            "- water plants @every(week) @due(2026-11-16)",
+            "- other",
+        ])
+    }
+
+    func testReopeningRepeatingTaskAddsNothing() {
+        let store = makeStore(initialContent: "- x @every(day) @due(2026-11-09) @done(2026-11-09)\n")
+        store.toggleDone(id: store.document.allTasks[0].id)
+        XCTAssertEqual(store.document.allTasks.count, 1)
+    }
+
+    func testAddTaskWithNoteWritesIndentedNoteLines() {
+        let store = makeStore()
+        store.addTask(text: "read this", projectName: nil, note: "https://x.dev\n\nquote ")
+        store.saveNow()
+        XCTAssertEqual(fileContent(of: store), "- read this\n\thttps://x.dev\n\tquote\n")
+    }
+
     func testAddRenameDeleteProject() {
         let store = makeStore(initialContent: "")
         store.addProject(name: "Alpha")

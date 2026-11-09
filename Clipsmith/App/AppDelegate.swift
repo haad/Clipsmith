@@ -54,6 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     // Phase 13 — Todo Tracking
     var todoStore: TodoStore!
     var todoQuickAddController: TodoQuickAddController!
+    var todoReminderScheduler: TodoReminderScheduler?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // CRITICAL: Both LSUIElement=YES and setActivationPolicy(.accessory) are
@@ -97,7 +98,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             AppSettingsKeys.commandPalettePrefix: "=",
             // Phase 13 — Todo Tracking feature flag + list preference
             AppSettingsKeys.todoTrackingEnabled: false,
-            AppSettingsKeys.todoShowCompleted: false
+            AppSettingsKeys.todoShowCompleted: false,
+            AppSettingsKeys.todoRemindersEnabled: true,
+            AppSettingsKeys.todoReminderMinutes: 9 * 60,
+            AppSettingsKeys.todoCaptureContext: true
         ])
 
         accessibilityMonitor.start()
@@ -207,6 +211,20 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         todoQuickAddController = TodoQuickAddController()
         todoQuickAddController.todoStore = todoStore
         todoQuickAddController.snippetStore = snippetStore
+
+        // Due-date reminders follow the todo file (not in hosted test runs).
+        if !DataFolder.isRunningTests {
+            let scheduler = TodoReminderScheduler(store: todoStore)
+            todoStore.onDocumentChange = { [weak scheduler] in scheduler?.reschedule() }
+            todoReminderScheduler = scheduler
+            scheduler.reschedule()
+        }
+        NotificationCenter.default.addObserver(
+            self,
+            selector: #selector(handleTodoRemindersChanged),
+            name: .clipsmithTodoRemindersChanged,
+            object: nil
+        )
 
         // Re-point TodoStore when Settings changes the todo file path.
         NotificationCenter.default.addObserver(
@@ -480,6 +498,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     /// file, then load the new one.
     @objc private func handleTodoFilePathChanged() {
         todoStore?.updateFileURL(TodoStore.resolveFileURL())
+    }
+
+    @objc private func handleTodoRemindersChanged() {
+        if UserDefaults.standard.bool(forKey: AppSettingsKeys.todoTrackingEnabled) {
+            todoStore?.loadIfNeeded()
+        }
+        todoReminderScheduler?.reschedule()
     }
 
     /// Settings changed the data folder: both stores switch (files are not moved).

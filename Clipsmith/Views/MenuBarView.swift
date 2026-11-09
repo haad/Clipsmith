@@ -18,6 +18,7 @@ extension Notification.Name {
     /// AppDelegate observes it and re-points TodoStore at the new file.
     static let clipsmithTodoFilePathChanged = Notification.Name("clipsmithTodoFilePathChanged")
     static let clipsmithDataFolderChanged = Notification.Name("clipsmithDataFolderChanged")
+    static let clipsmithTodoRemindersChanged = Notification.Name("clipsmithTodoRemindersChanged")
 }
 
 struct MenuBarView: View {
